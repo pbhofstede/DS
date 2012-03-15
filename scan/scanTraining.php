@@ -604,8 +604,8 @@ try {
 			}
 		}
 		myLog($log, "Einde controle 200 spelers zonder coach");
-		/*
-		if ($aantalScanned < 200) {
+		
+		if ($a >= 9) {
 			$datum = strtotime("-6 days", time());
 			
 			myLog($log, "Start coachHTlogin");
@@ -649,7 +649,7 @@ try {
 		}	
 		
 		CoachDB::setTrainingRunning(FALSE);
-		*/
+
 		$a = $a + 1;
 		header("Location: ".$config['url'].'/scanTraining.php?a='.$a);
 		
