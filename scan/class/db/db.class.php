@@ -8,9 +8,6 @@ class DB {
 	private function __construct() {
 		try {
 			self::$conn = new PDO("mysql:host=localhost;dbname=nh5_sql", "nh5_kepas", "dswachtwoord");
-			//self::$conn = new PDO("mysql:host=localhost;dbname=nh5_sql", "nh5", "andoorn4");
-			
-			//self::$conn = new PDO("mysql:host=localhost;dbname=nh5_sql", "root", "sunsation");
 			return self::$conn;
 		} catch (PDOException $e) {
 			print("Error connection to database: ".$e->getMessage());
