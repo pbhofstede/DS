@@ -1,0 +1,280 @@
+* {
+	margin: 0px;
+	padding: 0px;
+
+	font-size: 12px;
+	font-family: "arial";
+}
+
+body {
+	background-image: url(images/background.png);
+	background-color: orange;
+}
+
+/*Pagina op  zich*/
+.banner {
+	position: relative;
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
+}
+
+.container {
+	position: relative;
+	
+	width: 1000px;
+	margin-left: -550px;
+	left: 50%;
+	
+	height: auto;
+	
+	margin-top: 30px;
+
+	background-color: white;
+	
+	border: 1px solid black;
+	
+	
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.login {
+	position: relative;
+	
+	width: 300px;
+	margin-left: -150px;
+	left: 50%;
+	
+	height: auto;
+}
+
+.content {
+	position: relative;	
+	padding: 20px;
+}
+
+.menu {
+	width: 980px;
+	height: 15px;
+	
+	padding: 10px;
+
+	background-color: black;
+	border-bottom: 1px solid #CCCCCC;
+	color: white;
+	
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+
+	-webkit-border-radius-topleft: 5px;
+	-webkit-border-radius-topright: 5px;
+	
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.menu a {
+	color: white;
+	text-decoration: bold;
+	font-size: 14px;
+}
+
+.submenu {
+	width: 980px;
+	padding: 5px 10px 5px 10px;
+	
+	background-color: #999999;
+
+	font-size: 13;
+
+}
+
+.submenu .menuItem {
+	border-right: 1px solid #CCCCCC;
+	padding: 3px 10px 3px 10px;
+}
+
+.submenu .menuItemFirst {
+	border-right: 1px solid #CCCCCC;
+	padding: 3px 10px 3px 0px;
+}
+
+.submenu .menuItemLast {
+	padding: 3px 0px 3px 10px;
+}
+
+.submenu a {
+	color: white;
+	text-decoration: bold;
+	font-size: 13px;
+}
+
+.chpp {
+	position: absolute;
+	
+	left: 0;
+	top: 0;
+	
+	padding: 20px;
+	
+	background-color: white;
+	text-align: center;
+	
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+/*Tags*/
+h1, h2, h3, h4, h5, h6 {
+	font-weight: normal;
+}
+h1 {
+	font-size: 16px;
+	font-weight: bold;
+	padding:0; 
+	margin:5px 0 5px 0; 	
+	color: red;
+}
+
+h2 {
+	font-size: 15px;
+	font-weight: bold;
+	padding:0; 
+	margin:5px 0 5px 0; 
+	color: #EE6600;
+}
+
+h3 {
+	font-size: 15px;
+	font-weight: bold;
+	padding:0; 
+	margin:5px 0 5px 0; 
+} 
+
+
+h4 {
+	font-weight: bold;
+	text-decoration: underline;	
+}
+
+h5 {
+	font-weight: bold;
+}
+
+h6 {
+	text-decoration: underline;	
+}
+
+a {
+	color: #EE6600;
+	text-decoration: none;
+}
+
+/*Images*/
+img {
+	border: 0px;
+}
+
+/*Form*/
+form {
+	margin: 0px;
+}
+
+form .error {
+	color: red;
+}
+
+form p {
+	margin: 0px;
+	margin-bottom: 3px;
+}
+
+form label {
+	float: left;
+	
+	width: 150px;
+	margin-right: 20px;
+/*	
+	position: relative;
+*/	
+	font-weight: bold;
+	text-align: right;
+
+}
+
+
+.error {
+	color: red;
+}
+
+
+/* Table*/
+table {
+	margin: 10px;
+	border-collapse: collapse;
+	cursor: default;
+}
+
+table tr td {
+	border-bottom: solid 1px orange;
+}
+
+table th {
+	padding: 3px;
+	background-color: black;
+	color: orange;
+	font-weight: bold;
+	font-size: 13px;
+	text-align: left;
+}
+
+table th:hover {
+	background-color: black;
+	cursor: default;
+}
+
+table tr.niveau1 td, td.niveau1 {
+	background-color: #999999;
+	border-bottom: solid 1px #EE6600;
+	font-weight: bold;
+}
+
+table tr.niveau2 td, td.niveau2 {
+	background-color: #CCCCCC;
+	border-bottom: solid 1px #EE6600;
+	font-weight: bold;
+}
+
+table tr.none td, td.none {
+	border-bottom: none;
+}
+
+table.list tr:hover {
+	background: #FFFFFF;
+	color: #000000;
+	cursor: pointer;
+}
+
+table.list tr.niveau1:hover, table.list tr.niveau2:hover {
+	background: inherit;
+	color: inherit;
+	cursor: inherit;
+}
+
+
+/*
+Lists
+*/
+
+
+ul {
+	padding-left: 30px;
+}
+
+ol {
+	padding-left: 30px;
+}
+
+/*Rest*

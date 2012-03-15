@@ -1,0 +1,7 @@
+RewriteEngine on
+
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/$ $1.php?a=$2&b=$3&c=$4&d=$5
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/([^/]+)/$ $1.php?a=$2&b=$3&c=$4
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/$ $1.php?a=$2&b=$3
+RewriteRule ^([^/]+)/([^/]+)/$ $1.php?a=$2
+RewriteRule ^([^/]+)/$ $1.php

@@ -1,0 +1,117 @@
+* {
+	font-size: 13px;
+	margin: 0px;
+	padding: 0px;
+}
+
+body {
+	font-family: "arial";
+	background-image: url(images/background.png);
+}
+
+.banner {
+	position: relative;
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
+}
+
+.container {
+	position: relative;
+	
+	width: 600px;
+	margin-left: -300px;
+	left: 50%;
+	
+	height: auto;
+	
+	margin-top: 30px;
+
+	background-color: #e6e6e6;
+	
+	border: 1px solid black;
+	
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.login {
+	position: relative;
+	
+	width: 300px;
+	margin-left: -150px;
+	left: 50%;
+	
+	height: auto;
+}
+
+.content {
+	position: relative;	
+	padding: 20px;
+}
+
+.language {
+	padding: 3px;
+}
+
+.chpp {
+	position: absolute;
+	
+	left: 0;
+	top: 0;
+	
+	padding: 20px;
+	
+	background-color: white;
+	text-align: center;
+	
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+.cup {
+	position: absolute;
+	
+	right: 0;
+	top: 0;
+	
+	padding: 20px;
+	
+	text-align: center;
+}
+
+a {
+	color: black;
+	text-decoration: none;
+	font-style: italic;
+}
+
+img {
+	border: 0px;
+}
+
+form {
+	margin: 0px;
+}
+form p {
+	margin: 0px;
+	margin-bottom: 3px;
+}
+form label {
+	float: left;
+	
+	width: 200px;
+	margin-right: 30px;
+	
+	position: relative;
+	
+	font-weight: bold;
+	text-align: right;
+}
+
+form input, textarea {
+	background-color: #FFFFFF;
+	color: #000000;
+	
+	border: 1px solid #000000;
+}
