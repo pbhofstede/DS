@@ -28,12 +28,13 @@ if ($scouting != NULL) {
 				echo '<P align="right">Ook spelers uit andere scoutlichtingen laten zien die voldoen aan deze index  ';
 				if (!empty($_GET['c'])) {
 					$allPlayers = TRUE;
-					echo '<input align="right" type="checkbox" CHECKED onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'\'">';
+					echo '<input align="right" type="checkbox" CHECKED onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'\'"><BR>';
 				}
 				else {
 					$allPlayers = FALSE;
-					echo '<input align="right" type="checkbox" onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'/\'">';
+					echo '<input align="right" type="checkbox" onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'/\'"><BR>';
 				}
+				echo '<a href="'.$config['url'].'/scoutingpaste.php?a='.$_GET['a'].'" target="_blank">Copy naar forum</a>';
 				echo "</P>";
 			}
 		}

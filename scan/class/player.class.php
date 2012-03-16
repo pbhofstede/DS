@@ -497,7 +497,7 @@ class Player {
 			return 'CD';
 		}
 		else if ($vMax == $this->getIndexWB()) {
-			return 'WB ';
+			return 'WB';
 		}
 		else if ($vMax == $this->getIndexIM()) {
 			return 'IM';
@@ -513,6 +513,36 @@ class Player {
 		}
 		else if ($vMax == $this->getIndexSP()) {
 			return 'SP';
+		}
+	}
+	
+	public function getIndexByName($indexName) {
+		if ($indexName == 'GK') {
+			return $this->getIndexGK();
+		}
+		else if ($indexName == 'DEF') {
+			return $this->getIndexDEF();
+		}
+		else if ($indexName == 'CD') {
+			return $this->getIndexCD();
+		}
+		else if ($indexName == 'WB') {
+			return $this->getIndexWB();
+		}
+		else if ($indexName == 'IM') {
+			return $this->getIndexIM();
+		}
+		else if ($indexName == 'WG') {
+			return $this->getIndexWG();
+		}
+		else if ($indexName == 'SC') {
+			return $this->getIndexSC();
+		}
+		else if ($indexName == 'DFW') {
+			return $this->getIndexDFW();
+		}
+		else if ($indexName == 'SP') {
+			return $this->getIndexSP();
 		}
 	}
 	
