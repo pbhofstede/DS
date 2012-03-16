@@ -139,7 +139,7 @@ try {
 			PlayerDB::clearsundayTraining();
 			myLog($log, "done");
 		}
-		$coaches = CoachDB::getUsersToScan(date("Y-m-d", $thisTrainingdate));
+		$coaches = CoachDB::getUsersToScan(date("Y-m-d", $thisTrainingdate), $a);
 		myLog($log, "Start");
 		myLog($log, "Coaches: ".count($coaches));
 		$aantalScanned = count($coaches);
@@ -153,8 +153,7 @@ try {
 				try {
 					$coach = $coaches[$count];
 					
-					if (($coach->getHTuserToken() <> '') &&
-					    ($coach->getId() % 10 == $a)) {					
+					if ($coach->getHTuserToken() <> '') {					
 						$HT->setOauthToken($coach->getHTuserToken());
 						$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 						
@@ -453,6 +452,9 @@ try {
 						catch(HTError $e) {
 							myLog($log, "Error: ".$e);
 						}
+					}
+					else {
+						myLog($log, $coach->getTeamname().'('.$coach->getId().') GEEN HTuserToken!');
 					}
 				}
 				catch(HTError $e) {
