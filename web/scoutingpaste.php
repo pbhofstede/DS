@@ -83,21 +83,108 @@ if($scouting != NULL) {
 					$vIndexStr = 'SP';
 				}		
 				 
-				echo '[table][tr][th]naam[/th][th]age[/th][th]kp[/th][th]def[/th][th]pm[/th][th]psn[/th][th]sco[/th][th]wing[/th][th]sh[/th][th]index '.$vIndexStr.'[/th][th]spec[/th][/tr]<BR>';
+				echo '[table][tr][th]naam[/th][th]age[/th]';
+				if ($vIndexStr == 'GK') {
+					echo '[th]kp[/th]';
+				}
+				if (($vIndexStr == 'GK') ||
+				    ($vIndexStr == 'DEF') ||
+						($vIndexStr == 'CD') ||
+						($vIndexStr == 'WB') ||
+						($vIndexStr == 'IM') ||
+						($vIndexStr == 'WG') ||
+						($vIndexStr == 'SP')) {
+					echo '[th]def[/th]';
+				}
+				if (($vIndexStr == 'DEF') ||
+						($vIndexStr == 'CD') ||
+						($vIndexStr == 'WB') ||
+						($vIndexStr == 'IM') ||
+						($vIndexStr == 'WG') ||
+						($vIndexStr == 'DFW') ||
+						($vIndexStr == 'SP')) {
+					echo '[th]pm[/th]';
+				}
+				if (($vIndexStr == 'GK') ||
+				    ($vIndexStr == 'DEF') ||
+						($vIndexStr == 'CD') ||
+						($vIndexStr == 'WB') ||
+						($vIndexStr == 'IM') ||
+						($vIndexStr == 'WG') ||
+						($vIndexStr == 'SC') ||
+						($vIndexStr == 'DFW') ||
+						($vIndexStr == 'SP')) {
+					echo '[th]psn[/th]';
+				}
+				if (($vIndexStr == 'WG') ||
+						($vIndexStr == 'SC') ||
+						($vIndexStr == 'DFW')) {
+					echo '[th]sco[/th]';
+				}
+				if (($vIndexStr == 'WB') ||
+						($vIndexStr == 'WG') ||
+						($vIndexStr == 'SC') ||
+						($vIndexStr == 'DFW')) {
+					echo '[th]wing[/th]';
+				}	
+				if (($vIndexStr == 'GK') ||
+						($vIndexStr == 'SP')) {
+					echo '[th]sh[/th]';
+				}
+				echo '[th]index '.$vIndexStr.'[/th][th]spec[/th][/tr]<BR>';
 
 				foreach($playerList AS $player) {
 					if ($player->getscoutid() == $scout->getId()) {
 						echo '[tr]';
 						echo '[td]'.$player->getName().'[/td]';
 						echo '[td]'.$player->getLeeftijdStr().'[/td]';
-						echo '[td]'.$player->getKeeper().'[/td]';
-						echo '[td]'.$player->getDefender().'[/td]';
-						echo '[td]'.$player->getPlaymaker().'[/td]';
-						echo '[td]'.$player->getPassing().'[/td]';
-						echo '[td]'.$player->getScorer().'[/td]';
-						echo '[td]'.$player->getWinger().'[/td]';
-						echo '[td]'.$player->getSetPieces().'[/td]';
-						
+						if ($vIndexStr == 'GK') {
+							echo '[td]'.$player->getKeeper().'[/td]';
+						}
+						if (($vIndexStr == 'GK') ||
+				        ($vIndexStr == 'DEF') ||
+								($vIndexStr == 'CD') ||
+								($vIndexStr == 'WB') ||
+								($vIndexStr == 'IM') ||
+								($vIndexStr == 'WG') ||
+								($vIndexStr == 'SP')) {
+							echo '[td]'.$player->getDefender().'[/td]';
+						}
+						if (($vIndexStr == 'DEF') ||
+								($vIndexStr == 'CD') ||
+								($vIndexStr == 'WB') ||
+								($vIndexStr == 'IM') ||
+								($vIndexStr == 'WG') ||
+								($vIndexStr == 'DFW') ||
+								($vIndexStr == 'SP')) {
+							echo '[td]'.$player->getPlaymaker().'[/td]';
+						}
+						if (($vIndexStr == 'GK') ||
+								($vIndexStr == 'DEF') ||
+								($vIndexStr == 'CD') ||
+								($vIndexStr == 'WB') ||
+								($vIndexStr == 'IM') ||
+								($vIndexStr == 'WG') ||
+								($vIndexStr == 'SC') ||
+								($vIndexStr == 'DFW') ||
+								($vIndexStr == 'SP')) {
+							echo '[td]'.$player->getPassing().'[/td]';
+						}
+						if (($vIndexStr == 'WG') ||
+								($vIndexStr == 'SC') ||
+								($vIndexStr == 'DFW')) {
+							echo '[td]'.$player->getScorer().'[/td]';
+						}
+						if (($vIndexStr == 'WB') ||
+								($vIndexStr == 'WG') ||
+								($vIndexStr == 'SC') ||
+								($vIndexStr == 'DFW')) {
+							echo '[td]'.$player->getWinger().'[/td]';
+						}
+						if (($vIndexStr == 'GK') ||
+								($vIndexStr == 'SP')) {
+							echo '[td]'.$player->getSetPieces().'[/td]';
+						}
 						if ($player->getBestIndexName() == $vIndexStr) {
 							echo '[td]'.$player->getBestIndex().'[/td]';
 						}

@@ -211,9 +211,8 @@ if (($user != NULL) &&
 	echo '<label>&nbsp;</label>';
 	echo '<input type="submit" name="submit" value="Zoek!" />';
 	echo '</p>';
-	echo '</form>';
 //Als gezocht
-	if(isset($_POST['submit'])) {
+	if ((isset($_POST['submit'])) || isset($_POST['orderby'])){
 		echo '<h2>Resultaat</h2>';
 		if(!empty($_POST['playerId']) && !ctype_digit(trim($_POST['playerId']))) {
 			echo '<script type="text/javascript">';
@@ -367,7 +366,6 @@ if (($user != NULL) &&
 		
 			$vIndexStr = '';
 			$vFoundIndex = -400;
-			$orderBY = '';
 			
 			if (isset($_POST['indexGK']) && ($_POST['indexGK'] <> '') && ($_POST['indexGK'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index GK';
@@ -416,7 +414,16 @@ if (($user != NULL) &&
 			} else {
 			  $vIndexStr = 'Index';
 				$vFoundIndex = '';
-				$orderBY = 'indexGK';
+				$orderBY = 'dateOfBirth';
+			}
+			
+			if (isset($_POST['orderby'])) {
+				if ($_POST['orderby'] == 'Leeftijd') {
+					$orderBY = 'dateOfBirth';
+				}
+				else if ($_POST['orderby'] == 'Index') {
+					
+				}
 			}
 
 			if(!empty($_POST['playerName'])) {
@@ -432,7 +439,7 @@ if (($user != NULL) &&
 			}
 			
 			if($results != NULL) {
-				$resultaatAantal = 0;				
+				$resultaatAantal = 0;			
 				
 				echo '<table width="100%" class="list">';
 				echo '<tr>';
@@ -454,9 +461,9 @@ if (($user != NULL) &&
 						echo '<td>Sc</td>';
 						echo '<td>Sp</td>';
 						echo '<td>&nbsp;</td>';
-						echo '<td>Leeftijd</td>';
+						echo '<td><input type="submit" name="orderby" value="Leeftijd" style="background:none;border:0;color:#000000;font-weight:bold"></td>';
 						echo '<td>U20</td>';
-						echo '<td>'.$vIndexStr.'</td>';
+						echo '<td><input type="submit" name="orderby" value="Index" style="background:none;border:0;color:#000000;font-weight:bold"></td>';
 						echo '<td>Update</td>';
 					echo '</tr>';
 					foreach($results AS $player) {
@@ -529,6 +536,8 @@ if (($user != NULL) &&
 			}
 		}
 	}
+	
+	echo '</form>';
 } else {
 	redirect($config['url'].'/', 0);
 }
