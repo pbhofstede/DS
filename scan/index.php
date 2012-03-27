@@ -89,7 +89,7 @@ include('config.php');
 							<label>&nbsp;</label>
 							<input type="button" value="<?php echo $language['scan']; ?>" onClick="goScan()"/>
 						</p>
-						<div class="contect"><a href="<?php echo $config['url']; ?>/loginHT.php"><u><?php echo $language['new'];?></u></a></div>
+						<div class="content"><a href="<?php echo $config['url']; ?>/loginHT.php"><u><?php echo $language['new'];?></u></a></div>
 					</form>
 				</span>
 				<div align="right"><a href="<?php echo $config['urlweb']?>"><?php echo $language['toFullVersion']; ?></a></div>

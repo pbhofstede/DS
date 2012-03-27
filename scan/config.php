@@ -66,7 +66,7 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['reg_intro']  =  'Bedankt voor het toegang verlenen van DutchScouts om uw spelersinformatie uit te lezen.<br/><br/>Voer hieronder uw zelf gekozen inlognaam en wachtwoord in om voortaan mee in te loggen op de DutchScouts-website om de scouts eventueel met extra informatie te voorzien.<br /><br />';
 	$language['toFullVersion']	=	'Naar uitgebreide pagina';
 	
-	$language['incorrectAccount']	=	'Logingegevens incorrect';
+	$language['incorrectAccount']	=	'Logingegevens voor DutchScouts incorrect';
 	$language['noHTPermission']	=	'<FONT COLOR=FF0000>DutchScouts heeft geen toegang meer tot uw spelersgegevens.</FONT><BR>Ga naar <u><a href=http://www.dutchscouts.nl/scan/loginHT.php>http://www.dutchscouts.nl</a></u> om DutchScouts opnieuw toegang te geven tot uw spelers.<br>';
 	
 	$language['name']		=	'Inlognaam';
@@ -77,7 +77,6 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['differentPasswords'] = '*  Voer twee maal hetzelfde wachtwoord in.';
 	$language['coachNameExists'] = '*  Uw gekozen gebruikersnaam bestaat reeds, kies een andere gebruikersnaam.';
 	$language['register']	=   'Registreren';
-	$language['securitycode']	=	'Security code';
 	$language['scan']		=	'Scannen';
 	$language['login']		=	'Login';
 	$language['new']		=   'Nieuwe gebruiker of wachtwoord vergeten';
@@ -109,11 +108,11 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['assistenten'] = 'Aantal assistenten';
 
 } elseif($_SESSION['language'] == 'US') {
-	$language['intro']		=	"Please fill in your name and security code to upload the current state of your dutch players for the U20 and NT. Please keep in mind that all players will be saved and that the shown players are just an overview of the scanned players in your team. If there is a candidate among them, you will be contacted by a scout.<br/><br/>If you don't have an account on DutchScouts, you need to register once and give DutchScouts access to your teamdata. Do so by clicking on the link 'New user or password forgotten'.</br></br><strong>Update:</br>You don't have to update your players after training. DutchScouts updates your players automatically as long as you don't revoke the DutchScouts CHPP-license.</strong><br/><br/><br/>";
+	$language['intro']		=	"Please fill in your DutchScouts username and password to login and upload the current state of your Dutch players for the U20 and NT. Please keep in mind that all players will be saved and that the shown players are just an overview of the scanned players in your team. If there is a candidate among them, you will be contacted by a scout.<br/><br/>If you don't have an account on DutchScouts, you need to register once and give DutchScouts access to your teamdata. Do so by clicking on the link 'New user or password forgotten'.</br></br><strong>Update:</br>You don't have to update your players after training. DutchScouts updates your players automatically as long as you don't revoke the DutchScouts CHPP-license.</strong><br/><br/><br/>";
 	$language['reg_intro']  =  'Thank you for giving DutchScouts access to read your playerstats.<br/><br/>If you want to give the scouts additional information, please fill in your name and password to logon to the DutchScouts-website.<br/><br/>';
 	$language['toFullVersion']	=	'To full version';
 	
-	$language['incorrectAccount']	=	'Incorrent login name or securitycode';
+	$language['incorrectAccount']	=	'Incorrect DutchScouts username or password';
 	$language['noHTPermission']	=	"<FONT COLOR=FF0000>DutchScouts hasn't got permission te read yours players anymore.</FONT><BR>Please go to <u><a href=http://www.dutchscouts.nl/scan/loginHT.php>http://www.dutchscouts.nl</a></u> to give DutchScouts access to your players.<br>";
 	
 	$language['name']		=	'Login name';
@@ -124,7 +123,6 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['differentPasswords'] = '*  Please type the same password twice.';
 	$language['coachNameExists'] = '*  The username entered is an existing username. Please choose a different username.';
 	$language['register']	=   'Register';
-	$language['securitycode']	=	'Security code';
 	$language['scan']		=	'Scan';
 	$language['login']		=	'Login';
 	$language['new']		=   'New user or password forgotten';

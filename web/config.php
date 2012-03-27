@@ -115,10 +115,7 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['intro']		=	'Vul hieronder je gegevens in om je spelers te uploaden voor het U20 en NT. Bedenkt dat alle spelers opgeslagen worden en dat feit dat een speler na scannen getoont wordt het niet betekend dat deze een kans maakt in het U20 of NT. Mocht dit het geval zijn dan zal een scout je hiervan op de hoogte brengen.<br /><br />Update je spelers aub ook elke week of tenminste na elke pop.<br /><br /><br />';
 	$language['toFullVersion']	=	'Naar uitgebreide pagina';
 	
-	$language['incorrectAccount']	=	'Logingegevens incorrect';
-	
 	$language['name']		=	'Naam';
-	$language['securitycode']	=	'Security code';
 	$language['scan']		=	'Scannen';
 	
 	$language['ID']			=	'ID';
@@ -131,13 +128,10 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$specs_long = array("&nbsp;", "Technisch", "Snel", "Krachtig", "Onvoorspelbaar", "Koppen", "Snel herstel");
 
 } elseif($_SESSION['language'] == 'US') {
-	$language['intro']		=	'Please fill in your name and security code to upload the current state of your dutch players for the U20 and NT. Please keep in mind that all players will be saved and that the shown players are just an overview of the scanned players in your team. If there is a candidate among them, you will be contacted by a scout.<br /><br />Please scan your players every week or at least when they pop.<br /><br /><br />';
+	$language['intro']		=	'Please fill in your DutchScouts username and password to login and upload the current state of your Dutch players for the U20 and NT. Please keep in mind that all players will be saved and that the shown players are just an overview of the scanned players in your team. If there is a candidate among them, you will be contacted by a scout.<br /><br />Please scan your players every week or at least when they pop.<br /><br /><br />';
 	$language['toFullVersion']	=	'To full version';
 	
-	$language['incorrectAccount']	=	'Incorrent login name or securitycode';
-	
 	$language['name']		=	'Login name';
-	$language['securitycode']	=	'Security code';
 	$language['scan']		=	'Scan';
 	
 	$language['ID']			=	'ID';

@@ -35,7 +35,7 @@ if(isset($_POST['submit'])) {
 		}
 		else 
 		{
-			$error = '<span class="error">Geen toegang tot DutchScouts! Maak een nieuwe account aan op de hoofdpagina.</span>';
+			$error = '<span class="error">Geen toegang tot DutchScouts, voer uw juiste gebruikersnaam en wachtwoord in of maak een nieuwe account aan op de hoofdpagina.</span>';
 		}
 	}
 	else 
@@ -46,18 +46,19 @@ if(isset($_POST['submit'])) {
 
 if(empty($_POST['submit']) || $error != NULL) {
 	echo '<form action="" method="POST" name="inlogForm">';
-		echo '<p>';
-			echo '<label>Gebruikersnaam</label>';
-			echo '<input type="text" name="name" onfocus="formInUse = true;"/> '.$error;
-		echo '</p>';
-		echo '<p>';
-			echo '<label>Wachtwoord</label>';
-			echo '<input type="password" name="securitycode" onfocus="formInUse = true;"/>  Geef het wachtwoord om in DutchScouts in te kunnen loggen (geen Hattrick veiligheidscode).';
-		echo '</p>';
-		echo '<p>';
-			echo '<label>&nbsp;</label>';
-			echo '<input type="submit" name="submit" value="Inloggen" />';
-		echo '</p>';
+	echo '<p>';
+	echo '<label>Gebruikersnaam</label>';
+	echo '<input type="text" name="name" onfocus="formInUse = true;"/> ';
+	echo '</p>';
+	echo '<p>';
+	echo '<label>Wachtwoord</label>';
+	echo '<input type="password" name="securitycode" onfocus="formInUse = true;"/>  Geef het wachtwoord om in DutchScouts in te kunnen loggen (geen Hattrick veiligheidscode).';
+	echo '</p>';
+	echo '<p>';
+	echo '<label>&nbsp;</label>';
+	echo '<input type="submit" name="submit" value="Inloggen" /><BR><BR>';
+	echo $error;
+	echo '</p>';
 	echo '</form>';
 }
 include ('footer.php');

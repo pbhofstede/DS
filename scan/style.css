@@ -54,6 +54,10 @@ body {
 	padding: 3px;
 }
 
+.error {
+	color: red;
+}
+
 .chpp {
 	position: absolute;
 	

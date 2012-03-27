@@ -175,10 +175,14 @@ try {
 		}
 		else {
 			//kan niet met CHPP inloggen
-			echo $language['noHTPermission'];
+			echo '<span class="error">'.$language['noHTPermission'].'</span><BR><BR>';
+			
+			echo '<a href="'.$config['url'].'/loginHT.php"><u>'.$language['new'].'</u></a>';
 		}
 	} else {
-		echo $language['incorrectAccount'];
+		echo '<span class="error">'.$language['incorrectAccount'].'</span><BR><BR>';
+		
+		echo '<a href="'.$config['url'].'/loginHT.php"><u>'.$language['new'].'</u></a>';
 	}
 } catch(HTError $e) {
 	echo $e;
