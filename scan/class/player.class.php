@@ -225,7 +225,7 @@ class Player {
 			}
 			else
 			{
-				$this->scorerSubSkill = $scorer;
+				$this->scorerSubSkill = $scorer - 2;
 			}
 			$this->scorer	=	$scorer;
 		}
@@ -238,7 +238,15 @@ class Player {
 			}
 			else
 			{
-				$this->setPiecesSubSkill = $setPieces / 2;
+				if ($setPieces >= 18) {
+					$this->setPiecesSubSkill = 3;
+				}
+				else if ($setPieces >= 14) {
+					$this->setPiecesSubSkill = 2;
+				}
+				else {
+					$this->setPiecesSubSkill = 1;
+				}
 			}
 			$this->setPieces = $setPieces;
 		}
