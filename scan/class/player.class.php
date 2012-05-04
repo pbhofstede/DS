@@ -1035,10 +1035,14 @@ class Player {
 			}
 			
 			if ($this->getScorer() > 8) {
-			  $index = $index + (($this->getScorer() - 8) * 2);
+			  $index = $index + (($this->getScorer() - 8) * 3);
 			}
 			else {
 			  $index = $index + $this->getScorerSubSkill();
+			}
+			
+			if ($this->getWinger() > 4) {
+			  $index = $index + ($this->getWinger() - 4);
 			}
 			
 			$this->setIndexDFW($index	+ 

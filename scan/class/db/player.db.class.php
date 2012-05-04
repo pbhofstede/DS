@@ -52,10 +52,10 @@ class PlayerDB extends DB {
 		return $list;
 	}
 	
-	public static function getAllPlayers($idStartsWith) {	
+	public static function getAllPlayers($idEndsWith) {	
 		global $const_player_sql;
 		$prepare		=	parent::getConn()->prepare(
-			$const_player_sql."WHERE player.ID like '".$idStartsWith."%'");
+			$const_player_sql."WHERE player.ID like '%".$idEndsWith."'");
 		$prepare->execute();
 		
 		$list = null;
