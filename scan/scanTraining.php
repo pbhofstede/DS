@@ -255,7 +255,26 @@ try {
 												$vPosition = 0;
 												
 												if ($startingLineup != NULL) {
-													$walkover = $startingLineup->getPlayersNumber() < 9;
+													$aantalOpgesteldeSpelers = $startingLineup->getPlayersNumber();
+
+													$walkover = ($aantalOpgesteldeSpelers < 9);
+													
+													if (! $walkover) {
+														$aantalOpgesteldeSpelers = 0;
+														
+													  for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
+															$vLineupPlayer = $startingLineup->getPlayer($vLineUpindex);
+															
+															if ($vLineupPlayer != NULL) {
+																if (($vLineupPlayer->getRole() <> 17) &&
+																		($vLineupPlayer->getRole() <> 18)) {
+																	$aantalOpgesteldeSpelers = $aantalOpgesteldeSpelers + 1;
+																}
+															}
+														}
+														
+														$walkover = ($aantalOpgesteldeSpelers < 9);
+													}
 													
 													if (! $walkover) {
 														for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
