@@ -57,31 +57,71 @@ if($scouting != NULL) {
 				
 				if ($vMax == $vIndexGK) {
 					$vIndexStr = 'GK';
+					
+					$vMax2 = max($vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexDEF) {
 					$vIndexStr = 'DEF';
+					
+					$vMax2 = max($vIndexGK, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexCD) {
 					$vIndexStr = 'CD';
+					
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexWB) {
 					$vIndexStr = 'WB';
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexIM) {
 					$vIndexStr = 'IM';
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexWG) {
 					$vIndexStr = 'WG';
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexSC) {
 					$vIndexStr = 'SC';
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexDFW, $vIndexSP);
 				}
 				else if ($vMax == $vIndexDFW) {
 					$vIndexStr = 'DFW';
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexSP);
 				}
 				else if ($vMax == $vIndexSP) {
 					$vIndexStr = 'SP';
-				}		
+					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW);
+				}
+
+				if ($vMax2 == $vIndexGK) {
+					$vIndex2Str = 'GK';
+				}
+				else if ($vMax2 == $vIndexDEF) {
+					$vIndex2Str = 'DEF';
+				}
+				else if ($vMax2 == $vIndexCD) {
+					$vIndex2Str = 'CD';
+				}
+				else if ($vMax2 == $vIndexWB) {
+					$vIndex2Str = 'WB';
+				}
+				else if ($vMax2 == $vIndexIM) {
+					$vIndex2Str = 'IM';
+				}
+				else if ($vMax2 == $vIndexWG) {
+					$vIndex2Str = 'WG';
+				}
+				else if ($vMax2 == $vIndexSC) {
+					$vIndex2Str = 'SC';
+				}
+				else if ($vMax2 == $vIndexDFW) {
+					$vIndex2Str = 'DFW';
+				}
+				else if ($vMax2 == $vIndexSP) {
+					$vIndex2Str = 'SP';
+				}
 				 
 				echo '[table][tr][th]naam[/th][th]age[/th]';
 				if ($vIndexStr == 'GK') {
@@ -131,7 +171,7 @@ if($scouting != NULL) {
 						($vIndexStr == 'SP')) {
 					echo '[th]sh[/th]';
 				}
-				echo '[th]index '.$vIndexStr.'[/th][th]spec[/th][/tr]<BR>';
+				echo '[th]index '.$vIndexStr.'[/th][th]index '.$vIndex2Str.'[/th][th]spec[/th][/tr]<BR>';
 
 				foreach($playerList AS $player) {
 					if ($player->getscoutid() == $scout->getId()) {
@@ -197,6 +237,8 @@ if($scouting != NULL) {
 							  echo '[td]'.$player->getBestIndex().' ('.$player->getBestIndexName().')[/td]';
 							}
 						}
+						
+						echo '[td]'.$player->getIndexByName($vIndex2Str).'[/td]';
 						echo '[td]'.$specs[$player->getSpeciality()].'[/td]';
 						echo '[/tr]<BR>';
 					}
