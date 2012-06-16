@@ -459,6 +459,8 @@ try {
 							else {
 								$coach->setbot(-1);
 							}
+							
+							$coach->setTeamname($team->getTeamname());
 							CoachDB::updateCoach($coach);
 						
 							if (strlen($idlist) == 0) {

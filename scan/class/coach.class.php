@@ -93,6 +93,10 @@ class Coach {
 	public function getTeamname() {
 		return $this->teamname;
 	}
+	public function setTeamname($teamname) {
+		$this->teamname = $teamname;
+	}
+	
 	
 	public function setDSUserName($DSUserName) {
 		$this->DSUserName=$DSUserName;
