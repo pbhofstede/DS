@@ -4,8 +4,9 @@ include ('header.php');
 if ($user != Null) {
   
 	$scouting	=	$user->getScout();
-	
-	if ($scouting != Null) {
+	if (($scouting != NULL) or
+			($user->getRank() == 'administrator') or 
+			($user->getRank() == 'bc')) {
 		if (isset($_GET['NEW'])) {
 			$newPlayers = '<b>('.$_GET['NEW'].' nieuwe spelers)</b>';
 		}
