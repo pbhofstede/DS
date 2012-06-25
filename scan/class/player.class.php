@@ -845,7 +845,9 @@ class Player {
 				$this->getKeeper(), min($this->getDefender(), 7), 0,  0, 0, 0, min($this->getSetPieces(), 15));
 
 			if ($this->getDefender() > 7) {
-			  $index = $index + (($this->getDefender() - 7) * 2);
+			  $index = $index 
+								 + (($this->getDefender() - 7) * 2)
+								 + min($this->getDefenderSubSkill(), 2);
 			}
 			else {
 				$index = $index + $this->getDefenderSubSkill();
@@ -875,7 +877,9 @@ class Player {
 				0, $this->getDefender(), 0,  0, min($this->getPassing(), 10), 0, 0);
 			
 			if ($this->getPassing() > 10) {
-			  $index = $index + (($this->getPassing() - 10) * 2);
+			  $index = $index 
+								 + (($this->getPassing() - 10) * 2)
+								 + min($this->getPassingSubSkill(), 2);
 			}
 			else {
 				$index = $index + $this->getPassingSubSkill();
@@ -900,7 +904,9 @@ class Player {
 				0, $this->getDefender(), min($this->getPlaymaker(), 9),  0, 0, 0, 0);
 			
 			if ($this->getPlaymaker() > 9) {
-			  $index = $index + (($this->getPlaymaker() - 9) * 2);
+			  $index = $index 
+								 + (($this->getPlaymaker() - 9) * 2)
+								 + min($this->getPlaymakerSubSkill(), 2);
 			}
 			else {
 				$index = $index + $this->getPlaymakerSubSkill();
@@ -925,7 +931,9 @@ class Player {
 				0, $this->getDefender(), 0, min($this->getWinger(), 12), 0, 0, 0);
 			
 			if ($this->getWinger() > 12) {
-			  $index = $index + (($this->getWinger() - 12) * 2);
+			  $index = $index 
+								 + (($this->getWinger() - 12) * 2)
+								 + min($this->getWingerSubSkill(), 2);
 			}
 			else {
 				$index = $index + $this->getWingerSubSkill();
@@ -950,10 +958,11 @@ class Player {
 				0, 0, 7, 0, 0, 0, 0,
 				0, 0, $this->getPlaymaker(), 0, 0, 0, 0);
 				
-			$this->setIndexIM($index +
-				($this->getDefender() - 5) +
-				(($this->getPassing() - 5) * 2)+
-				$this->getPlaymakerSubSkill());
+			$this->setIndexIM($index 
+												+ ($this->getDefender() - 5)
+												+ (($this->getPassing() - 5) * 2)
+												+ min($this->getPassingSubSkill(), 2)
+												+ $this->getPlaymakerSubSkill());
 		}
 		else {
 			$this->setIndexIM(CalculateTrainingWeeks($aVergLeeftijdDagen, 
@@ -966,19 +975,30 @@ class Player {
 		//Winger
 		if ($this->getU20()) {
 			$index = CalculateTrainingWeeks($aVergLeeftijdDagen, 
-				0, 0, 6, 7, 0, 0, 0,
-				0, 0, min($this->getPlaymaker(), 11), $this->getWinger(), 0, 0, 0);
+				0, 0, 6, 7, 4, 0, 0,
+				0, 0, min($this->getPlaymaker(), 11), $this->getWinger(), min($this->getPassing(), 6), 0, 0);
 			
 			if ($this->getPlaymaker() > 11) {
-			  $index = $index + (($this->getPlaymaker() - 11) * 4);
+			  $index = $index 
+								 + (($this->getPlaymaker() - 11) * 4)
+								 + min($this->getPlaymakerSubSkill(), 4);
 			}
 			else {
 			  $index = $index + $this->getPlaymakerSubSkill();
 			}
 			
-			$this->setIndexWG($index +
-				($this->getPassing() - 5) +
-				$this->getWingerSubSkill());				
+			//3 weken per lvl passen boven redelijk
+			if ($this->getPassing() > 6) {
+			  $index = $index 
+								 + (($this->getPassing() - 6) * 3)
+								 + min($this->getPassingSubSkill(), 3);
+			}
+			else {
+			  $index = $index + $this->getPassingSubSkill();
+			}
+			
+			$this->setIndexWG($index 
+												+ $this->getWingerSubSkill());				
 		}
 		else {
 			$index = CalculateTrainingWeeks($aVergLeeftijdDagen, 
@@ -988,10 +1008,14 @@ class Player {
 				$this->getPlaymakerSubSkill() + $this->getWingerSubSkill() + $this->getPassingSubSkill();
 			
 			if ($this->getDefender() >= 3) {
-			  $index = $index + (($this->getDefender() - 3) * 2);
+			  $index = $index 
+								 + (($this->getDefender() - 3) * 2)
+								 + min($this->getDefenderSubSkill(), 2);
 			}
 			else {
-			  $index = $index + ($this->getDefender() - 3);
+			  $index = $index 
+								 - (3 - $this->getDefender())
+								 + min($this->getDefenderSubSkill(), 1);
 			}
 			$this->setIndexWG($index);
 		}
@@ -1003,7 +1027,9 @@ class Player {
 				0, 0, 0, 0, min($this->getPassing(), 9), $this->getScorer(), 0);
 			
 			if ($this->getPassing() > 9) {
-			  $index = $index + (($this->getPassing() - 9) * 3);
+			  $index = $index 
+								 + (($this->getPassing() - 9) * 3)
+								 + min($this->getPassingSubSkill(), 3);
 			}
 			else {
 			  $index = $index + $this->getPassingSubSkill();
@@ -1028,14 +1054,18 @@ class Player {
 				0, 0, $this->getPlaymaker(), 0, min($this->getPassing(), 12), min($this->getScorer(), 8), 0);
 			
 			if ($this->getPassing() > 12) {
-			  $index = $index + (($this->getPassing() - 12) * 2);
+			  $index = $index 
+								 + (($this->getPassing() - 12) * 2)
+								 + min($this->getPassingSubSkill(), 2);
 			}
 			else {
 			  $index = $index + $this->getPassingSubSkill();
 			}
 			
 			if ($this->getScorer() > 8) {
-			  $index = $index + (($this->getScorer() - 8) * 3);
+			  $index = $index 
+								 + (($this->getScorer() - 8) * 3)
+								 + min($this->getScorerSubSkill(), 3);
 			}
 			else {
 			  $index = $index + $this->getScorerSubSkill();
@@ -1044,6 +1074,7 @@ class Player {
 			if ($this->getWinger() > 4) {
 			  $index = $index + ($this->getWinger() - 4);
 			}
+			$index = $index + min($this->getWingerSubSkill(), 1);
 			
 			$this->setIndexDFW($index	+ 
 				$this->getPlaymakerSubSkill());
