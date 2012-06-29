@@ -449,8 +449,6 @@ class PlayerDB extends DB {
 		$prepare->bindParam(1, date("Y-m-d", strtotime("-200 days", time())), PDO::PARAM_STR);
 		$prepare->execute();
 		
-		$list = null;
-		
 		foreach($prepare->fetchAll() AS $row) {
 			if ($row['id'] % 10 == $a) {
 				$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 

@@ -517,7 +517,7 @@ try {
 	
 		myLog($log, "Eind");
 		
-		myLog($log, "Start controle 200 spelers zonder coach: ".$a);
+		myLog($log, "Start controle spelers zonder coach: ".$a);
 		$allPlayers = PlayerDB::getPlayerWithoutCoach($a);
 		if ($allPlayers != Null) {
 			$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
@@ -626,7 +626,7 @@ try {
 				$HT->clearTrainingStats();
 			}
 		}
-		myLog($log, "Einde controle 200 spelers zonder coach");
+		myLog($log, "Einde controle spelers zonder coach");
 		
 		if ($a >= 9) {
 			$datum = strtotime("-6 days", time());
