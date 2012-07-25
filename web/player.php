@@ -63,7 +63,7 @@ if (($user != NULL) &&
 		echo '<tr class="none">';
 				
 		$U20 = $player->getHasU20Age();
-		echo "<td width='15%' valign='top'>Speler ID:<BR>Naam:<BR>Eigenaar:<BR><BR>Conditie %:<BR>Type training:<BR>Training intensiteit:<BR>Vaardigheid trainer:<BR>Assistenten:<BR>Fysio's:<BR>Dokters:<BR><BR>";
+		echo "<td width='15%' valign='top'>Speler ID:<BR>Naam:<BR>Team ID:<BR>Team:<BR><BR>Conditie %:<BR>Type training:<BR>Training intensiteit:<BR>Vaardigheid trainer:<BR>Assistenten:<BR>Fysio's:<BR>Dokters:<BR><BR>";
 		echo 'Leeftijd:<BR>TSI:<BR>Salaris:<BR>Vorm:<BR>Conditie:<BR><BR>Specialiteit:';
 				
 		if ($player->getU20() <> '') {
@@ -78,10 +78,10 @@ if (($user != NULL) &&
 		$vCoach = $player->getCoach();
 		if($vCoach != NULL) {
 			if ($vCoach->getbot() == -1) {
-				echo 'BOT...<br /><br /><BR><br /><br /><BR><br /><br /><BR>';
+				echo 'BOT...<br /><BR><br /><BR><br /><br /><BR><br /><br /><BR>';
 			}
 			else {
-				echo ''.$vCoach->getTeamname().' ('.$vCoach->getTeamid().')<br /><br />';
+				echo $vCoach->getTeamid().'<BR>'.$vCoach->getTeamname().'<br/><br/>';
 							
 				echo ''.$vCoach->getconditieperc().'<BR>';
 				if ($vCoach->gettrainingtype() > 0) {

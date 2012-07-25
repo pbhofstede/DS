@@ -34,7 +34,35 @@ if ($scouting != NULL) {
 					$allPlayers = FALSE;
 					echo '<input align="right" type="checkbox" onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'/\'"><BR>';
 				}
-				echo '<a href="'.$config['url'].'/scoutingpaste.php?a='.$_GET['a'].'" target="_blank">Copy naar forum</a>';
+				echo '<form action="'.$config['url'].'/scoutingpaste.php" method="get" target="_blank">';
+				echo '<input type="hidden" name="a" value="'.$_GET['a'].'"/>';
+				echo 'Index 1: ';
+				echo '<select name="index1">';
+				echo '<option value="indexGK">GK</option>';
+				echo '<option value="indexCD">CD</option>';
+				echo '<option value="indexDEF">DEF</option>';
+				echo '<option value="indexWB">WB</option>';
+				echo '<option value="indexIM">IM</option>';
+				echo '<option value="indexWG">WG</option>';
+				echo '<option value="indexSC">SC</option>';
+				echo '<option value="indexDFW">DFW</option>';
+				echo '<option value="indexSP">SP</option>';
+				echo '</select>';
+				echo '  Index 2:';
+				echo '<select name="index2">';
+				echo '<option value="indexGK">GK</option>';
+				echo '<option value="indexCD">CD</option>';
+				echo '<option value="indexDEF">DEF</option>';
+				echo '<option value="indexWB">WB</option>';
+				echo '<option value="indexIM">IM</option>';
+				echo '<option value="indexWG">WG</option>';
+				echo '<option value="indexSC">SC</option>';
+				echo '<option value="indexDFW">DFW</option>';
+				echo '<option value="indexSP">SP</option>';
+				echo '</select>';
+				echo '<input type="submit" value="Copy naar forum" />';
+				echo '</form>';
+				
 				echo "</P>";
 			}
 		}

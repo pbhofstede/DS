@@ -39,87 +39,61 @@ if($scouting != NULL) {
 				$vIndexSP = 0;
 				
 				
-				foreach($playerList AS $player) {
-					if ($player->getscoutid() == $scout->getId()) {
-						$vIndexGK = $vIndexGK + $player->getIndexGK();
-						$vIndexDEF = $vIndexDEF + $player->getIndexDEF();
-						$vIndexCD = $vIndexCD + $player->getIndexCD();
-						$vIndexWB = $vIndexWB + $player->getIndexWB();
-						$vIndexIM = $vIndexIM + $player->getIndexIM();
-						$vIndexWG = $vIndexWG + $player->getIndexWG();
-						$vIndexSC = $vIndexSC + $player->getIndexSC();
-						$vIndexDFW = $vIndexDFW + $player->getIndexDFW();
-						$vIndexSP = $vIndexSP + $player->getIndexSP();
-					}
-				}
-				
 				$vMax = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				
-				if ($vMax == $vIndexGK) {
+				if ($_GET['index1'] == 'indexGK') {
 					$vIndexStr = 'GK';
-					
-					$vMax2 = max($vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexDEF) {
+				else if ($_GET['index1'] == 'indexDEF') {
 					$vIndexStr = 'DEF';
-					
-					$vMax2 = max($vIndexGK, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexCD) {
+				else if ($_GET['index1'] == 'indexCD') {
 					$vIndexStr = 'CD';
-					
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexWB) {
+				else if ($_GET['index1'] == 'indexWB') {
 					$vIndexStr = 'WB';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexIM) {
+				else if ($_GET['index1'] == 'indexIM') {
 					$vIndexStr = 'IM';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexWG, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexWG) {
+				else if ($_GET['index1'] == 'indexWG') {
 					$vIndexStr = 'WG';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexSC, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexSC) {
+				else if ($_GET['index1'] == 'indexSC') {
 					$vIndexStr = 'SC';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexDFW, $vIndexSP);
 				}
-				else if ($vMax == $vIndexDFW) {
+				else if ($_GET['index1'] == 'indexDFW') {
 					$vIndexStr = 'DFW';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexSP);
 				}
-				else if ($vMax == $vIndexSP) {
+				else {
 					$vIndexStr = 'SP';
-					$vMax2 = max($vIndexGK, $vIndexDEF, $vIndexCD, $vIndexWB, $vIndexIM, $vIndexWG, $vIndexSC, $vIndexDFW);
 				}
 
-				if ($vMax2 == $vIndexGK) {
+				if ($_GET['index2'] == 'indexGK') {
 					$vIndex2Str = 'GK';
 				}
-				else if ($vMax2 == $vIndexDEF) {
+				else if ($_GET['index2'] == 'indexDEF') {
 					$vIndex2Str = 'DEF';
 				}
-				else if ($vMax2 == $vIndexCD) {
+				else if ($_GET['index2'] == 'indexCD') {
 					$vIndex2Str = 'CD';
 				}
-				else if ($vMax2 == $vIndexWB) {
+				else if ($_GET['index2'] == 'indexWB') {
 					$vIndex2Str = 'WB';
 				}
-				else if ($vMax2 == $vIndexIM) {
+				else if ($_GET['index2'] == 'indexIM') {
 					$vIndex2Str = 'IM';
 				}
-				else if ($vMax2 == $vIndexWG) {
+				else if ($_GET['index2'] == 'indexWG') {
 					$vIndex2Str = 'WG';
 				}
-				else if ($vMax2 == $vIndexSC) {
+				else if ($_GET['index2'] == 'indexSC') {
 					$vIndex2Str = 'SC';
 				}
-				else if ($vMax2 == $vIndexDFW) {
+				else if ($_GET['index2'] == 'indexDFW') {
 					$vIndex2Str = 'DFW';
 				}
-				else if ($vMax2 == $vIndexSP) {
+				else {
 					$vIndex2Str = 'SP';
 				}
 				 
@@ -225,18 +199,21 @@ if($scouting != NULL) {
 								($vIndexStr == 'SP')) {
 							echo '[td]'.$player->getSetPieces().'[/td]';
 						}
-						if ($player->getBestIndexName() == $vIndexStr) {
-							echo '[td]'.$player->getBestIndex().'[/td]';
-						}
-						else {
-							$vGewildeIndex = $player->getIndexByName($vIndexStr);
-							if ($vGewildeIndex >= ($player->getBestIndex() - 7)) {
-								echo '[td]'.$vGewildeIndex.'[/td]';
-							}
-							else {
-							  echo '[td]'.$player->getBestIndex().' ('.$player->getBestIndexName().')[/td]';
-							}
-						}
+						
+						//if ($player->getBestIndexName() == $vIndexStr) {
+						//	echo '[td]'.$player->getBestIndex().'[/td]';
+						//}
+						//else {
+						//	$vGewildeIndex = $player->getIndexByName($vIndexStr);
+						//	if ($vGewildeIndex >= ($player->getBestIndex() - 7)) {
+						//		echo '[td]'.$vGewildeIndex.'[/td]';
+						//	}
+						//	else {
+						//	  echo '[td]'.$player->getBestIndex().' ('.$player->getBestIndexName().')[/td]';
+						//	}
+						//}
+						
+						echo '[td]'.$player->getIndexByName($vIndexStr).'[/td]';
 						
 						echo '[td]'.$player->getIndexByName($vIndex2Str).'[/td]';
 						echo '[td]'.$specs[$player->getSpeciality()].'[/td]';
