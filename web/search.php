@@ -48,9 +48,9 @@ if (($user != NULL) &&
 		$output		=	'<select name="'.$name.'">';
 		
 		foreach($levelArray AS $key => $value) {
-			if(empty($_POST[$name]) && $key == '0') {
+			if(empty($_GET[$name]) && $key == '0') {
 				$output	.=	'<option value="'.$key.'" selected>'.$value.'</option>';
-			} elseif(isset($_POST[$name]) && ($key == $_POST[$name])) {
+			} elseif(isset($_GET[$name]) && ($key == $_GET[$name])) {
 				$output .= '<option value="'.$key.'" selected>'.$value.'</option>';
 			} else {
 				$output	.= '<option value="'.$key.'">'.$value.'</option>';
@@ -68,31 +68,31 @@ if (($user != NULL) &&
 	echo 'Bij minimalen eisen met veel resultaat zullen slechts de eerste 100 spelers weergegeven worden.';
 //Zoeken	
 	echo '<h2>Zoekopdracht</h2>';
-	echo '<form action="" method="POST">';
+	echo '<form action="" method="GET">';
 	echo '<TABLE>';
 	echo '<TR><TD><label>Leeftijd Min</label></TD><TD>';
-	if(!empty($_POST['ageMinimum'])) {
-		echo '<input type="text" name="ageMinimum" value="'.$_POST['ageMinimum'].'" size="3" />';
+	if(!empty($_GET['ageMinimum'])) {
+		echo '<input type="text" name="ageMinimum" value="'.$_GET['ageMinimum'].'" size="3" />';
 	} else {
 		echo '<input type="text" name="ageMinimum" value="17" size="3" />';
 	}
 	echo '</TD><TD><label>Index GK >=</label></TD><TD>';
-	if(!empty($_POST['indexGK'])) {
-		echo '<input type="text" name="indexGK" value="'.$_POST['indexGK'].'" size="5" />';
+	if(!empty($_GET['indexGK'])) {
+		echo '<input type="text" name="indexGK" value="'.$_GET['indexGK'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexGK" value="" size="5" />';
 	}
 	echo '</TD></TR>';	
 	
 	echo '<TR><TD><label>Leeftijd Max</label></TD><TD>';
-	if(!empty($_POST['ageMaximum'])) {
-		echo '<input type="text" name="ageMaximum" value="'.$_POST['ageMaximum'].'" size="3" />';
+	if(!empty($_GET['ageMaximum'])) {
+		echo '<input type="text" name="ageMaximum" value="'.$_GET['ageMaximum'].'" size="3" />';
 	} else {
 		echo '<input type="text" name="ageMaximum" value="36" size="3" />';
 	}
 	echo '</TD><TD><label>Index CD >=</label></TD><TD>';
-	if(!empty($_POST['indexCD'])) {
-		echo '<input type="text" name="indexCD" value="'.$_POST['indexCD'].'" size="5" />';
+	if(!empty($_GET['indexCD'])) {
+		echo '<input type="text" name="indexCD" value="'.$_GET['indexCD'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexCD" value="" size="5" />';
 	}
@@ -101,47 +101,47 @@ if (($user != NULL) &&
 	echo '<TR><TD><label>Specialiteit</label></TD><TD>';
 	echo '<select name="speciality">';
 			foreach($specialityArray AS $key => $value) {
-				if(empty($_POST['speciality']) && $key == '0') {
+				if(empty($_GET['speciality']) && $key == '0') {
 					echo '<option value="'.$key.'" selected>'.$value.'</option>';
-				} elseif($key == $_POST['speciality']) {
+				} elseif($key == $_GET['speciality']) {
 					echo '<option value="'.$key.'" selected>'.$value.'</option>';
 				} else {
 					echo '<option value="'.$key.'">'.$value.'</option>';
 				}
 			}
 	echo '</select></TD><TD><label>Index DEF >=</label></TD><TD>';
-	if(!empty($_POST['indexDEF'])) {
-		echo '<input type="text" name="indexDEF" value="'.$_POST['indexDEF'].'" size="5" />';
+	if(!empty($_GET['indexDEF'])) {
+		echo '<input type="text" name="indexDEF" value="'.$_GET['indexDEF'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexDEF" value="" size="5" />';
 	}
 	echo '</TD></TR>';
 	
 	echo '<TR><TD><label>Keepen</label></TD><TD>'.showDropdown('keeper').'</TD><TD><label>Index WB >=</label></TD><TD>';
-	if(!empty($_POST['indexWB'])) {
-		echo '<input type="text" name="indexWB" value="'.$_POST['indexWB'].'" size="5" />';
+	if(!empty($_GET['indexWB'])) {
+		echo '<input type="text" name="indexWB" value="'.$_GET['indexWB'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexWB" value="" size="5" />';
 	}
 	echo '</TD></TR>';
 	echo '<TR><TD><label>Verdedigen</label></TD><TD>'.showDropdown('defender').'</TD><TD><label>Index IM >=</label></TD><TD>';
-	if(!empty($_POST['indexIM'])) {
-		echo '<input type="text" name="indexIM" value="'.$_POST['indexIM'].'" size="5" />';
+	if(!empty($_GET['indexIM'])) {
+		echo '<input type="text" name="indexIM" value="'.$_GET['indexIM'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexIM" value="" size="5" />';
 	}
 	echo '</TD></TR>';
 	echo '<TR><TD><label>Positiespel</label></TD><TD>'.showDropdown('playmaker').'</TD><TD><label>Index WG >=</label></TD><TD>';
-	if(!empty($_POST['indexWG'])) {
-		echo '<input type="text" name="indexWG" value="'.$_POST['indexWG'].'" size="5" />';
+	if(!empty($_GET['indexWG'])) {
+		echo '<input type="text" name="indexWG" value="'.$_GET['indexWG'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexWG" value="" size="5" />';
 	}
 	echo '</TD></TR>';
 	
 	echo '<TR><TD><label>Vleugelspel</label></TD><TD>'.showDropdown('winger').'</TD><TD><label>Index SC >=</label></TD><TD>';
-	if(!empty($_POST['indexSC'])) {
-		echo '<input type="text" name="indexSC" value="'.$_POST['indexSC'].'" size="5" />';
+	if(!empty($_GET['indexSC'])) {
+		echo '<input type="text" name="indexSC" value="'.$_GET['indexSC'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexSC" value="" size="5" />';
 	}
@@ -149,16 +149,16 @@ if (($user != NULL) &&
 	
 	
 	echo '<TR><TD><label>Passen</label></TD><TD>'.showDropdown('passing').'</TD><TD><label>Index DFW >=</label></TD><TD>';
-	if(!empty($_POST['indexDFW'])) {
-		echo '<input type="text" name="indexDFW" value="'.$_POST['indexDFW'].'" size="5" />';
+	if(!empty($_GET['indexDFW'])) {
+		echo '<input type="text" name="indexDFW" value="'.$_GET['indexDFW'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexDFW" value="" size="5" />';
 	}
 	echo '</TD></TR>';
 	
 	echo '<TR><TD><label>Scoren</label></TD><TD>'.showDropdown('scorer').'</TD><TD><label>Index SP >=</label></TD><TD>';
-	if(!empty($_POST['indexSP'])) {
-		echo '<input type="text" name="indexSP" value="'.$_POST['indexSP'].'" size="5" />';
+	if(!empty($_GET['indexSP'])) {
+		echo '<input type="text" name="indexSP" value="'.$_GET['indexSP'].'" size="5" />';
 	} else {
 		echo '<input type="text" name="indexSP" value="" size="5" />';
 	}
@@ -167,8 +167,8 @@ if (($user != NULL) &&
 	echo '<TR><TD><label>Spelhervatten</label></TD><TD>'.showDropdown('setPieces').'</TD><TD></TD><TD></TD></TR>';
 	
 	echo '<TR><TD><label>Speler ID</label></TD><TD>';
-	if (isset($_POST['playerId'])) {
-		echo '<input type="text" name="playerId" size="30" value="'.$_POST['playerId'].'"/>';
+	if (isset($_GET['playerId'])) {
+		echo '<input type="text" name="playerId" size="30" value="'.$_GET['playerId'].'"/>';
 	}
 	else
 	{
@@ -176,8 +176,8 @@ if (($user != NULL) &&
 	}
 	echo '<TD></TD><TD></TD></TR>';
 	echo '<TR><TD><label>Spelernaam</label></TD><TD>';
-	if (isset($_POST['playerName'])) {
-		echo '<input type="text" name="playerName" size="30" value="'.$_POST['playerName'].'"/>';
+	if (isset($_GET['playerName'])) {
+		echo '<input type="text" name="playerName" size="30" value="'.$_GET['playerName'].'"/>';
 	}
 	else
 	{
@@ -186,8 +186,8 @@ if (($user != NULL) &&
 	echo '<TD></TD><TD></TD></TR>';
 	
 	echo '<TR><TD><label>U20</label></TD><TD>';
-	if ((isset($_POST['u20'])) && 
-	    ($_POST['u20'])) {		
+	if ((isset($_GET['u20'])) && 
+	    ($_GET['u20'])) {		
 		echo '<input type="checkbox" name="u20" CHECKED/>';
 	}
 	else
@@ -196,8 +196,8 @@ if (($user != NULL) &&
 	}
 	
 	echo '<TD><label>Incl. update ouder 16wk</label></TD><TD>';
-	if ((isset($_POST['inclOLD'])) && 
-	    ($_POST['inclOLD'])) {		
+	if ((isset($_GET['inclOLD'])) && 
+	    ($_GET['inclOLD'])) {		
 		echo '<input type="checkbox" name="inclOLD" CHECKED/>';
 	}
 	else
@@ -212,15 +212,15 @@ if (($user != NULL) &&
 	echo '<input type="submit" name="submit" value="Zoek!" />';
 	echo '</p>';
 //Als gezocht
-	if ((isset($_POST['submit'])) || isset($_POST['orderby'])){
+	if ((isset($_GET['submit'])) || isset($_GET['orderby'])){
 		echo '<h2>Resultaat</h2>';
-		if(!empty($_POST['playerId']) && !ctype_digit(trim($_POST['playerId']))) {
+		if(!empty($_GET['playerId']) && !ctype_digit(trim($_GET['playerId']))) {
 			echo '<script type="text/javascript">';
 				echo 'alert(\'Ingevulde waarde is geen getal\');';
 			echo '</script>';
 // Als gezocht op speler ID			
-		} else if(!empty($_POST['playerId'])) {
-			$player		=	PlayerDB::getPlayer(trim($_POST['playerId']));
+		} else if(!empty($_GET['playerId'])) {
+			$player		=	PlayerDB::getPlayer(trim($_GET['playerId']));
 			if (($player != NULL) &&
           ((time() - $player->getLastupdate()) <= (8 * 86400))) {
 				header("Location: ".$config['url']."/player/".$player->getId()."/");
@@ -232,7 +232,7 @@ if (($user != NULL) &&
 					$HT->setOauthToken($coach->getHTuserToken()); 
 					$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());	
 			 		try {
-						$HTplayer = $HT->getPlayer($_POST['playerId']);
+						$HTplayer = $HT->getPlayer($_GET['playerId']);
 						
 						if (($HTplayer != NULL) && ($HTplayer->getNativeCountryId() == 12)) {
 							$aantalDagen = ($HTplayer->getAge() * 112) + $HTplayer->getDays();
@@ -367,49 +367,49 @@ if (($user != NULL) &&
 			$vIndexStr = '';
 			$vFoundIndex = -400;
 			
-			if (isset($_POST['indexGK']) && ($_POST['indexGK'] <> '') && ($_POST['indexGK'] > $vFoundIndex)) {
+			if (isset($_GET['indexGK']) && ($_GET['indexGK'] <> '') && ($_GET['indexGK'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index GK';
-				$vFoundIndex = $_POST['indexGK'];
+				$vFoundIndex = $_GET['indexGK'];
 				$orderBY = 'indexGK';
 			}
-			elseif (isset($_POST['indexCD']) && ($_POST['indexCD'] <> '') && ($_POST['indexCD'] > $vFoundIndex)) {
+			elseif (isset($_GET['indexCD']) && ($_GET['indexCD'] <> '') && ($_GET['indexCD'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index CD';
-				$vFoundIndex = $_POST['indexCD'];
+				$vFoundIndex = $_GET['indexCD'];
 				$orderBY = 'indexCD';
 			}
-			elseif (isset($_POST['indexDEF']) && ($_POST['indexDEF'] <> '') && ($_POST['indexDEF'] > $vFoundIndex)) {
+			elseif (isset($_GET['indexDEF']) && ($_GET['indexDEF'] <> '') && ($_GET['indexDEF'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index DEF';
-				$vFoundIndex = $_POST['indexDEF'];
+				$vFoundIndex = $_GET['indexDEF'];
 				$orderBY = 'indexDEF';
 			}
-			elseif (isset($_POST['indexWB']) && ($_POST['indexWB'] <> '') && ($_POST['indexWB'] > $vFoundIndex)) {
+			elseif (isset($_GET['indexWB']) && ($_GET['indexWB'] <> '') && ($_GET['indexWB'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index WB';
-				$vFoundIndex = $_POST['indexWB'];
+				$vFoundIndex = $_GET['indexWB'];
 				$orderBY = 'indexWB';
 			}
-			else if (isset($_POST['indexIM']) && ($_POST['indexIM'] <> '') && ($_POST['indexIM'] > $vFoundIndex)) {
+			else if (isset($_GET['indexIM']) && ($_GET['indexIM'] <> '') && ($_GET['indexIM'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index IM';
-				$vFoundIndex = $_POST['indexIM'];
+				$vFoundIndex = $_GET['indexIM'];
 				$orderBY = 'indexIM';
 			}
-			else if (isset($_POST['indexWG']) && ($_POST['indexWG'] <> '') && ($_POST['indexWG'] > $vFoundIndex)) {
+			else if (isset($_GET['indexWG']) && ($_GET['indexWG'] <> '') && ($_GET['indexWG'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index WG';
-				$vFoundIndex = $_POST['indexWG'];
+				$vFoundIndex = $_GET['indexWG'];
 				$orderBY = 'indexWG';
 			}
-			else if (isset($_POST['indexSC']) && ($_POST['indexSC'] <> '') && ($_POST['indexSC'] > $vFoundIndex)) {
+			else if (isset($_GET['indexSC']) && ($_GET['indexSC'] <> '') && ($_GET['indexSC'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index SC';
-				$vFoundIndex = $_POST['indexSC'];
+				$vFoundIndex = $_GET['indexSC'];
 				$orderBY = 'indexSC';
 			}
-			else if (isset($_POST['indexDFW']) && ($_POST['indexDFW'] <> '') && ($_POST['indexDFW'] > $vFoundIndex)) {
+			else if (isset($_GET['indexDFW']) && ($_GET['indexDFW'] <> '') && ($_GET['indexDFW'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index DFW';
-				$vFoundIndex = $_POST['indexDFW'];
+				$vFoundIndex = $_GET['indexDFW'];
 				$orderBY = 'indexDFW';
 			}
-		  else if (isset($_POST['indexSP']) && ($_POST['indexSP'] <> '') && ($_POST['indexSP'] > $vFoundIndex)) {
+		  else if (isset($_GET['indexSP']) && ($_GET['indexSP'] <> '') && ($_GET['indexSP'] > $vFoundIndex)) {
 			  $vIndexStr = 'Index SP';
-				$vFoundIndex = $_POST['indexSP'];
+				$vFoundIndex = $_GET['indexSP'];
 				$orderBY = 'indexSP';
 			} else {
 			  $vIndexStr = 'Index';
@@ -417,25 +417,25 @@ if (($user != NULL) &&
 				$orderBY = 'dateOfBirth';
 			}
 			
-			if (isset($_POST['orderby'])) {
-				if ($_POST['orderby'] == 'Leeftijd') {
+			if (isset($_GET['orderby'])) {
+				if ($_GET['orderby'] == 'Leeftijd') {
 					$orderBY = 'dateOfBirth';
 				}
-				else if ($_POST['orderby'] == 'Index') {
+				else if ($_GET['orderby'] == 'Index') {
 					
 				}
 			}
 
-			if(!empty($_POST['playerName'])) {
-				$results =	PlayerDB::getPlayerByName('%'.$_POST['playerName'].'%');
+			if(!empty($_GET['playerName'])) {
+				$results =	PlayerDB::getPlayerByName('%'.$_GET['playerName'].'%');
 			}
 			else {
 				$results	=	PlayerDB::searchPlayer(
-					(time() - ($_POST['ageMinimum'] * 112 * 86400)), 
-					(time() - (($_POST['ageMaximum'] + 1) * 112 * 86400)), 
-					$_POST['keeper'], $_POST['defender'], $_POST['playmaker'], $_POST['winger'], $_POST['passing'], $_POST['scorer'], $_POST['setPieces'], 
-					$_POST['speciality'], $_POST['indexGK'], $_POST['indexCD'], $_POST['indexDEF'], $_POST['indexWB'], $_POST['indexIM'],
-					$_POST['indexWG'], $_POST['indexSC'], $_POST['indexDFW'], $_POST['indexSP'], $orderBY, isset($_POST['u20']), isset($_POST['inclOLD']));
+					(time() - ($_GET['ageMinimum'] * 112 * 86400)), 
+					(time() - (($_GET['ageMaximum'] + 1) * 112 * 86400)), 
+					$_GET['keeper'], $_GET['defender'], $_GET['playmaker'], $_GET['winger'], $_GET['passing'], $_GET['scorer'], $_GET['setPieces'], 
+					$_GET['speciality'], $_GET['indexGK'], $_GET['indexCD'], $_GET['indexDEF'], $_GET['indexWB'], $_GET['indexIM'],
+					$_GET['indexWG'], $_GET['indexSC'], $_GET['indexDFW'], $_GET['indexSP'], $orderBY, isset($_GET['u20']), isset($_GET['inclOLD']));
 			}
 			
 			if($results != NULL) {
