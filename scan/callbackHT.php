@@ -16,7 +16,8 @@
 		if ($HT->getClub()->getUserId() > 0) {	
 			$coach = CoachDB::getCoach($HT->getClub()->getUserId());
 			if ($coach == NULL) {
-				CoachDB::insertCoach(new Coach($HT->getClub()->getUserId(), $HT->getClub()->getTeamId(), $HT->getClub()->getTeamname(), 
+				CoachDB::insertCoach(new Coach($HT->getClub()->getUserId(), $HT->getClub()->getTeamId(), $HT->getClub()->getTeamname(),
+          "user", "",
 					"", "", $userToken, $userTokenSecret, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 			
 				$coach = CoachDB::getCoach($HT->getClub()->getUserId());
