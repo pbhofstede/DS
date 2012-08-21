@@ -1,7 +1,4 @@
 <?php
-/*include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');
-*/
-
 include ('header.php');
 try {
  	if (isset($_SESSION['dutchscouts'])) {
@@ -58,7 +55,7 @@ try {
 			 	{
 					$player = $HT->getPlayer($playerID);
 					
-					if (($player != NULL) && ($player->isSkillsAvailable())){		
+					if (($player != NULL) && ($player->isSkillsAvailable())) {		
 						$playerID = $player->getId();	
 						$nationalPlayer = NationalPlayersDB::getNationalPlayer($playerID);			
 						if($nationalPlayer != Null){

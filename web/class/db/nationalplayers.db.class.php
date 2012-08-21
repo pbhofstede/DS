@@ -103,7 +103,6 @@ class NationalPlayersDB extends DB {
 				$prepare->bindParam(23, $injury, PDO::PARAM_INT);
 				
 				$prepare->execute();
-				echo "Speler ".$playerID." toegevoegd ".$spec."<BR>";
 			}
 			catch(HTError $e)
 			{

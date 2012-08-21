@@ -1,5 +1,5 @@
 <?php
-include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');
+include ('header.php');
 
 try {
 	$coach = CoachDB::getCoach(2705367);	
@@ -37,10 +37,11 @@ try {
 	
 		if ($playerID > 0){
 			$player = $HT->getPlayer($playerID);
-			if ($player->isSkillsAvailable()){			
+			if (($player != NULL) && ($player->isSkillsAvailable())) {	
+				$playerID = $player->getId();			
 				$nationalPlayer = NationalPlayersDB::getNationalPlayer($playerID);			
-				if($nationalPlayer != 0){
-					$deletenationalPlayer =NationalPlayersDB::deleteNationalPlayers($playerID);
+				if($nationalPlayer != Null){
+					NationalPlayersDB::deleteNationalPlayers($playerID);
 				} else {
 					$newPlayers = $newPlayers + 1;
 				}	

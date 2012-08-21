@@ -11,13 +11,16 @@ if ($user != Null) {
 		if (isset($_GET['NEW'])) {
 			$newPlayers = '<b>('.$_GET['NEW'].' nieuwe spelers)</b>';
 		}
+		else {
+		  $newPlayers = '';
+		}
 
 		echo '<h2>U20 spelers te koop</h2>';
 		echo' <form action="" method="POST">';
 			echo '<input name="submit" type="submit" id="submit" value="Voeg toe"> '.$newPlayers;
 		echo '</form>';
 
-		if($_POST['submit']) {
+		if(isset($_POST['submit'])) {
 			redirect($config['url'].'/getNTPlayerInfo.php?NT=0&Callback='.$config['url'].'/U20/');
 		}
 
