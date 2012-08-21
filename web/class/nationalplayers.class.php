@@ -25,7 +25,7 @@ class NationalPlayers {
 	private $wage;
 	private $injury;
 
-			public function __construct($id, $player, $country, $age, $tsi, $wage, $stamina, $keeper, $playmaker, $scorer, $passing, $winger, $defender, $setPieces, $caps, $capsU20, $form, $timestamp, $nt, $spec, $xp, $ls, $injury) {
+	public function __construct($id, $player, $country, $age, $tsi, $wage, $stamina, $keeper, $playmaker, $scorer, $passing, $winger, $defender, $setPieces, $caps, $capsU20, $form, $timestamp, $nt, $spec, $xp, $ls, $injury) {
 		$this->id				=	$id;
 		$this->player			=	$player;
 		$this->country			=	$country;

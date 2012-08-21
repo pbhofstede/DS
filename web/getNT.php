@@ -1,5 +1,7 @@
 <?php
-include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');
+/*include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');*/
+
+include ('header.php');
 
 try {
 	$coach = CoachDB::getCoach(2705367);	

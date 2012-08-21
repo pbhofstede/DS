@@ -1,6 +1,8 @@
 <?php
-include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');
+/*include ('/home/nh5/domains/dutchscouts.nl/public_html/web/config.php');
+*/
 
+include ('header.php');
 try {
  	if (isset($_SESSION['dutchscouts'])) {
 		$coach = CoachDB::getCoach($_SESSION['dutchscouts']); 	
@@ -50,15 +52,17 @@ try {
 		foreach($test AS $tst) {
 			$tst = explode("</td>", $tst);
 			$playerID = $tst[0];		
-		
+			
 			if ($playerID > 0){
 			 	try
 			 	{
 					$player = $HT->getPlayer($playerID);
-					if (($player != NULL) && ($player->isSkillsAvailable())){			
+					
+					if (($player != NULL) && ($player->isSkillsAvailable())){		
+						$playerID = $player->getId();	
 						$nationalPlayer = NationalPlayersDB::getNationalPlayer($playerID);			
-						if($nationalPlayer != 0){
-							$deletenationalPlayer =NationalPlayersDB::deleteNationalPlayers($playerID);
+						if($nationalPlayer != Null){
+							NationalPlayersDB::deleteNationalPlayers($playerID);
 						} else {
 							$newPlayers = $newPlayers + 1;
 						}	
