@@ -23,7 +23,17 @@ function cmpDate($playerA, $playerB) {
 if($scouting != NULL) {
 	foreach($scouting AS $scout) {
 		if($scout->getId() == $_GET['a']) {
-			$playerList	=	$scout->getPlayerList(false);
+			if ((strpos($scout->getName(), 'FWC') === FALSE) &&
+					(strpos($scout->getName(), 'QWC') === FALSE) &&
+					(strpos($scout->getName(), 'U20') === FALSE)) {
+				
+				$u20 = FALSE;
+			}
+			else {
+			  $u20 = TRUE;
+			}
+			
+			$playerList	=	$scout->getPlayerList($u20);
 			
 			if($playerList != NULL) {				 
 				usort($playerList, 'cmpDate');
@@ -148,7 +158,8 @@ if($scouting != NULL) {
 				echo '[th]index '.$vIndexStr.'[/th][th]index '.$vIndex2Str.'[/th][th]spec[/th][/tr]<BR>';
 
 				foreach($playerList AS $player) {
-					if ($player->getscoutid() == $scout->getId()) {
+					if (($u20) ||
+					   ($player->getscoutid() == $scout->getId())) {
 						echo '[tr]';
 						echo '[td]'.$player->getName().'[/td]';
 						echo '[td]'.$player->getLeeftijdStr().'[/td]';
@@ -220,7 +231,7 @@ if($scouting != NULL) {
 						echo '[/tr]<BR>';
 					}
 				}
-			} 
+			}
 			echo '[/table]';
 		}
 	}
