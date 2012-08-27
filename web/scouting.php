@@ -25,6 +25,7 @@ if ($scouting != NULL) {
 			if ((strpos($scout->getName(), 'FWC') === FALSE) &&
 					(strpos($scout->getName(), 'QWC') === FALSE) &&
 					(strpos($scout->getName(), 'U20') === FALSE)) {
+				$u20 = FALSE;
 				echo '<P align="right">Ook spelers uit andere scoutlichtingen laten zien die voldoen aan deze index  ';
 				if (!empty($_GET['c'])) {
 					$allPlayers = TRUE;
@@ -34,6 +35,9 @@ if ($scouting != NULL) {
 					$allPlayers = FALSE;
 					echo '<input align="right" type="checkbox" onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/'.$sort.'/'.(! $allPlayers).'/\'"><BR>';
 				}
+			}
+			else {
+				$u20 = TRUE;
 			}
 			echo '<form action="'.$config['url'].'/scoutingpaste.php" method="get" target="_blank">';
 			echo '<input type="hidden" name="a" value="'.$_GET['a'].'"/>';
@@ -49,18 +53,23 @@ if ($scouting != NULL) {
 			echo '<option value="indexDFW">DFW</option>';
 			echo '<option value="indexSP">SP</option>';
 			echo '</select>';
-			echo '  Index 2:';
-			echo '<select name="index2">';
-			echo '<option value="indexGK">GK</option>';
-			echo '<option value="indexCD">CD</option>';
-			echo '<option value="indexDEF">DEF</option>';
-			echo '<option value="indexWB">WB</option>';
-			echo '<option value="indexIM">IM</option>';
-			echo '<option value="indexWG">WG</option>';
-			echo '<option value="indexSC">SC</option>';
-			echo '<option value="indexDFW">DFW</option>';
-			echo '<option value="indexSP">SP</option>';
-			echo '</select>';
+			if ($u20) {
+				echo '<input type = hidden name="index2">';
+			}
+			else {
+				echo '  Index 2:';
+				echo '<select name="index2">';
+				echo '<option value="indexGK">GK</option>';
+				echo '<option value="indexCD">CD</option>';
+				echo '<option value="indexDEF">DEF</option>';
+				echo '<option value="indexWB">WB</option>';
+				echo '<option value="indexIM">IM</option>';
+				echo '<option value="indexWG">WG</option>';
+				echo '<option value="indexSC">SC</option>';
+				echo '<option value="indexDFW">DFW</option>';
+				echo '<option value="indexSP">SP</option>';
+				echo '</select>';
+			}
 			echo '<input type="submit" value="Copy naar forum" />';
 			echo '</form>';
 			

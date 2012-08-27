@@ -20,6 +20,96 @@ function cmpDate($playerA, $playerB) {
 		return 0;
 }
 
+function cmpIndexGK($playerA, $playerB)
+{
+ 	if ($playerA->getIndexGK() > $playerB->getIndexGK())
+ 		return -1;
+ 	else if ($playerA->getIndexGK() < $playerB->getIndexGK())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexDEF($playerA, $playerB)
+{
+ 	if ($playerA->getIndexDEF() > $playerB->getIndexDEF())
+ 		return -1;
+ 	else if ($playerA->getIndexDEF() < $playerB->getIndexDEF())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexCD($playerA, $playerB)
+{
+ 	if ($playerA->getIndexCD() > $playerB->getIndexCD())
+ 		return -1;
+ 	else if ($playerA->getIndexCD() < $playerB->getIndexCD())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexWB($playerA, $playerB)
+{
+ 	if ($playerA->getIndexWB() > $playerB->getIndexWB())
+ 		return -1;
+ 	else if ($playerA->getIndexWB() < $playerB->getIndexWB())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexIM($playerA, $playerB)
+{
+ 	if ($playerA->getIndexIM() > $playerB->getIndexIM())
+ 		return -1;
+ 	else if ($playerA->getIndexIM() < $playerB->getIndexIM())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexWG($playerA, $playerB)
+{
+ 	if ($playerA->getIndexWG() > $playerB->getIndexWG())
+ 		return -1;
+ 	else if ($playerA->getIndexWG() < $playerB->getIndexWG())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexSC($playerA, $playerB)
+{
+ 	if ($playerA->getIndexSC() > $playerB->getIndexSC())
+ 		return -1;
+ 	else if ($playerA->getIndexSC() < $playerB->getIndexSC())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexDFW($playerA, $playerB)
+{
+ 	if ($playerA->getIndexDFW() > $playerB->getIndexDFW())
+ 		return -1;
+ 	else if ($playerA->getIndexDFW() < $playerB->getIndexDFW())
+ 		return 1;
+ 	else
+		return 0;
+}
+
+function cmpIndexSP($playerA, $playerB)
+{
+ 	if ($playerA->getIndexSP() > $playerB->getIndexSP())
+ 		return -1;
+ 	else if ($playerA->getIndexSP() < $playerB->getIndexSP())
+ 		return 1;
+ 	else
+		return 0;
+}
+
 if($scouting != NULL) {
 	foreach($scouting AS $scout) {
 		if($scout->getId() == $_GET['a']) {
@@ -35,9 +125,7 @@ if($scouting != NULL) {
 			
 			$playerList	=	$scout->getPlayerList($u20);
 			
-			if($playerList != NULL) {				 
-				usort($playerList, 'cmpDate');
-				
+			if($playerList != NULL) {				
 				$vIndexGK = 0;
 				$vIndexDEF = 0;
 				$vIndexCD = 0;
@@ -53,30 +141,39 @@ if($scouting != NULL) {
 				
 				if ($_GET['index1'] == 'indexGK') {
 					$vIndexStr = 'GK';
+					$sortName = 'cmpIndexGK';
 				}
 				else if ($_GET['index1'] == 'indexDEF') {
 					$vIndexStr = 'DEF';
+					$sortName = 'cmpIndexDEF';
 				}
 				else if ($_GET['index1'] == 'indexCD') {
 					$vIndexStr = 'CD';
+					$sortName = 'cmpIndexCD';
 				}
 				else if ($_GET['index1'] == 'indexWB') {
 					$vIndexStr = 'WB';
+					$sortName = 'cmpIndexWB';
 				}
 				else if ($_GET['index1'] == 'indexIM') {
 					$vIndexStr = 'IM';
+					$sortName = 'cmpIndexIM';
 				}
 				else if ($_GET['index1'] == 'indexWG') {
 					$vIndexStr = 'WG';
+					$sortName = 'cmpIndexWG';
 				}
 				else if ($_GET['index1'] == 'indexSC') {
 					$vIndexStr = 'SC';
+					$sortName = 'cmpIndexSC';
 				}
 				else if ($_GET['index1'] == 'indexDFW') {
 					$vIndexStr = 'DFW';
+					$sortName = 'cmpIndexDFW';
 				}
 				else {
 					$vIndexStr = 'SP';
+					$sortName = 'cmpIndexSP';
 				}
 
 				if ($_GET['index2'] == 'indexGK') {
@@ -106,6 +203,13 @@ if($scouting != NULL) {
 				else {
 					$vIndex2Str = 'SP';
 				}
+				
+				if ($u20) {
+					usort($playerList, $sortName);
+				}
+				else {
+					usort($playerList, 'cmpDate');
+				}	
 				 
 				echo '[table][tr][th]naam[/th][th]age[/th]';
 				if ($vIndexStr == 'GK') {
@@ -155,7 +259,11 @@ if($scouting != NULL) {
 						($vIndexStr == 'SP')) {
 					echo '[th]sh[/th]';
 				}
-				echo '[th]index '.$vIndexStr.'[/th][th]index '.$vIndex2Str.'[/th][th]spec[/th][/tr]<BR>';
+				echo '[th]index '.$vIndexStr.'[/th]';
+				if (! $u20) {
+					echo '[th]index '.$vIndex2Str.'[/th]';
+				}
+				echo '[th]spec[/th][/tr]<BR>';
 
 				foreach($playerList AS $player) {
 					if (($u20) ||
@@ -225,8 +333,9 @@ if($scouting != NULL) {
 						//}
 						
 						echo '[td]'.$player->getIndexByName($vIndexStr).'[/td]';
-						
-						echo '[td]'.$player->getIndexByName($vIndex2Str).'[/td]';
+						if (! $u20) {
+							echo '[td]'.$player->getIndexByName($vIndex2Str).'[/td]';
+						}
 						echo '[td]'.$specs[$player->getSpeciality()].'[/td]';
 						echo '[/tr]<BR>';
 					}
