@@ -1,8 +1,9 @@
 <?php
 class NationalPlayersDB extends DB {
 	
-	public static function getNationalPlayersList() {
-		$prepare	=	parent::getconn()->prepare("SELECT * FROM nationalplayers WHERE nt = 1 ORDER BY timestamp DESC");
+	public static function getNationalPlayersList($country) {
+		$prepare	=	parent::getconn()->prepare("SELECT * FROM nationalplayers WHERE nt = 1 AND country = ? ORDER BY timestamp DESC");
+		$prepare->bindParam(1, $country, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {
@@ -12,9 +13,23 @@ class NationalPlayersDB extends DB {
 		
 		return $nationalPlayersList;
 	}
+	
+	public static function getCountryList($nt) {
+	  $prepare =	parent::getConn()->prepare("SELECT distinct country FROM nationalplayers where NT = ? order by country");
+		$prepare->bindParam(1, $nt, PDO::PARAM_INT);
+		$prepare->execute();
+		$list = null;
+		
+		foreach($prepare->fetchAll() AS $row) {
+			$list[]		=	$row['country'];
+		}
+		
+		return $list;
+	}
 
-	public static function getU20PlayersList() {
-		$prepare	=	parent::getconn()->prepare("SELECT * FROM nationalplayers WHERE nt = 0 ORDER BY timestamp DESC");
+	public static function getU20PlayersList($country) {
+		$prepare	=	parent::getconn()->prepare("SELECT * FROM nationalplayers WHERE nt = 0 AND country = ? ORDER BY timestamp DESC");
+		$prepare->bindParam(1, $country, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {
