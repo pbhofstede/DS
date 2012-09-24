@@ -49,6 +49,10 @@ else {
 				if(CoachDB::getCoach($_POST['scoutAdd'])) {
 					CoachDB::insertScout($_POST['scoutAdd'], $scouting->getId());
 				}
+			} elseif(isset($_POST['submitMutScout'])) {
+				$scouting->setName($_POST['naam']);
+				$scouting->setIndices($_POST['indices']);
+				ScoutDB::updateScout($scouting);
 			} elseif(isset($_POST['submitDeleteScout'])) {
 				CoachDB::deleteScout($_POST['scoutDelete'], $scouting->getId());
 			} elseif(isset($_GET['b']) && ($_GET['b'] == 'deleteRequirement')) {
@@ -61,12 +65,19 @@ else {
 			$currentRequirements	=	ScoutRequirementsDB::getScoutRequirementsByScout($scouting->getId());
 			
 			echo '<table width="100%" style="border: 1px solid black">';
-				echo '<tr>';
-					echo '<td colspan="2" style="padding: 3px; background-color: black; color: white">'.output($scouting->getName()).'</td>';
-				echo '</tr>';
-				echo '<tr>';
-					echo '<td colspan="2"><strong>Leden</strong></td>';
-				echo '</tr>';
+			echo '<tr>';
+			echo '<td colspan="2" style="padding: 3px; background-color: black; color: white">'.output($scouting->getName()).'</td>';
+			echo '</tr>';
+			
+			echo '<form action="" method="POST">';
+			echo '<tr><td>Naam</td><td><input type="text" name="naam" value="'.$scouting->getName().'"/></tr>';
+			echo '<tr><td>Indices (GK,DEF,CD,WB,IM,WG,SC,DFW,SP)</td><td><input type="text" name="indices" value="'.$scouting->getIndices().'"/></tr>';
+			echo '<tr><td></td><td><input type="submit" name="submitMutScout" value="Aanpassen"/></td></tr>';
+			echo '</form>';
+			
+			echo '<tr>';
+			echo '<td colspan="2"><strong>Leden</strong></td>';
+			echo '</tr>';
 				if($groupScouts != NULL) {
 					foreach($groupScouts AS $scout) {
 						if($scout != NULL) {

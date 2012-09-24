@@ -2,6 +2,7 @@
 class Scout {
 	private $id;
 	private $name;
+	private $indices;
 	
 	public function __construct($id, $name) {
 		$this->id		=	$id;
@@ -12,7 +13,7 @@ class Scout {
 		$requirements		=	ScoutRequirementsDB::getScoutRequirementsByScout($this->id);
 		
 		if($requirements != NULL) {
-			return PlayerDB::getPlayerByRequirements($requirements, $forceAllPlayers);
+			return PlayerDB::getPlayerByRequirements($requirements, $forceAllPlayers, $this);
 		}
 	}
 		
@@ -26,6 +27,18 @@ class Scout {
 	
 	public function getName() {
 		return $this->name;
+	}
+	
+	public function setName($name) {
+		$this->name = $name;
+	}
+	
+	public function getIndices() {
+	  return $this->indices;
+	}
+
+	public function setIndices($indices) {
+	  $this->indices = $indices;
 	}
 }
 ?>

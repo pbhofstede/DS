@@ -51,6 +51,7 @@ class Player {
 	private $assistants;
 	private $scoutid;
 	private $sundayTraining;
+	private $scout; //variabele om de scoutlichting runtime in op te slaan om de beste index te kunnen bepalen
 	
 	/**
 	* Constructs the player ID
@@ -486,41 +487,113 @@ class Player {
 		$this->indexSP = $index;
 	}
 	
+	public function getBestIndexScoutName() {
+	  $indexWaarde = $this->getBestIndexScout();
+		
+		return $this->getIndexNameByValue($indexWaarde);
+	}
+	
+	public function getBestIndexScout() {
+		if ($this->scout == NULL) {
+		  $maxIndex = $this->getBestIndex();
+			echo "null";
+		}
+		else {
+			$indices = explode(',', $this->scout->getIndices());
+			$maxIndex = -400;
+			
+			foreach($indices AS $indexName) {
+				if ($indexName == 'GK') {
+					if ($this->getIndexGK() > $maxIndex) {
+						$maxIndex = $this->getIndexGK();
+					}
+				}
+				else if ($indexName == 'DEF') {
+					if ($this->getIndexDEF() > $maxIndex) {
+						$maxIndex = $this->getIndexDEF();
+					}
+				}
+				else if ($indexName == 'CD') {
+					if ($this->getIndexCD() > $maxIndex) {
+						$maxIndex = $this->getIndexCD();
+					}
+				}
+				else if ($indexName == 'WB') {
+					if ($this->getIndexWB() > $maxIndex) {
+						$maxIndex = $this->getIndexWB();
+					}
+				}
+				else if ($indexName == 'IM') {
+					if ($this->getIndexIM() > $maxIndex) {
+						$maxIndex = $this->getIndexIM();
+					}
+				}
+				else if ($indexName == 'WG') {
+					if ($this->getIndexWG() > $maxIndex) {
+						$maxIndex = $this->getIndexWG();
+					}
+				}
+				else if ($indexName == 'SC') {
+					if ($this->getIndexSC() > $maxIndex) {
+						$maxIndex = $this->getIndexSC();
+					}
+				}
+				else if ($indexName == 'DFW') {
+					if ($this->getIndexDFW() > $maxIndex) {
+						$maxIndex = $this->getIndexDFW();
+					}
+				}
+				else if ($indexName == 'SP') {
+					if ($this->getIndexSP() > $maxIndex) {
+						$maxIndex = $this->getIndexSP();
+					}
+				}
+			}
+		}
+		return $maxIndex;
+	}
+	
 	public function getBestIndex() {
 	  return max($this->getIndexGK(), $this->getIndexCD(), $this->getIndexDEF(), $this->getIndexWB(), $this->getIndexIM(), 
 							 $this->getIndexWG(), $this->getIndexSC(), $this->getIndexDFW(), $this->getIndexSP());  
 	}
 	
 	public function getBestIndexName() {
-	  $vMax = max($this->getIndexGK(), $this->getIndexCD(), $this->getIndexDEF(), $this->getIndexWB(), $this->getIndexIM(), 
-							 $this->getIndexWG(), $this->getIndexSC(), $this->getIndexDFW(), $this->getIndexSP());  
+	  $vMax = $this->getBestIndex();  
 		
-		if ($vMax == $this->getIndexGK()) {
+		return $this->getIndexNameByValue($vMax);
+	}
+	
+	private function getIndexNameByValue($indexValue) {
+		if ($indexValue == $this->getIndexGK()) {
 			return 'GK';
 		}
-		else if ($vMax == $this->getIndexDEF()) {
+		else if ($indexValue == $this->getIndexDEF()) {
 			return 'DEF';
 		}
-		else if ($vMax == $this->getIndexCD()) {
+		else if ($indexValue == $this->getIndexCD()) {
 			return 'CD';
 		}
-		else if ($vMax == $this->getIndexWB()) {
+		else if ($indexValue == $this->getIndexWB()) {
 			return 'WB';
 		}
-		else if ($vMax == $this->getIndexIM()) {
+		else if ($indexValue == $this->getIndexIM()) {
 			return 'IM';
 		}
-		else if ($vMax == $this->getIndexWG()) {
+		else if ($indexValue == $this->getIndexWG()) {
 			return 'WG';
 		}
-		else if ($vMax == $this->getIndexSC()) {
+		else if ($indexValue == $this->getIndexSC()) {
 			return 'SC';
 		}
-		else if ($vMax == $this->getIndexDFW()) {
+		else if ($indexValue == $this->getIndexDFW()) {
 			return 'DFW';
 		}
-		else if ($vMax == $this->getIndexSP()) {
+		else if ($indexValue == $this->getIndexSP()) {
 			return 'SP';
+		}
+		else {
+		  return '';
 		}
 	}
 	
@@ -1115,6 +1188,10 @@ class Player {
 	}
 	public function setsundayTraining($value) {
 	  return $this->sundayTraining = $value;
+	}
+	
+	public function setScout($scout) {
+	  $this->scout = $scout;
 	}
 }
 

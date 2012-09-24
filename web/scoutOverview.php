@@ -12,9 +12,9 @@ else {
 
 function cmpBestIndex($playerA, $playerB)
 {
- 	if ($playerA->getBestIndex() > $playerB->getBestIndex())
+ 	if ($playerA->getBestIndexScout() > $playerB->getBestIndexScout())
  		return -1;
- 	else if ($playerA->getBestIndex() < $playerB->getBestIndex())
+ 	else if ($playerA->getBestIndexScout() < $playerB->getBestIndexScout())
  		return 1;
  	else
 		return 0;
@@ -97,7 +97,7 @@ if($scouting != NULL) {
 						echo '<td>'.$player->getassistants().'</td>';
 						echo '<td>'.$language[$player->gettrainingtype()+20].'</td>';
 						echo '<td>'.$player->getlasttraining().'</td>';
-						echo '<td>'.$player->getBestIndexName().': '.$player->getBestIndex().'</td>';
+						echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
 						echo '</tr>';
 						
 						$playersFound = TRUE;
@@ -182,7 +182,7 @@ if($scouting != NULL) {
 								echo '<td>'.$player->getlasttraining().'</td>';
 							}
 							
-							echo '<td>'.$player->getBestIndexName().': '.$player->getBestIndex().'</td>';
+							echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
 							echo '</tr>';
 						}
 					}
@@ -229,7 +229,7 @@ if($scouting != NULL) {
 						echo '<td>'.$player->getassistants().'</td>';
 						echo '<td>'.$language[$player->gettrainingtype()+20].'</td>';
 						echo '<td>'.$player->getlasttraining().'</td>';
-						echo '<td>'.$player->getBestIndexName().': '.$player->getBestIndex().'</td>';
+						echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
 						echo '</tr>';
 						$playersFound = TRUE;
 					}
@@ -281,7 +281,7 @@ if($scouting != NULL) {
 							echo '<td>'.$player->getassistants().'</td>';
 							echo '<td>'.$language[$player->gettrainingtype()+20].'</td>';
 							echo '<td>'.$player->getlasttraining().'</td>';
-							echo '<td>'.$player->getBestIndexName().': '.$player->getBestIndex().'</td>';
+							echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
 							echo '</tr>';
 							$playersFound = TRUE;
 						}
@@ -333,7 +333,7 @@ if($scouting != NULL) {
 							echo '<td>'.$player->getassistants().'</td>';
 							echo '<td>'.$language[$player->gettrainingtype()+20].'</td>';
 							echo '<td bgcolor="#FEE0C6">'.$player->getsundayTraining().'</td>';							
-							echo '<td>'.$player->getBestIndexName().': '.$player->getBestIndex().'</td>';
+							echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
 							echo '</tr>';
 						}
 					}

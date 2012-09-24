@@ -466,7 +466,7 @@ class PlayerDB extends DB {
 		return $list;
 	}
 	
-	public static function getPlayerByRequirements($requirements, $forceAllPlayers) {	
+	public static function getPlayerByRequirements($requirements, $forceAllPlayers, $scout) {	
 		global $const_player_sql;
 		$datum = strtotime("-119 days", time());
 		
@@ -498,7 +498,7 @@ class PlayerDB extends DB {
 			else {
 				$u20Int = 0;
 			}
-			$scout = $requirement->getScoutID();
+			$scoutID = $requirement->getScoutID();
 		 	$indexGK = $requirement->getIndexGK();
 	 		$indexCD = $requirement->getIndexCD();
 	 		$indexDEF = $requirement->getIndexDEF();
@@ -550,7 +550,7 @@ class PlayerDB extends DB {
 			}
 				
 			$prepare_index->bindParam(1, $u20Int, PDO::PARAM_INT);
-			$prepare_index->bindParam(2, $scout, PDO::PARAM_INT);
+			$prepare_index->bindParam(2, $scoutID, PDO::PARAM_INT);
 			$prepare_index->bindParam(3, $indexGK, PDO::PARAM_INT);
 			$prepare_index->bindParam(4, $indexCD, PDO::PARAM_INT);
 			$prepare_index->bindParam(5, $indexDEF, PDO::PARAM_INT);
@@ -579,6 +579,8 @@ class PlayerDB extends DB {
 						$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'], 
 						$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
 						$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+					
+					$player->setScout($scout);
 					
 					if($list != NULL && !in_array($player, $list)) {
 						$list[]		=	$player;
