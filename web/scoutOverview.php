@@ -56,8 +56,52 @@ if($scouting != NULL) {
 			echo '</tr>';
 			echo '<tr>';
 			
-			//Spelers in scoutgroep
 			echo '<td width="50%" valign="top"><table width="95%" class="list">';
+			
+			//pops
+			echo '<tr class="niveau1">';
+			echo '<td colspan="12">Pops (laatste week)</td>';
+			echo '</tr>';
+			echo '<tr class="niveau2">';
+			echo '<td>Naam</td>';
+			echo '<td>ID</td>';
+			echo '<td>Leeftijd</td>';
+			echo '<td>Datum</td>';
+			echo '<td>Skill</td>';
+			echo '<td>Van</td>';
+			echo '<td colspan="5">Naar</td>';
+			echo '<td>Index</td>';
+			echo '</tr>';
+			
+			$playerList	=	$scout->getPlayerList(FALSE);
+			$playersFound = FALSE;
+			
+			if($playerList != NULL) {
+				usort($playerList,'cmpBestIndex');
+				
+				foreach($playerList AS $player) {
+					$vLog = PlayerLogDB::getPlayerLogByPlayerByDate($player->getId(), $datumTraining);
+
+					if ($vLog != Null) {
+						echo '<tr onClick="top.location=\''.$config['url'].'/player/'.$player->getId().'/\'">';
+						echo '<td>'.$player->getName().'</td>';
+						echo '<td>'.$player->getId().'</td>';
+						echo '<td>'.$player->getLeeftijdStr().'</td>';
+						echo '<td>'.date("d-m-y", $vLog->getDate()).'</td>';
+						echo '<td>'.$vLog->getType().'</td>';
+						echo '<td>'.$vLog->getOld().'</td>';
+						echo '<td colspan="5">'.$vLog->getNew().'</td>';
+						echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
+						echo '</tr>';
+						
+						$playersFound = TRUE;
+					}
+				}
+			} 
+			if (! $playersFound) {
+				echo '<tr><td colspan="12" style="cursor: default">Geen pops geregistreerd</td></tr>';
+			}
+			
 			//Nieuwe spelers
 			echo '<tr class="niveau1">';
 			echo '<td colspan="12">Nieuw (laatste week)</td>';
