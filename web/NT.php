@@ -48,6 +48,47 @@ if ($user != Null) {
 		echo '</form>';
 
 		if ($country <> '') {
+		 	echo'<h3>Teamdetails</h3>';	
+		 	echo '<table width=100%>';
+			echo '<tr align="right" class="niveau2">';
+				echo '<td align="left">Update</td>';
+				echo '<td>TS</td>';
+				echo '<td>TC</td>';
+				echo '<td>253</td>';
+				echo '<td>343</td>';
+				echo '<td>352</td>';
+				echo '<td>433</td>';
+				echo '<td>442</td>';
+				echo '<td>451</td>';
+				echo '<td>523</td>';
+				echo '<td>532</td>';
+				echo '<td>541</td>';
+				echo '<td>550</td>';
+			echo '</tr>';
+			$teamDetailList		=	NationalPlayersDB::getTeamDetails($country, 1);
+			if($teamDetailList != NULL) 
+			{
+				foreach($teamDetailList AS $NT)
+				{
+					echo '<tr align="right">';
+					echo '<td align="left">'.date("d-m-y H:i", $NT->getUpdate()).'</td>';
+					echo '<td>'.$NT->getTS().'</td>';
+					echo '<td>'.$NT->getTC().'</td>';
+					echo '<td>'.$NT->getXP253().'</td>';
+					echo '<td>'.$NT->getXP343().'</td>';
+					echo '<td>'.$NT->getXP352().'</td>';
+					echo '<td>'.$NT->getXP433().'</td>';
+					echo '<td>'.$NT->getXP442().'</td>';
+					echo '<td>'.$NT->getXP451().'</td>';
+					echo '<td>'.$NT->getXP523().'</td>';
+					echo '<td>'.$NT->getXP532().'</td>';
+					echo '<td>'.$NT->getXP541().'</td>';
+					echo '<td>'.$NT->getXP550().'</td>';
+					echo '</tr>';	
+				}
+			}
+			echo '</table>';
+			
 			echo'<h3>De spelers</h3>';	
 					$NTPlayersList = NationalPlayersDB::getNationalPlayersList($country);
 					if($NTPlayersList != NULL) 

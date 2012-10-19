@@ -1,4 +1,90 @@
 <?php
+
+class TeamDetail{
+    private $update;
+    private $ts;
+    private $tc;
+    private $xp253;
+    private $xp343;
+    private $xp352;
+    private $xp433;
+    private $xp442;
+    private $xp451;
+    private $xp523;
+    private $xp532;
+    private $xp541;
+    private $xp550;
+ 	
+	public function __construct($update, $ts, $tc, $xp253, $xp343, $xp352, $xp433, $xp442, $xp451, $xp523, $xp532, $xp541, $xp550) 
+	{
+		$this->update			=	$update;
+		$this->ts				=	$ts;
+		$this->tc				=	$tc;
+		$this->xp253			=	$xp253;
+		$this->xp343			=	$xp343;
+		$this->xp352			=	$xp352;
+		$this->xp433			=	$xp433;
+		$this->xp442			=	$xp442;
+		$this->xp451			=	$xp451;
+		$this->xp523			=	$xp523;
+		$this->xp532			=	$xp532;
+		$this->xp541			=	$xp541;
+		$this->xp550			=	$xp550;
+	}
+	
+	public function getXP550() {
+		return $this->xp550;
+	}
+	
+	public function getXP541() {
+		return $this->xp541;
+	}
+	
+	public function getXP532() {
+		return $this->xp532;
+	}
+	
+	public function getXP523() {
+		return $this->xp523;
+	}
+	
+	public function getXP451() {
+		return $this->xp451;
+	}
+	
+	public function getXP442() {
+		return $this->xp442;
+	}
+	
+	public function getXP433() {
+		return $this->xp433;
+	}
+	
+	public function getXP352() {
+		return $this->xp352;
+	}
+	
+	public function getXP343() {
+		return $this->xp343;
+	}
+	
+	public function getXP253() {
+		return $this->xp253;
+	}
+	
+	public function getTC() {
+		return $this->tc;
+	}
+	
+	public function getTS() {
+		return $this->ts;
+	}
+	
+	public function getUpdate() {
+		return $this->update;
+	}
+}
+
 class NationalPlayers {
 	
 	private $id;
@@ -24,8 +110,9 @@ class NationalPlayers {
 	private $ls;
 	private $wage;
 	private $injury;
+	private $teamid;
 
-	public function __construct($id, $player, $country, $age, $tsi, $wage, $stamina, $keeper, $playmaker, $scorer, $passing, $winger, $defender, $setPieces, $caps, $capsU20, $form, $timestamp, $nt, $spec, $xp, $ls, $injury) {
+	public function __construct($id, $player, $teamid, $country, $age, $tsi, $wage, $stamina, $keeper, $playmaker, $scorer, $passing, $winger, $defender, $setPieces, $caps, $capsU20, $form, $timestamp, $nt, $spec, $xp, $ls, $injury) {
 		$this->id				=	$id;
 		$this->player			=	$player;
 		$this->country			=	$country;
@@ -49,6 +136,11 @@ class NationalPlayers {
 		$this->ls				=	$ls;
 		$this->wage				=   $wage;
 		$this->injury			=	$injury;
+		$this->teamid			=   $teamid;
+	}
+	
+	public function getTeamID() {
+		return $this->teamid;
 	}
 
 	public function getId() {
