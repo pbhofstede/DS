@@ -31,7 +31,8 @@ try {
 				 	NationalPlayersDB::insertNationalTeamDetails($U20_Id, $U20, 0);
 				 
 				 	$U20Players = $HT->getNationalPlayers($U20_Id);
-					for($j=1; $j<=$U20Players; $j++)
+				 	$count = $U20Players->getNumberPlayers();
+					for($j=1; $j<=$count; $j++)
 					{
 						$U20Player = $U20Players->getPlayer($j);
 						if ($U20Player != NULL)

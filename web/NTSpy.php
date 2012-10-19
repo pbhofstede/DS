@@ -22,7 +22,6 @@ try {
 			if ($vCountry != NULL)
 			{
 				$NT_Id = $vCountry->getNationalTeamId();
-				$U20_Id = $vCountry->getU20TeamId(); 
 				
 				$NT = $HT->getNationalTeamDetail($NT_Id); 
 				if ($NT != NULL)
@@ -31,7 +30,8 @@ try {
 				 	
 					 
 					$NTPlayers = $HT->getNationalPlayers($NT_Id); 
-				 	for($j=1; $j<=$NTPlayers; $j++)
+					$count = $NTPlayers->getNumberPlayers();
+				 	for($j=1; $j<=$count; $j++)
 					{
 						$NTPlayer = $NTPlayers->getPlayer($j);
 						if ($NTPlayer != NULL)
@@ -42,7 +42,7 @@ try {
 								$player = $HT->getPlayer($PlayerID);
 								if (($player != NULL) && ($player->isSkillsAvailable())) 
 								{
-								 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().')<br>';
+								 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().') [NT]<br>';
 									$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 									if($nationalPlayer != Null)
 									{
@@ -89,13 +89,15 @@ try {
 					} 
 				 	
 				}
+				$U20_Id = $vCountry->getU20TeamId(); 
 				$U20 = $HT->getNationalTeamDetail($U20_Id); 
 				if ($U20 != NULL)
 				{
 				 	NationalPlayersDB::insertNationalTeamDetails($U20_Id, $U20, 0);
 				 
 				 	$U20Players = $HT->getNationalPlayers($U20_Id);
-					for($j=1; $j<=$U20Players; $j++)
+				 	$count = $U20Players->getNumberPlayers();
+					for($j=1; $j<=$count; $j++)
 					{
 						$U20Player = $U20Players->getPlayer($j);
 						if ($U20Player != NULL)
@@ -106,6 +108,7 @@ try {
 								$player = $HT->getPlayer($PlayerID);
 								if (($player != NULL) && ($player->isSkillsAvailable())) 
 								{
+								 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().') [U20]<br>';
 									$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 									if($nationalPlayer != Null){
 										NationalPlayersDB::deleteNationalPlayers($PlayerID);

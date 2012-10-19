@@ -31,7 +31,8 @@ try {
 				 	
 					 
 					$NTPlayers = $HT->getNationalPlayers($NT_Id); 
-				 	for($j=1; $j<=$NTPlayers; $j++)
+					$count = $NTPlayers->getNumberPlayers();
+				 	for($j=1; $j<=$count; $j++)
 					{
 						$NTPlayer = $NTPlayers->getPlayer($j);
 						if ($NTPlayer != NULL)
@@ -42,7 +43,6 @@ try {
 								$player = $HT->getPlayer($PlayerID);
 								if (($player != NULL) && ($player->isSkillsAvailable())) 
 								{
-								 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().')<br>';
 									$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 									if($nationalPlayer != Null)
 									{
