@@ -27,18 +27,18 @@ try {
 		  $a = $_GET['a'];
 		}
 		  
-		//$log = new Logging();
-		//$log->lfile('../scan/log/NTSpy');
+		$log = new Logging();
+		$log->lfile('../scan/log/NTSpy');
 		
 		if ($a == 0)
 		{
 			if( !ini_get('safe_mode') )
 			{
-				//myLog($log, "Safe mode off: setting time limit = 0");
+				myLog($log, "Safe mode off: setting time limit = 0");
 				set_time_limit(0);
 			} 
 			else {
-				//myLog($log, "Safe mode...");
+				myLog($log, "Safe mode...");
 			}	
 	  	}	 
 		$start = $a * 10; // 10 landen per keer
@@ -53,7 +53,7 @@ try {
 	  	
 	  	if ($a == 0)
 	  	{
-			//myLog($log, $vCount.' countries');	
+			myLog($log, $vCount.' countries');	
 		}
 	  	
 	  	if ($start < $vCount)
@@ -67,8 +67,8 @@ try {
 			for($i=$start+1; $i<=$vMax; $i++) 
 			{
 				$vCountry = $worlddetails->getLeague($i);
-				//myLog($log, '');
-				//myLog($log, $i.' '.$vCountry->getCountryName());
+				myLog($log, '');
+				myLog($log, $i.' '.$vCountry->getCountryName());
 				if ($vCountry != NULL)
 				{
 					$NT_Id = $vCountry->getNationalTeamId();
@@ -76,7 +76,10 @@ try {
 					$NT = $HT->getNationalTeamDetail($NT_Id); 
 					if ($NT != NULL)
 					{
-					 	NationalPlayersDB::insertNationalTeamDetails($NT_Id, $NT, 1);
+					 	if (NationalPlayersDB::insertNationalTeamDetails($NT_Id, $NT, 1) == TRUE)
+					 	{
+							myLog($log, 'Teamdetails NT inserted');	
+						}
 					 	
 						 
 						$NTPlayers = $HT->getNationalPlayers($NT_Id); 
@@ -93,7 +96,7 @@ try {
 									if (($player != NULL) && ($player->isSkillsAvailable())) 
 									{
 									 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().') [NT]<br>';
-									 	//myLog($log, $PlayerID.' '.$player->getName());
+									 	myLog($log, $PlayerID.' '.$player->getName());
 										$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 										if($nationalPlayer != Null)
 										{
@@ -144,7 +147,10 @@ try {
 					$U20 = $HT->getNationalTeamDetail($U20_Id); 
 					if ($U20 != NULL)
 					{
-					 	NationalPlayersDB::insertNationalTeamDetails($U20_Id, $U20, 0);
+					 	if (NationalPlayersDB::insertNationalTeamDetails($U20_Id, $U20, 0) == TRUE)
+					 	{
+							myLog($log, 'Teamdetails U20 inserted');	
+						}
 					 
 					 	$U20Players = $HT->getNationalPlayers($U20_Id);
 					 	$count = $U20Players->getNumberPlayers();
@@ -160,7 +166,7 @@ try {
 									if (($player != NULL) && ($player->isSkillsAvailable())) 
 									{
 									 	echo $PlayerID.' '.$player->getName().' ('.$vCountry->getCountryName().') [U20]<br>';
-									 	//myLog($log, $PlayerID.' '.$player->getName());
+									 	myLog($log, $PlayerID.' '.$player->getName());
 										$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 										if($nationalPlayer != Null){
 											NationalPlayersDB::deleteNationalPlayers($PlayerID);
@@ -210,7 +216,7 @@ try {
 	} 
 }
 catch(HTError $e) {
-	echo $e->getMessage();
+	myLog($log, $e->getMessage());
 } 
 
 ini_set("max_execution_time", "30");

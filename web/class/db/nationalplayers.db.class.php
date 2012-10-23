@@ -74,6 +74,7 @@ class NationalPlayersDB extends DB {
 
 	public static function insertNationalTeamDetails($teamid, $team, $isNT)
 	{	
+	 	return FALSE;
 		$country = $team->getShortTeamName();
 		$ts = $team->getTeamSpirit();
 		$tc = $team->getSelfConfidence();
@@ -131,6 +132,7 @@ class NationalPlayersDB extends DB {
 			$prepare->bindParam(15, $isNT, PDO::PARAM_INT);
 					
 			$prepare->execute();
+			return TRUE;
 		}
 	} 
 
