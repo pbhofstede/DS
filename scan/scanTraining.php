@@ -10,6 +10,8 @@ require ('class/log.class.php');
 
 $aantalScanned = 0;
 
+//test push
+
 function myLog($log, $aStr) {
 	$log->lwrite($aStr);
 	//echo $aStr.'<BR>';
