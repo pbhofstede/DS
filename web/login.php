@@ -1,7 +1,7 @@
 <?php
 include ('header.php');
 
-$error = '';
+$error = NULL;
 
 if(isset($_POST['submit'])) {
  
@@ -19,7 +19,7 @@ if(isset($_POST['submit'])) {
 					$_SESSION['dutchscoutsName']	=	$_POST['name'];
 					$_SESSION['dutchscoutsSC']		=	$_POST['securitycode'];
 							
-					redirect($config['url']);
+					redirect($config['url'].'/');
 				}
 				else
 				{

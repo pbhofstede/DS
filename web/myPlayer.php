@@ -175,18 +175,40 @@ if ($user != NULL) {
 			}
 		// Commentaar / informatie voor coach van scout
 			$playerComment	=	PlayerCommentDB::getPlayerCommentById($player->getId());
+			echo '<form action="" method="POST">'; 
+			echo '<table width="100%">';
+				echo '<tr class="niveau1">';
+					echo '<td>Uw opmerkingen</td>';
+				echo '</tr>';
+				if (($playerComment != NULL) && 
+				    ($playerComment->getCoach() <> '')) {
+					echo '<tr class="none">';
+					echo '<td><textarea name="coach" cols=70 rows=6>'.$playerComment->getCoach().'</textarea></td>';
+					echo '</tr>';
+				} else {
+					echo '<tr><td><textarea name="coach" cols=70 rows=6>Voer hier uw opmerkingen in...</textarea></td></tr>';
+				}
+			echo '<tr class="none"><td colspan="2" align="right"><input type="submit" name="submit" value="Voeg toe" /></td></tr>';
+			echo '</table>';
+			
+			if (isset($_POST['submit'])) {
+				PlayerCommentDB::insertOrUpdatePlayerComment(new PlayerComment($player->getId(), $playerComment->getScouts(), $_POST['coach']));
+				header("Location: ".$config['url']."/myPlayer/".$player->getId()."/");
+			}
+			
 			echo '<table width="100%">';
 				echo '<tr class="niveau1">';
 					echo '<td>Commentaar / Informatie van de scouts</td>';
 				echo '</tr>';
 				if($playerComment != NULL) {
 					echo '<tr class="none">';
-						echo '<td>'.$playerComment->getCoach().'</td>';
+						echo '<td>'.$playerComment->getScouts().'</td>';
 					echo '</tr>';
 				} else {
 					echo '<tr><td>Geen informatie beschikbaar</td></tr>';
 				}
 			echo '</table>';
+			
 			echo '<span style="float: right"><a href="'.$config['url'].'/myPlayers/">Terug naar mijn spelers</a></span>';
 		} else {
 			echo 'Speler niet aanwezig.';
