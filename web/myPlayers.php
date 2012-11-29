@@ -31,7 +31,13 @@ if($players != NULL) {
 				echo '<TD>'.$player->getLeeftijdStr().'</TD>';
 				$indexScoutName = $player->getBestIndexScoutName();
 				echo '<TD>'.$player->getBestIndexScout().' ('.$indexScoutName.')</TD>';
-				echo '<TD>'.PlayerDB::getScoutPosition($player->getID(), $indexScoutName).'</td>';
+				
+				if (! $player->getU20()) {
+				  echo '<TD>'.PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $indexScoutName).'</td>';
+				}
+				else {
+				  echo '<td></td>';
+				}
 			echo '</tr>';
 		}
 	echo '</table>';

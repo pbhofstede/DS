@@ -594,7 +594,7 @@ class PlayerDB extends DB {
 		return $list;	
 	}
 	
-	public static function getScoutPosition($playerId, $aIndexName) {
+	public static function getScoutPosition($playerId, $u20, $aIndexName) {
 		$columnName = 'index'.$aIndexName;
 		
 		$datum = strtotime("-119 days", time());
@@ -602,8 +602,16 @@ class PlayerDB extends DB {
 		$sql =
 			"SELECT COUNT(DOEL.ID) as AANTAL ".
 			"FROM player BRON ".
-			"LEFT JOIN player DOEL ON (".
-			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
+			"LEFT JOIN player DOEL ON (";
+			
+		if ($u20) {
+			$sql = $sql."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
+		}
+		else {
+			$sql = $sql."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+		}
+		
+		$sql = $sql.
 			"  (DOEL.".$columnName." > BRON.".$columnName.") AND".
 			"  (DOEL.u20 = BRON.u20) AND".
 			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
@@ -622,7 +630,7 @@ class PlayerDB extends DB {
 	
 	}
 	
-	public static function getScoutPositionConcurrenten($playerId, $aIndexName) {
+	public static function getScoutPositionConcurrenten($playerId, $u20, $aIndexName) {
 		$columnName = 'index'.$aIndexName;
 		
 		$datum = strtotime("-119 days", time());
@@ -630,16 +638,24 @@ class PlayerDB extends DB {
 		$sqlBeter =
 			"SELECT DOEL.ID ".
 			"FROM player BRON ".
-			"LEFT JOIN player DOEL ON (".
-			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
-			"  (DOEL.".$columnName." >= BRON.".$columnName.") AND".
+			"LEFT JOIN player DOEL ON (";
+			
+		if ($u20) {
+			$sqlBeter = $sqlBeter."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
+		}
+		else {
+			$sqlBeter = $sqlBeter."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+		}
+		
+		$sqlBeter = $sqlBeter.
+			"  (DOEL.".$columnName." > BRON.".$columnName.") AND".
 			"  (DOEL.u20 = BRON.u20) AND".
 			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
 			"WHERE ".
 			"  (BRON.ID = ?) AND".
 			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."') ".
 			"ORDER BY DOEL.".$columnName." ASC ".
-			"LIMIT 6";
+			"LIMIT 5";
 			
 		$prepare		=	parent::getConn()->prepare($sqlBeter);
 		
@@ -659,16 +675,24 @@ class PlayerDB extends DB {
 		$sqlMinder =
 			"SELECT DOEL.ID ".
 			"FROM player BRON ".
-			"LEFT JOIN player DOEL ON (".
-			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
-			"  (DOEL.".$columnName." < BRON.".$columnName.") AND".
+			"LEFT JOIN player DOEL ON (";
+			
+		if ($u20) {
+			$sqlMinder = $sqlMinder."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
+		}
+		else {
+			$sqlMinder = $sqlMinder."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+		}
+		
+		$sqlMinder = $sqlMinder.
+			"  (DOEL.".$columnName." <= BRON.".$columnName.") AND".
 			"  (DOEL.u20 = BRON.u20) AND".
 			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
 			"WHERE ".
 			"  (BRON.ID = ?) AND".
 			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."') ".
 			"ORDER BY DOEL.".$columnName." DESC ".
-			"LIMIT 5";
+			"LIMIT 6";
 			
 		$prepare		=	parent::getConn()->prepare($sqlMinder);
 		
