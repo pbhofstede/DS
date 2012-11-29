@@ -393,7 +393,7 @@ class PlayerDB extends DB {
 	public static function getPlayerListByCoach($coachId) {
 		global $const_player_sql;
 		$prepare		=	parent::getConn()->prepare(
-			$const_player_sql."WHERE player.coach = ? ORDER BY player.lastupdate DESC");
+			$const_player_sql."WHERE player.coach = ? ORDER BY player.dateOfBirth DESC, player.lastupdate DESC");
 		$prepare->bindParam(1, $coachId, PDO::PARAM_INT);
 		$prepare->execute();
 		
@@ -602,7 +602,11 @@ class PlayerDB extends DB {
 		$sql =
 			"SELECT COUNT(DOEL.ID) as AANTAL ".
 			"FROM player BRON ".
-			"LEFT JOIN player DOEL ON ((abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND (DOEL.".$columnName." > BRON.".$columnName.")) ".
+			"LEFT JOIN player DOEL ON (".
+			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
+			"  (DOEL.".$columnName." > BRON.".$columnName.") AND".
+			"  (DOEL.u20 = BRON.u20) AND".
+			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
 			"WHERE ".
 			"  (BRON.ID = ?) AND".
 			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."')";
@@ -616,6 +620,66 @@ class PlayerDB extends DB {
 			
 		return $row['AANTAL'] + 1;
 	
+	}
+	
+	public static function getScoutPositionConcurrenten($playerId, $aIndexName) {
+		$columnName = 'index'.$aIndexName;
+		
+		$datum = strtotime("-119 days", time());
+		
+		$sqlBeter =
+			"SELECT DOEL.ID ".
+			"FROM player BRON ".
+			"LEFT JOIN player DOEL ON (".
+			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
+			"  (DOEL.".$columnName." >= BRON.".$columnName.") AND".
+			"  (DOEL.u20 = BRON.u20) AND".
+			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
+			"WHERE ".
+			"  (BRON.ID = ?) AND".
+			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."') ".
+			"ORDER BY DOEL.".$columnName." ASC ".
+			"LIMIT 6";
+			
+		$prepare		=	parent::getConn()->prepare($sqlBeter);
+		
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
+		
+		$list = NULL;
+		
+		foreach($prepare->fetchAll() AS $row) {
+	    $listUnsorted[] = PlayerDB::getPlayer($row['ID']);
+		}
+		
+		for ($i = sizeof($listUnsorted) - 1; $i >= 0; $i--) {
+			$list[] = $listUnsorted[$i];
+		}
+		
+		$sqlMinder =
+			"SELECT DOEL.ID ".
+			"FROM player BRON ".
+			"LEFT JOIN player DOEL ON (".
+			"  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ".
+			"  (DOEL.".$columnName." < BRON.".$columnName.") AND".
+			"  (DOEL.u20 = BRON.u20) AND".
+			"  ((DOEL.scoutID = BRON.scoutID) or (BRON.scoutID IS NULL) or (DOEL.scoutID IS NULL))) ".
+			"WHERE ".
+			"  (BRON.ID = ?) AND".
+			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."') ".
+			"ORDER BY DOEL.".$columnName." DESC ".
+			"LIMIT 5";
+			
+		$prepare		=	parent::getConn()->prepare($sqlMinder);
+		
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
+		
+		foreach($prepare->fetchAll() AS $row) {
+	    $list[] = PlayerDB::getPlayer($row['ID']);
+		}
+		
+		return $list;
 	}
 }
 ?>
