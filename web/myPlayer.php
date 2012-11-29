@@ -22,7 +22,9 @@ if ($user != NULL) {
 			// Speler gegevens
 			echo '<table width="100%">';
 				echo '<tr>';
-					echo '<th colspan="2">'.$player->getName().'</th>';
+				$indexScoutName = $player->getBestIndexScoutName();
+				
+				echo '<th colspan="2">'.$player->getName().' '.$indexScoutName.': '.$player->getBestIndexScout().' Positie: '.PlayerDB::getScoutPosition($player->getID(), $indexScoutName).'</th>';
 				echo '</tr>';
 				echo '<tr class="niveau1">';
 					echo '<td colspan="2">Speler gegevens</td>';

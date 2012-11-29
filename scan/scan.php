@@ -92,6 +92,7 @@ try {
 			echo '<td><strong>'.$language['ID'].'</strong></td>';
 			echo '<td><strong>'.$language['player'].'</strong></td>';
 			echo '<td><strong>'.$language['age'].'</strong></td>';
+			echo '<td><strong>Index</strong></td>';
 			echo '<td width=10%><strong>'.$language['interessant'].'</strong></td>';
 			echo '<td></td>';
 			echo '</tr>';
@@ -145,7 +146,10 @@ try {
 					
 					if ($doUpdate) {
 						$localPlayer->calcIndices();
-					}		
+					}
+					
+					echo '<TD>'.$localPlayer->getBestIndexScout().' ('.$localPlayer->getBestIndexScoutName().')</TD>';
+					
 					if ($localPlayer->getIsInteresting()) {	
 						echo "<TD><FONT COLOR='green'><B>V</B></TD>";
 					}

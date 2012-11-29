@@ -496,7 +496,6 @@ class Player {
 	public function getBestIndexScout() {
 		if ($this->scout == NULL) {
 		  $maxIndex = $this->getBestIndex();
-			echo "null";
 		}
 		else {
 			$indices = explode(',', $this->scout->getIndices());

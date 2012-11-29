@@ -15,18 +15,23 @@ else {
 if($players != NULL) {
 	echo '<table width="100%" class="list">';
 		echo '<tr>';
-			echo '<th colspan="3">Spelers</th>';
+			echo '<th colspan="5">Spelers</th>';
 		echo '</tr>';
 		echo '<tr class="niveau1">';
 			echo '<td>'.$language['ID'].'</td>';
 			echo '<td>'.$language['player'].'</td>';
 			echo '<td>'.$language['age'].'</td>';
+			echo '<td>Index</td>';
+			echo '<td>Scouting pos.</td>';
 		echo '</tr>';
 		foreach($players AS $player) {
 			echo '<tr onClick="top.location=\''.$config['url'].'/myPlayer/'.$player->getId().'/\'">';
 				echo '<td>'.output($player->getId()).'</td>';
 				echo '<td>'.output($player->getName()).'</td>';
 				echo '<TD>'.$player->getLeeftijdStr().'</TD>';
+				$indexScoutName = $player->getBestIndexScoutName();
+				echo '<TD>'.$player->getBestIndexScout().' ('.$indexScoutName.')</TD>';
+				echo '<TD>'.PlayerDB::getScoutPosition($player->getID(), $indexScoutName).'</td>';
 			echo '</tr>';
 		}
 	echo '</table>';

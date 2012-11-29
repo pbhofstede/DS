@@ -52,7 +52,7 @@ if(empty($_POST['submit']) || $error != NULL) {
 	echo '</p>';
 	echo '<p>';
 	echo '<label>Wachtwoord</label>';
-	echo '<input type="password" name="securitycode" onfocus="formInUse = true;"/>  Geef het wachtwoord om in DutchScouts in te kunnen loggen (geen Hattrick veiligheidscode).';
+	echo '<input type="password" name="securitycode" onfocus="formInUse = true;" autocomplete="off"/>  Geef het wachtwoord om in DutchScouts in te kunnen loggen (geen Hattrick veiligheidscode).';
 	echo '</p>';
 	echo '<p>';
 	echo '<label>&nbsp;</label>';

@@ -83,7 +83,7 @@ include('config.php');
 						</p>
 						<p>
 							<label><?php echo $language['password']; ?></label>
-							<input type="password" id="password" maxlength="100" onKeyPress="checkKey(event)" onfocus="formInUse = true;"/>
+							<input type="password" id="password" maxlength="100" onKeyPress="checkKey(event)" onfocus="formInUse = true;" autocomplete="off"/>
 						</p>
 						<p>
 							<label>&nbsp;</label>

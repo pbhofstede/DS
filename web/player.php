@@ -289,19 +289,25 @@ if (($user != NULL) &&
 						}
 						echo '</textarea></td>';
 						echo '<td><textarea readonly="yes" name="coach" cols=70 rows=6>';
-							echo $playerComment->getCoach();
 						echo '</textarea></td>';
 					echo '</tr>';
 					echo '<tr class="none"><td colspan="2" align="right"><input type="submit" name="submit" value="Voeg toe" /></td></tr>';
 				}
 			echo '</table>';
 			
+			if ($playerComment != NULL) {
+				$coach_comment = $playerComment->getCoach();
+			}
+			else {
+			  $coach_comment = '';
+			}
+			
 			if (isset($_POST['submit'])) {
-				PlayerCommentDB::insertOrUpdatePlayerComment(new PlayerComment($player->getId(), $_POST['scouts'], $playerComment->getCoach()));
+				PlayerCommentDB::insertOrUpdatePlayerComment(new PlayerComment($player->getId(), $_POST['scouts'], $coach_comment));
 				header("Location: ".$config['url']."/player/".$player->getId()."/");
 			}
 			if (isset($_POST['verander'])) {
-				PlayerCommentDB::insertOrUpdatePlayerComment(new PlayerComment($player->getId(), $_POST['scouts'], $playerComment->getCoach()));
+				PlayerCommentDB::insertOrUpdatePlayerComment(new PlayerComment($player->getId(), $_POST['scouts'], $coach_comment));
 				header("Location: ".$config['url']."/player/".$player->getId()."/");
 			}
 //Player Log

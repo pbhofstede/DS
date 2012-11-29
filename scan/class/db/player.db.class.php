@@ -593,5 +593,29 @@ class PlayerDB extends DB {
 		
 		return $list;	
 	}
+	
+	public static function getScoutPosition($playerId, $aIndexName) {
+		$columnName = 'index'.$aIndexName;
+		
+		$datum = strtotime("-119 days", time());
+		
+		$sql =
+			"SELECT COUNT(DOEL.ID) as AANTAL ".
+			"FROM player BRON ".
+			"LEFT JOIN player DOEL ON ((abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND (DOEL.".$columnName." > BRON.".$columnName.")) ".
+			"WHERE ".
+			"  (BRON.ID = ?) AND".
+			"  (DOEL.lastupdate >= '".date("Y-m-d", $datum)."')";
+			
+		$prepare		=	parent::getConn()->prepare($sql);
+		
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
+		
+		$row = $prepare->fetch();
+			
+		return $row['AANTAL'] + 1;
+	
+	}
 }
 ?>
