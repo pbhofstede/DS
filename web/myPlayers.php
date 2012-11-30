@@ -21,11 +21,17 @@ if($players != NULL) {
 			echo '<td>'.$language['ID'].'</td>';
 			echo '<td>'.$language['player'].'</td>';
 			echo '<td>'.$language['age'].'</td>';
-			echo '<td>Index</td>';
-			echo '<td>Scouting pos.</td>';
+			echo '<td>Index*</td>';
+			echo '<td>Scouting pos.*</td>';
 		echo '</tr>';
 		foreach($players AS $player) {
-			echo '<tr onClick="top.location=\''.$config['url'].'/myPlayer/'.$player->getId().'/\'">';
+		  if ($player->getIsInteresting()) {
+			  echo '<tr class="niveau2" ';
+			}
+			else {
+			  echo '<tr ';
+			}
+			echo 'onClick="top.location=\''.$config['url'].'/myPlayer/'.$player->getId().'/\'">';
 				echo '<td>'.output($player->getId()).'</td>';
 				echo '<td>'.output($player->getName()).'</td>';
 				echo '<TD>'.$player->getLeeftijdStr().'</TD>';
@@ -41,6 +47,8 @@ if($players != NULL) {
 			echo '</tr>';
 		}
 	echo '</table>';
+	
+	echo '<h4 style="color:#EE6600">* Let op! De index is een objectieve index op de hoogte van de relevante vaardigheden. Hierbij wordt geen rekening gehouden met specialiteiten, vorm, conditie, bruikbaarheid van de speler of persoonlijke voorkeuren van een bondscoach.</h4>';
 } 
 else {
 	if ($user != NULL) {

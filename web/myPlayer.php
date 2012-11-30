@@ -235,6 +235,7 @@ if ($user != NULL) {
 					}
 				}	
 				echo '</table>';
+				echo '<h4 style="color:#EE6600">* Let op! De index is een objectieve index op de hoogte van de relevante vaardigheden. Hierbij wordt geen rekening gehouden met specialiteiten, vorm, conditie, bruikbaarheid van de speler of persoonlijke voorkeuren van een bondscoach.</h4>';
 			}
 			
 		// Commentaar / informatie voor coach van scout

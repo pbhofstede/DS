@@ -663,13 +663,16 @@ class PlayerDB extends DB {
 		$prepare->execute();
 		
 		$list = NULL;
+		$listUnsorted = NULL;
 		
 		foreach($prepare->fetchAll() AS $row) {
 	    $listUnsorted[] = PlayerDB::getPlayer($row['ID']);
 		}
 		
-		for ($i = sizeof($listUnsorted) - 1; $i >= 0; $i--) {
-			$list[] = $listUnsorted[$i];
+		if ($listUnsorted != Null) {
+			for ($i = sizeof($listUnsorted) - 1; $i >= 0; $i--) {
+				$list[] = $listUnsorted[$i];
+			}
 		}
 		
 		$sqlMinder =
