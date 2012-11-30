@@ -3,7 +3,7 @@ class CoachDB extends DB {
 	public static function getCoach($coachId) {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach WHERE id = ? LIMIT 1");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE id = ? LIMIT 1");
 		$prepare->bindParam(1, $coachId, PDO::PARAM_INT);
 		$prepare->execute();
 		
@@ -12,14 +12,14 @@ class CoachDB extends DB {
 			return new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'],
 				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 		}
 	}
 	
 	public static function getCoachByDSUserName($userName) {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach WHERE DSUserName = ? LIMIT 1");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE DSUserName = ? LIMIT 1");
 		$prepare->bindParam(1, $userName, PDO::PARAM_STR);
 		$prepare->execute();
 		
@@ -28,14 +28,14 @@ class CoachDB extends DB {
 			return new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'],
 				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 		}
 	}
 	
 	public static function LoginUser($DSUserName, $DSPassword) {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach WHERE DSUserName = ?");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE DSUserName = ?");
 		$prepare->bindParam(1, $DSUserName, PDO::PARAM_STR);
 		$prepare->execute();
 		
@@ -46,7 +46,7 @@ class CoachDB extends DB {
 				return new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'],
 					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 			}
 		}
 	}
@@ -54,7 +54,7 @@ class CoachDB extends DB {
 	public static function getAllCoaches() {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach ORDER BY ID ASC");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach ORDER BY ID ASC");
 		$prepare->execute();
 		
 		$coaches = array();
@@ -65,7 +65,7 @@ class CoachDB extends DB {
 			$coaches[$count] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
 				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 			
 			$count++;
 			$row =	$prepare->fetch();
@@ -77,7 +77,7 @@ class CoachDB extends DB {
 	public static function getAllCoachesLoginUpdate($datum) {	
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach WHERE (bot = 0) and	((lastHTlogin is null) or (lastHTlogin < ?)) ORDER BY lastHTlogin ASC limit 0, 600");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE (bot = 0) and	((lastHTlogin is null) or (lastHTlogin < ?)) ORDER BY lastHTlogin ASC limit 0, 600");
 		$prepare->bindParam(1, $datum, PDO::PARAM_STR);
 		$prepare->execute();
 		
@@ -89,7 +89,7 @@ class CoachDB extends DB {
 			$coaches[$count] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
 				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 			
 			$count++;
 			$row =	$prepare->fetch();
@@ -102,7 +102,7 @@ class CoachDB extends DB {
 	public static function getUsersToScan($trainingsdate, $a) {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach ".
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot. leagueID FROM coach ".
 			"  WHERE (HTUserToken <> '') AND (HTUserTokenSecret <> '') AND ((LastTrainingDate is null) or (LastTrainingDate <> ?)) ORDER BY ID ASC");
 		$prepare->bindParam(1, $trainingsdate, PDO::PARAM_STR);
 		$prepare->execute();
@@ -114,7 +114,7 @@ class CoachDB extends DB {
 				$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
 					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 			}
 		}
 		
@@ -208,11 +208,12 @@ class CoachDB extends DB {
 		$physios = $coach->getphysios();
 		$doctors = $coach->getdoctors();
 		$lastHTlogin = $coach->getlastHTlogin();
+		$leagueID = $coach->getleagueID();
 		$prepare	=	parent::getConn()->prepare(
 			"INSERT INTO coach (id, teamid, teamname, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin) ".
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID) ".
 			"  VALUES ".
-			"  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			"  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)");
 		$prepare->bindParam(1, $coachID, PDO::PARAM_INT);
 		$prepare->bindParam(2, $teamID, PDO::PARAM_INT);
 		$prepare->bindParam(3, $teamName, PDO::PARAM_STR);
@@ -229,6 +230,7 @@ class CoachDB extends DB {
 		$prepare->bindParam(14, $physios, PDO::PARAM_INT);
 		$prepare->bindParam(15, $doctors, PDO::PARAM_INT);
     $prepare->bindParam(16, $lastHTlogin, PDO::PARAM_STR);
+		$prepare->bindParam(17, $leagueID, PDO::PARAM_INT);
 		$prepare->execute();
 	}
 	
@@ -250,9 +252,10 @@ class CoachDB extends DB {
 		$doctors = $coach->getdoctors();
 		$lastHTlogin = $coach->getlastHTlogin();
 		$bot = $coach->getbot();
+		$leagueID = $coach->getleagueID();
 		$prepare	=	parent::getConn()->prepare(
 			"UPDATE coach set teamid = ?, teamname = ?, DSUserName = ?, DSPassword = ?, HTUserToken = ?, HTUserTokenSecret = ?, LastTrainingDate = ?, conditieperc = ?, ".
-			"  trainingtype = ?, trainingintensity = ?, trainerskill = ?, assistants = ?, physios = ?, doctors = ?, lastHTlogin = ?, bot = ? where id = ?");
+			"  trainingtype = ?, trainingintensity = ?, trainerskill = ?, assistants = ?, physios = ?, doctors = ?, lastHTlogin = ?, bot = ?, leagueID = ? where id = ?");
 		$prepare->bindParam(1, $teamID, PDO::PARAM_INT);
 		$prepare->bindParam(2, $teamName, PDO::PARAM_STR);
 		$prepare->bindParam(3, $DSUserName, PDO::PARAM_STR);
@@ -269,7 +272,9 @@ class CoachDB extends DB {
 		$prepare->bindParam(14, $doctors, PDO::PARAM_INT);
 		$prepare->bindParam(15, $lastHTlogin, PDO::PARAM_STR);
 		$prepare->bindParam(16, $bot, PDO::PARAM_INT);
-		$prepare->bindParam(17, $coachID, PDO::PARAM_INT);
+		$prepare->bindParam(17, $leagueID, PDO::PARAM_INT);
+		
+		$prepare->bindParam(18, $coachID, PDO::PARAM_INT);
 		$prepare->execute();
 	}
 	
@@ -282,14 +287,14 @@ class CoachDB extends DB {
 	
 	public static function getCoachList() {
 		$prepare	=	parent::getConn()->prepare("SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-		"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot FROM coach WHERE DSUserName <> '' ORDER BY teamname ASC");
+		"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE DSUserName <> '' ORDER BY teamname ASC");
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {
 			$list[]		=	new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'],
 				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot']);
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 		}																													
 		
 		return $list;

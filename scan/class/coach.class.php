@@ -19,6 +19,7 @@ class Coach {
 	private $doctors;
 	private $lastHTlogin;
 	private $bot;
+	private $leagueID;
 	
 	/**
 	* Constructs the coach
@@ -28,7 +29,7 @@ class Coach {
 	*/
 	
 	public function __construct($id, $teamid, $teamname, $rank, $lastlogin, $DSUserName, $DSPassword, $HTuserToken, $HTuserTokenSecret, 
-		$LastTraining, $conditieperc, $trainingtype, $trainingintensity, $trainerskill, $assistants, $physios, $doctors, $lastHTlogin, $bot) {
+		$LastTraining, $conditieperc, $trainingtype, $trainingintensity, $trainerskill, $assistants, $physios, $doctors, $lastHTlogin, $bot, $leagueID) {
 		$this->id		=	$id;
 		$this->teamid		=	$teamid;
 		$this->teamname		=	$teamname;
@@ -48,6 +49,7 @@ class Coach {
 		$this->doctors = $doctors;
 		$this->lastHTlogin = $lastHTlogin;
 		$this->bot = $bot;
+		$this->leagueID = $leagueID;
 	}
 	
 	public function getScout() {
@@ -201,6 +203,13 @@ class Coach {
 	}	
 	public function getbot() {
 		return $this->bot;
+	}
+	
+	public function setleagueID($leagueID) {
+		$this->leagueID=$leagueID;
+	}	
+	public function getleagueID() {
+		return $this->leagueID;
 	}
 }
 ?>

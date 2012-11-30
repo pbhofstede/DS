@@ -39,7 +39,8 @@ try {
 			$training = $HT->getTraining();
 			
 			$TeamPlayers = $HT->getTeamPlayers(null, false);
-			$trainerID = $HT->getTeam()->getTrainerId();
+			$team = $HT->getTeam(); 
+			$trainerID = $team->getTrainerId();
 			
 			$i=1;			
 			
@@ -61,6 +62,9 @@ try {
 			$coach->setconditieperc($training->getLastTrainingStaminaTrainingPart());
 			$coach->settrainingtype($training->getLastTrainingTrainingType());
 			$coach->settrainingintensity($training->getLastTrainingTrainingLevel());
+			
+			$coach->setleagueID($team->getLeagueId());
+			
 			$specialists = $HT->getClub()->getSpecialists();
 			if ($specialists != Null) {
 				$coach->setassistants($specialists->getAssistantTrainers());
@@ -72,9 +76,7 @@ try {
 				$coach->setphysios(0);
 				$coach->setdoctors(0);
 			}
-			$coach->setlastHTlogin($HT->getTeam()->getLastLoginDate());
-		
-			$trainerID = $HT->getTeam()->getTrainerId();
+			$coach->setlastHTlogin($team->getLastLoginDate());
 			
 			while($i <= $TeamPlayers->getNumberPlayers()) {
 				$player = $TeamPlayers->getPlayer($i);

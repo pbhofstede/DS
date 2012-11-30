@@ -15,10 +15,13 @@
 	
 		if ($HT->getClub()->getUserId() > 0) {	
 			$coach = CoachDB::getCoach($HT->getClub()->getUserId());
+			
+			$team = $HT->getTeam(); 
+			
 			if ($coach == NULL) {
 				CoachDB::insertCoach(new Coach($HT->getClub()->getUserId(), $HT->getClub()->getTeamId(), $HT->getClub()->getTeamname(),
           "user", "",
-					"", "", $userToken, $userTokenSecret, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+					"", "", $userToken, $userTokenSecret, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $team->getLeagueId()));
 			
 				$coach = CoachDB::getCoach($HT->getClub()->getUserId());
 			}
@@ -27,8 +30,9 @@
 				$coach->setDSPassword("");
 				$coach->setHTuserToken($userToken);
 				$coach->setHTuserTokenSecret($userTokenSecret);
+			  $coach->setleagueID($team->getLeagueId());
 			}
-			
+
 			CoachDB::updateCoach($coach);
 		}
   }

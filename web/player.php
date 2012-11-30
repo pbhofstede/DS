@@ -220,6 +220,60 @@ if (($user != NULL) &&
 		}
 		echo '</tr>';
 		echo '</table>';
+		
+		//Concurrenten		
+		$indexScoutName = $player->getBestIndexScoutName();
+		$mijnPositie = PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $indexScoutName);
+		$concurrenten = PlayerDB::getScoutPositionConcurrenten($player->getID(), $player->getU20(), $indexScoutName);
+		echo '<table width="100%">';
+		echo '<tr class="niveau1">';
+		if ($player->getU20()) {
+			echo '<td colspan="6">Concurrenten (leeftijd u20: + of - 50 dagen)</td>';
+		}
+		else {
+			echo '<td colspan="6">Concurrenten (leeftijd NT: + of - 1 seizoen)</td>';
+		}
+		echo '</tr>';
+		echo '<tr class="niveau2">';
+		echo '<td>Positie</td>';
+		echo '<td>ID</td>';
+		echo '<td>Speler</td>';
+		echo '<td>Specialiteit</td>';
+		echo '<td>Leeftijd</td>';
+		echo '<td>Index '.$indexScoutName.'</td>';
+		echo '</tr>';
+		
+		if ($concurrenten != Null) {
+			$aantalVoor = 0;
+			foreach($concurrenten AS $concurrent) {
+				if ($concurrent->getId() == $player->getId()) {
+					break;
+				}
+				else {
+					$aantalVoor++;
+				}
+			}
+			
+			$startNummer = $mijnPositie - $aantalVoor;
+			foreach($concurrenten AS $concurrent) {
+				if ($concurrent->getId() == $player->getId()) {
+					echo '<tr class="niveau2">';
+				}
+				else {
+					echo '<tr>';
+				}
+				echo '<td>'.$startNummer.'</td>';
+				echo '<td>'.$concurrent->getId().'</td>';
+				echo '<td>'.$concurrent->getName().'</td>';
+				echo '<td>'.$specs[$concurrent->getSpeciality()].'</td>';
+				echo '<td>'.$concurrent->getLeeftijdStr().'</td>';
+				echo '<td>'.$concurrent->getIndexByName($indexScoutName).'</td>';
+				echo '</tr>';
+				$startNummer++;
+			}
+		}	
+		echo '</table>';
+		
 // Speler training volgens coach
 			echo '<table width="100%">';
 				echo '<tr>';

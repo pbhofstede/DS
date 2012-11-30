@@ -174,6 +174,8 @@ try {
 							$trainerID = 0;
 						}
 						
+						$coach->setleagueID($team->getLeagueId());
+						
 						$i=1;
 						$idlist = '';
 					

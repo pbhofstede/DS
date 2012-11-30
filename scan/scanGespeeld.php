@@ -140,6 +140,8 @@ try {
 											
 							$TeamPlayers = $HT->getTeamPlayers(null, false);
 							$team = $HT->getTeam();
+							
+							$coach->setleagueID($team->getLeagueId());
 						
 							$i=1;
 							

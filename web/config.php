@@ -67,14 +67,14 @@ $const_player_sql =
 			"FROM player left join coach on (coach.id = player.coach) ";
 
 
-if ($_SERVER["SERVER_NAME"] == 'www.dutchscouts.nl') {
-	$config['url']			=	'http://www.dutchscouts.nl/web';
-	$config['scan_url']		=	'http://www.dutchscouts.nl/scan';
-} 
-else if ($_SERVER["SERVER_NAME"] == 'localhost') {
+if ($_SERVER["SERVER_NAME"] == 'localhost') {
 	$config['url']			=	'http://localhost/dutchscouts/web';
 	$config['scan_url']		=	'http://localhost/dutchscouts/scan';
 }
+else {
+	$config['url']			=	'http://web.dutchscouts.nl';
+	$config['scan_url']		=	'http://scan.dutchscouts.nl';
+} 
 
 if(!empty($_GET['language'])) {
 	if($_GET['language'] == 'NL') {

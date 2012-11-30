@@ -54,6 +54,8 @@ class TrainingDB extends DB {
 		$prepare->bindParam(1, $coachId, PDO::PARAM_INT);
 		$prepare->execute();
 		
+		$list = Null;
+		
 		foreach($prepare->fetchAll() AS $row) {
 			$list[]		=	new Training($row['id'], $row['coachId'], strtotime($row['van']), strtotime($row['tot']), $row['training'], $row['ti'], $row['conditie'], $row['assistenten'], $row['fysios']);
 		}
