@@ -594,7 +594,7 @@ class PlayerDB extends DB {
 		return $list;	
 	}
 	
-	public static function getScoutPosition($playerId, $u20, $aIndexName) {
+	public static function getScoutPosition($playerId, $u20, $leeftijdjaren, $aIndexName) {
 		$columnName = 'index'.$aIndexName;
 		
 		$datum = strtotime("-119 days", time());
@@ -608,7 +608,14 @@ class PlayerDB extends DB {
 			$sql = $sql."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
 		}
 		else {
-			$sql = $sql."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+		  if ($leeftijdjaren < 28) {
+				$sql = $sql."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+			}
+			else {
+				$dagen = ($leeftijdjaren - 28 + 1) * 112 * -1;
+				
+			  $sql = $sql."  (datediff(BRON.dateOfBirth, DOEL.dateOfBirth) > ".$dagen.") AND";
+			}
 		}
 		
 		$sql = $sql.
@@ -630,7 +637,7 @@ class PlayerDB extends DB {
 	
 	}
 	
-	public static function getScoutPositionConcurrenten($playerId, $u20, $aIndexName) {
+	public static function getScoutPositionConcurrenten($playerId, $u20, $leeftijdjaren, $aIndexName) {
 		$columnName = 'index'.$aIndexName;
 		
 		$datum = strtotime("-119 days", time());
@@ -644,7 +651,14 @@ class PlayerDB extends DB {
 			$sqlBeter = $sqlBeter."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
 		}
 		else {
-			$sqlBeter = $sqlBeter."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+		  if ($leeftijdjaren < 28) {
+				$sqlBeter = $sqlBeter."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+			}
+			else {
+				$dagen = ($leeftijdjaren - 28 + 1) * 112 * -1;
+				
+			  $sqlBeter = $sqlBeter."  (datediff(BRON.dateOfBirth, DOEL.dateOfBirth) > ".$dagen.") AND";
+			}
 		}
 		
 		$sqlBeter = $sqlBeter.
@@ -684,7 +698,14 @@ class PlayerDB extends DB {
 			$sqlMinder = $sqlMinder."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 50) AND ";
 		}
 		else {
-			$sqlMinder = $sqlMinder."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+			if ($leeftijdjaren < 28) {
+				$sqlMinder = $sqlMinder."  (abs(datediff(DOEL.dateOfBirth, BRON.dateOfBirth)) < 112) AND ";
+			}
+			else {
+				$dagen = ($leeftijdjaren - 28 + 1) * 112 * -1;
+				
+			  $sqlMinder = $sqlMinder."  (datediff(BRON.dateOfBirth, DOEL.dateOfBirth) > ".$dagen.") AND";
+			}
 		}
 		
 		$sqlMinder = $sqlMinder.

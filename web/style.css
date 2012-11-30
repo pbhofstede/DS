@@ -257,12 +257,13 @@ table.list tr:hover {
 	cursor: pointer;
 }
 
+/*
 table.list tr.niveau1:hover, table.list tr.niveau2:hover {
 	background: inherit;
 	color: inherit;
 	cursor: inherit;
 }
-
+*/
 
 /*
 Lists

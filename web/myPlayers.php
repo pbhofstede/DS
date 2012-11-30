@@ -39,7 +39,7 @@ if($players != NULL) {
 				echo '<TD>'.$player->getBestIndexScout().' ('.$indexScoutName.')</TD>';
 				
 				if (! $player->getU20()) {
-				  echo '<TD>'.PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $indexScoutName).'</td>';
+				  echo '<TD>'.PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $player->getLeeftijdJaar(), $indexScoutName).'</td>';
 				}
 				else {
 				  echo '<td></td>';

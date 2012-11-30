@@ -70,10 +70,12 @@ $const_player_sql =
 if ($_SERVER["SERVER_NAME"] == 'localhost') {
 	$config['url']			=	'http://localhost/dutchscouts/web';
 	$config['scan_url']		=	'http://localhost/dutchscouts/scan';
+  $config['urlweb']		=	'http://localhost/dutchscouts/web';
 }
 else {
-	$config['url']			=	'http://web.dutchscouts.nl';
-	$config['scan_url']		=	'http://scan.dutchscouts.nl';
+	$config['url']			=	'http://www.dutchscouts.nl/web';
+	$config['scan_url']		=	'http://www.dutchscouts.nl/scan';
+  $config['urlweb']		=	'http://www.dutchscouts.nl/web';
 } 
 
 if(!empty($_GET['language'])) {

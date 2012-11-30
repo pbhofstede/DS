@@ -22,14 +22,16 @@ require('class/db/player.db.class.php');
 require('class/playerLog.class.php');
 require('class/db/playerLog.db.class.php');
 
-if ($_SERVER["SERVER_NAME"] == 'www.dutchscouts.nl') {
-  $config['url']		=	'http://www.dutchscouts.nl/scan';
-  $config['urlweb']		=	'http://www.dutchscouts.nl/web';
-} 
-else if ($_SERVER["SERVER_NAME"] == 'localhost') {
-  $config['url']		=	'http://localhost/dutchscouts/scan';
+if ($_SERVER["SERVER_NAME"] == 'localhost') {
+	$config['url']			=	'http://localhost/dutchscouts/scan';
+	$config['scan_url']		=	'http://localhost/dutchscouts/scan';
   $config['urlweb']		=	'http://localhost/dutchscouts/web';
 }
+else {
+	$config['url']			=	'http://www.dutchscouts.nl/scan';
+	$config['scan_url']		=	'http://www.dutchscouts.nl/scan';
+  $config['urlweb']		=	'http://www.dutchscouts.nl/web';
+} 
 
 $HT_TR_SP = 2;
 $HT_TR_DEF = 3;

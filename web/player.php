@@ -223,8 +223,8 @@ if (($user != NULL) &&
 		
 		//Concurrenten		
 		$indexScoutName = $player->getBestIndexScoutName();
-		$mijnPositie = PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $indexScoutName);
-		$concurrenten = PlayerDB::getScoutPositionConcurrenten($player->getID(), $player->getU20(), $indexScoutName);
+		$mijnPositie = PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $player->getLeeftijdJaar(), $indexScoutName);
+		$concurrenten = PlayerDB::getScoutPositionConcurrenten($player->getID(), $player->getU20(), $player->getLeeftijdJaar(), $indexScoutName);
 		echo '<table width="100%">';
 		echo '<tr class="niveau1">';
 		if ($player->getU20()) {

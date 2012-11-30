@@ -809,6 +809,12 @@ class Player {
 		return floor($aantalDagen / 112).'.'.$aantalDagen % 112;
 	}
 	
+	public function getLeeftijdJaar() {
+		$aantalDagen = getDayInt(0) - getDayInt($this->getDateOfBirth());
+		
+		return floor($aantalDagen / 112);
+	}
+	
 	public function getDefenderStr() {
 	  if ($this->getDefenderSubSkill() > 0) {
 		  return $this->getDefender().' +'.Round($this->getDefenderSubSkill(), 1);
@@ -1143,8 +1149,11 @@ class Player {
 			  $index = $index + $this->getScorerSubSkill();
 			}
 			
-			if ($this->getWinger() > 4) {
-			  $index = $index + ($this->getWinger() - 4);
+			if ($this->getWinger() <= 3) {
+			  $index = $index + $this->getWinger();
+			}
+			else {
+			  $index = $index + 3 + (($this->getWinger() - 3) * 1.5);
 			}
 			$index = $index + min($this->getWingerSubSkill(), 1);
 			
