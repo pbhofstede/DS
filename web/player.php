@@ -162,7 +162,7 @@ if (($user != NULL) &&
 			}
 		}
 		echo '</td>';
-		echo '<td width="10%" valign="top">index GK:<br />index CD:<br />index DEF:<br />index WB: <br />index IM:<br />index WG:<br />index SC:<br />index DFW:<br />index SP:</TD>'; 
+		echo '<td width="10%" valign="top">index GK:<br />index CD:<br />index DEF:<br />index WB: <br />index IM:<br />index WG:<br />index SC:<br />index DFW:<br />index SP:<br /><br />Kwal. index:</TD>'; 
 		echo '<td width="10%" valign="top">';
 		if ($player->getindexGK() > 0) {
 			echo '<b><p STYLE="color: green;">'.$player->getindexGK().'</p></b>';
@@ -213,16 +213,20 @@ if (($user != NULL) &&
 			echo ''.$player->getindexDFW().'<br/>';
 		}
     if ($player->getindexSP() > 0) {
-			echo '<b><p STYLE="color: green;">'.$player->getindexSP().'</p></b></TD>';
+			echo '<b><p STYLE="color: green;">'.$player->getindexSP().'</p></b>';
 		}
 		else {
-			echo ''.$player->getindexSP().'</TD>';
+			echo ''.$player->getindexSP().'<br/>';
 		}
+		
+		$indexScoutName = $player->getBestIndexScoutName();
+		$index = $player->getBestIndexScout();
+		echo '<br/>'.$indexScoutName.': '.Round($player->getLeeftijdWeken() + $index - 200, 2);
+		echo '</TD>';
 		echo '</tr>';
 		echo '</table>';
 		
 		//Concurrenten		
-		$indexScoutName = $player->getBestIndexScoutName();
 		$mijnPositie = PlayerDB::getScoutPosition($player->getID(), $player->getU20(), $player->getLeeftijdJaar(), $indexScoutName);
 		$concurrenten = PlayerDB::getScoutPositionConcurrenten($player->getID(), $player->getU20(), $player->getLeeftijdJaar(), $indexScoutName);
 		echo '<table width="100%">';

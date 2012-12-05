@@ -815,6 +815,12 @@ class Player {
 		return floor($aantalDagen / 112);
 	}
 	
+	public function getLeeftijdWeken() {
+		$aantalDagen = getDayInt(0) - (getDayInt($this->getDateOfBirth()) + (17 * 112));
+		
+		return floor($aantalDagen / 7);
+	}
+	
 	public function getDefenderStr() {
 	  if ($this->getDefenderSubSkill() > 0) {
 		  return $this->getDefender().' +'.Round($this->getDefenderSubSkill(), 1);

@@ -98,6 +98,20 @@ function cmpBestIndex($playerA, $playerB)
 		return 0;
 }
 
+function cmpBestIndexKwal($playerA, $playerB)
+{
+	$a = Round($playerA->getLeeftijdWeken() + $playerA->getBestIndexScout() - 200, 2);
+	$b = Round($playerB->getLeeftijdWeken() + $playerB->getBestIndexScout() - 200, 2);
+	
+ 	if ($a > $b)
+ 		return -1;
+ 	else if ($a < $b)
+ 		return 1;
+ 	else
+		return 0;
+}
+
+
 function cmpBirthday($playerA, $playerB)
 {
  	if ($playerA->getDateOfBirth() > $playerB->getDateOfBirth())
@@ -145,7 +159,7 @@ if($scouting != NULL) {
 			echo '<h2>Scoutgroep: '.$scout->getName().'</h2>';
 			echo '<table width="100%" class="list">';
 			echo '<tr>';
-			echo '<th colspan="20">Spelers</th>';
+			echo '<th colspan="21">Spelers</th>';
 			echo '</tr>';
 			echo '<tr class="niveau1">';
 			echo '<td>ID</td>';
@@ -160,13 +174,14 @@ if($scouting != NULL) {
 			echo '<td>Sp</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpBirthday/'.$allPlayers.'/\'">Leeftijd</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpUpdate/'.$allPlayers.'/\'">Update</td>';
-			echo '<td>Cond%</td>';
+			echo '<td>Co%</td>';
 			echo '<td>TI</td>';
 			echo '<td>Trnr</td>';
 			echo '<td>Ass</td>';
-			echo '<td>Training</td>';
-			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpTraining/'.$allPlayers.'/\'">% Training</td>';
+			echo '<td>TRN</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpTraining/'.$allPlayers.'/\'">% TRN</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpBestIndex/'.$allPlayers.'/\'">Index</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpBestIndexKwal/'.$allPlayers.'/\'">Kwal.</td>';
 			echo '<td>U20</td>';
 			echo '</tr>';
 
@@ -218,7 +233,9 @@ if($scouting != NULL) {
 					echo '<td>'.$player->getassistants().'</td>';
   				echo '<td>'.$language[$player->gettrainingtype()+20].'</td>';
 					echo '<td>'.$player->getlasttraining().'%</td>';
-					echo '<td>'.$player->getBestIndexScoutName().': '.$player->getBestIndexScout().'</td>';
+					$index = $player->getBestIndexScout();
+					echo '<td>'.$player->getBestIndexScoutName().': '.$index.'</td>';
+					echo '<td>'.Round($player->getLeeftijdWeken() + $index - 200, 2).'</td>';
 					if ($player->getU20()) {
 						echo '<td>'.$afwijkingDagen.'</td>';
 					}
