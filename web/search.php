@@ -65,7 +65,7 @@ if (($user != NULL) &&
 	echo '<h1>Spelers zoeken</h1>';
 	echo 'Hier is het mogelijk specifieke spelers te zoeken.<br />';
 	echo 'De eisen zijn minimum eisen. ';
-	echo 'Bij minimalen eisen met veel resultaat zullen slechts de eerste 100 spelers weergegeven worden.';
+	echo 'Bij minimale eisen met veel resultaat zullen slechts de eerste 100 spelers weergegeven worden.';
 //Zoeken	
 	echo '<h2>Zoekopdracht</h2>';
 	echo '<form action="" method="GET">';
@@ -273,19 +273,19 @@ if (($user != NULL) &&
 										if ($team->isBot()) {
 											CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
 												"user", "", "", "", "", "",
-												0, 0, 0, 0, 0, 0, 0, 0, 0, -1));
+												0, 0, 0, 0, 0, 0, 0, 0, 0, -1, $team->getLeagueId()));
 										}
 										else {
 											CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
 												"user", "", "", "", "", "",
-												0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0));
+												0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0, $team->getLeagueId()));
 										}
 										
 									}
 									else {
 										CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
 											"user", "", "", "", "", "",
-											0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+											0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 									}
 									
 									$playercoach = CoachDB::getCoach($userID);
