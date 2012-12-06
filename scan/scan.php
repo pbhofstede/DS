@@ -147,7 +147,7 @@ try {
 					}
 					
 					if ($doUpdate) {
-						$localPlayer->calcIndices();
+						$localPlayer->calcIndicesAndUpdateToDB();
 					}
 					
 					echo '<TD>'.$localPlayer->getBestIndexScout().' ('.$localPlayer->getBestIndexScoutName().')</TD>';
@@ -161,7 +161,6 @@ try {
 					
 					if ($doUpdate) {
 						echo "<TD><B>updated</B></td>";
-						PlayerDB::updatePlayer($localPlayer);
 					}
 					else {
 						echo "<TD></td>";

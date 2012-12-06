@@ -32,14 +32,12 @@ if (($user != NULL) &&
 		if (!empty($_GET['b'])) {
 			if ($_GET['b'] == 'makeU20') {
 				$player->setU20(TRUE);
-				$player->calcIndices();
-				PlayerDB::updatePlayer($player);
+				$player->calcIndicesAndUpdateToDB();
 				PlayerDB::updatePlayerScout($player->getID(), 0);
 			}
 			else if ($_GET['b'] == 'makeNT') {
 				$player->setU20(FALSE);
-				$player->calcIndices();
-				PlayerDB::updatePlayer($player);
+				$player->calcIndicesAndUpdateToDB();
 			}
 			redirect($config['url'].'/player/'.$player->getID().'/');
 		}

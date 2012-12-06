@@ -174,7 +174,7 @@ try {
 											0, 0));
 											
 										$localPlayer = PlayerDB::getPlayer($player->getId());
-										$localPlayer->calcIndices();
+										$localPlayer->calcIndicesAndUpdateToDB();
 									}
 										
 									$matches = $HT->getSeniorTeamMatches();
@@ -369,7 +369,12 @@ try {
 											$localPlayer->addSundayTraining($HT_TR_VLA, 1, $posWG + $posSC);	
 										}
 										
-										PlayerDB::updatePlayer($localPlayer);
+										$localPlayer->update($coach->getId(), $dateOfBirth, $player->getTsi(), $player->getSalary(), $player->getInjury(), 
+											$player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
+											$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
+											$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time());
+							
+										$localPlayer->calcIndicesAndUpdateToDB();
 									} 
 								}
 								$i++;

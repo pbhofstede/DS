@@ -37,8 +37,7 @@ if (($user != NULL) &&
 		$vSubSetpieces = $_POST['setpieces'];
 		$player->setSetPiecesSubSkill($vSubSetpieces);
 		
-		$player->calcIndices();
-		PlayerDB::updatePlayer($player);
+		$player->calcIndicesAndUpdateToDB();
 		
 		header("Location: ".$config['url']."/player/".$player->getId()."/");
 	}

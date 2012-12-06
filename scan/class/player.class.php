@@ -909,7 +909,7 @@ class Player {
 		return $this->assistants;
 	}	
 	
-	public function calcIndices() {
+	public function calcIndicesAndUpdateToDB() {
 		//index berekenen ahv datum laatste update!
 		$aVergLeeftijdDagen = getDayInt($this->getLastupdate()) - getDayInt($this->getDateOfBirth());
 		
@@ -1191,6 +1191,8 @@ class Player {
 				+ 
 				$this->getDefenderSubSkill() + $this->getPlaymakerSubSkill() + $this->getPassingSubSkill() + $this->getSetPiecesSubSkill());
 		}
+		
+		PlayerDB::updatePlayer($this);
 	}
 	
 	public function getscoutid() {

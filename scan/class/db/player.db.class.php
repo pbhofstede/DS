@@ -209,7 +209,7 @@ class PlayerDB extends DB {
 			else {
 				//speler is 21 geworden, U20 uit zetten en NT-indexes berekenen
 				$player->setu20(FALSE);
-				$player->calcIndices();
+				$player->calcIndicesAndUpdateToDB();
 				$u20Int = 0;
 			}
     }

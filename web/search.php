@@ -332,8 +332,7 @@ if (($user != NULL) &&
 								}
 								
 								if ($player != Null) {
-									$player->calcIndices();
-									PlayerDB::updatePlayer($player);
+									$player->calcIndicesAndUpdateToDB();
 									
 									header("Location: ".$config['url']."/player/".$HTplayer->getId()."/");
 								}

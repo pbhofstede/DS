@@ -447,8 +447,7 @@ try {
 									$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
 									$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time());
 							
-								$localPlayer->calcIndices();
-								PlayerDB::updatePlayer($localPlayer);
+								$localPlayer->calcIndicesAndUpdateToDB();
 							}
 							$i++;
 						}

@@ -19,8 +19,7 @@ for ($i = 0; $i<=9; $i++) {
 				//	 ($player->getHasU20Age() <> '')) {
 				//	$player->setu20(TRUE);
 				if ($player->getu20()) { 	
-					$player->calcIndices();
-					PlayerDB::updatePlayer($player);
+					$player->calcIndicesAndUpdateToDB();
 					
 					$count++;
 				}
