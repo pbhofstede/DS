@@ -137,7 +137,7 @@ try {
 			myLog($log, "Clearing last training...");
 			PlayerDB::clearLastTraining();
 			myLog($log, "done");
-			myLog($log, "Clearing last training...");
+			myLog($log, "Clearing last sunday training...");
 			PlayerDB::clearsundayTraining();
 			myLog($log, "done");
 		}

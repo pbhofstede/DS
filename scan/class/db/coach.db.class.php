@@ -102,7 +102,7 @@ class CoachDB extends DB {
 	public static function getUsersToScan($trainingsdate, $a) {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot. leagueID FROM coach ".
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach ".
 			"  WHERE (HTUserToken <> '') AND (HTUserTokenSecret <> '') AND ((LastTrainingDate is null) or (LastTrainingDate <> ?)) ORDER BY ID ASC");
 		$prepare->bindParam(1, $trainingsdate, PDO::PARAM_STR);
 		$prepare->execute();
