@@ -985,12 +985,12 @@ class Player {
 		if ($this->getU20()) {
 			$index = CalculateTrainingWeeks($aVergLeeftijdDagen, 
 				0, 7, 6, 0, 0, 0, 0,
-				0, $this->getDefender(), min($this->getPlaymaker(), 9),  0, 0, 0, 0);
+				0, $this->getDefender(), min($this->getPlaymaker(), 12),  0, 0, 0, 0);
 			
-			if ($this->getPlaymaker() > 9) {
+			if ($this->getPlaymaker() > 12) {
 			  $index = $index 
-								 + (($this->getPlaymaker() - 9) * 2)
-								 + min($this->getPlaymakerSubSkill(), 2);
+								 + (($this->getPlaymaker() - 12) * 4)
+								 + min($this->getPlaymakerSubSkill(), 4);
 			}
 			else {
 				$index = $index + $this->getPlaymakerSubSkill();
