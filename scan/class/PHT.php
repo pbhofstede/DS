@@ -1,10 +1,10 @@
 <?php
 /**
- * PHT 2.10 - 2011-10-27
+ * PHT 2.14 - 2012-10-07
  *
  * @author Telesphore
  * @link http://pht.htloto.org
- * @version 2.10
+ * @version 2.14
  * @license http://www.php.net/license/3_0.txt
  */
 
@@ -20,7 +20,7 @@ class CHPPConnection
 	private $dom;
 	private $oauthToken;
 	private $oauthTokenSecret;
-	private $oauthFirstTokenSecret;
+	protected $oauthFirstTokenSecret;
 	private $logfile = null;
 	private $canlogfile = null;
 	private $overrideSupporter = 0;
@@ -60,6 +60,7 @@ class CHPPConnection
 	private $youthTeamsArchivesMatches = array();
 	private $lineups = array();
 	private $youthLineups = array();
+	private $tournamentLineups = array();
 	private $liveNumber = null;
 	private $liveMatches = null;
 	private $live = null;
@@ -88,6 +89,8 @@ class CHPPConnection
 	private $arenasStats = array();
 	private $myArenaStats = array();
 	private $matchOrders = array();
+	private $youthMatchOrders = array();
+	private $tournamentMatchOrders = array();
 	private $challenges = null;
 	private $challengeableteams = array();
 	private $cups = array();
@@ -123,6 +126,15 @@ class CHPPConnection
 	private $flagsRaisedPlayers = array();
 	private $hofPlayers = array();
 	private $userAlliances = null;
+	private $youthTeams = array();
+	private $youthScouts = array();
+	private $avatars = null;
+	private $youthAvatars = null;
+	private $youthTeamsPlayers = array();
+	private $youthTeamsPlayersDetails = null;
+	private $youthTeamsPlayersUnlockskills = null;
+	private $youthPlayers = array();
+	private $tournamentMatchesDetails = array();
 	//----------
 
 	//---url---
@@ -310,11 +322,10 @@ class CHPPConnection
 	}
 
 	/**
-	 * Returns HTCheckToken object
+	 * Invalidate a token
 	 *
 	 * @param String $oauthToken
 	 * @param String $oauthTokenSecret
-	 * @return HTCheckToken
 	 */
 	public function invalidateToken($oauthToken = null, $oauthTokenSecret = null)
 	{
@@ -386,7 +397,7 @@ class CHPPConnection
 	}
 
 	/**
-	 * @return String
+	 * @return Integer
 	 */
 	protected function getTimestamp()
 	{
@@ -463,7 +474,7 @@ class CHPPConnection
 	}
 
 	/**
-	 * Urlencode paramters properly for oauth query
+	 * Urlencode parameters properly for oauth query
 	 *
 	 * @param Array|String $input
 	 * @return String
@@ -541,6 +552,24 @@ class CHPPConnection
 		{
 			file_put_contents($this->logfile, date("Y-m-d H:i:s ").$text."\n", FILE_APPEND);
 		}
+	}
+
+	/**
+	 * Return if chpp server is available or not
+	 *
+	 * @param Integer $timeout (Timeout in milliseconds)
+	 * @return Boolean
+	 */
+	public function pingChppServer($timeout = 1000)
+	{
+		$curl = curl_init(self::XML_SERVER);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_NOBODY, true);
+		curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
+		curl_setopt($curl, CURLOPT_TIMEOUT_MS, (int)$timeout);
+		$header = curl_exec($curl);
+		$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		return ((int)$code) === 200;
 	}
 
 	/**
@@ -925,7 +954,7 @@ class CHPPConnection
 		}
 		if(!isset($this->leagues[$id]) || $this->leagues[$id] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'leaguedetails', 'leagueLevelUnitID'=>$id, 'version'=>'1.2'));
+			$url = $this->buildUrl(array('file'=>'leaguedetails', 'leagueLevelUnitID'=>$id, 'version'=>'1.4'));
 			$this->leagues[$id] = new HTLeague($this->fetchUrl($url));
 		}
 		return $this->leagues[$id];
@@ -1266,7 +1295,7 @@ class CHPPConnection
 		}
 		if(!isset($this->teamsPlayers[$teamId]) || $this->teamsPlayers[$teamId] === null)
 		{
-			$params = array('file'=>'players', 'version'=>'2.1', 'actionType'=>'view', 'teamID'=>$teamId);
+			$params = array('file'=>'players', 'version'=>'2.2', 'actionType'=>'view', 'teamID'=>$teamId);
 			if($includeMatchInfo == true)
 			{
 				$params['includeMatchInfo'] = 'true';
@@ -1313,7 +1342,7 @@ class CHPPConnection
 		}
 		if(!isset($this->teamsOldPlayers[$teamId]) || $this->teamsOldPlayers[$teamId] === null)
 		{
-			$params = array('file'=>'players', 'version'=>'2.1', 'actionType'=>'viewOldies', 'teamID'=>$teamId);
+			$params = array('file'=>'players', 'version'=>'2.2', 'actionType'=>'viewOldies', 'teamID'=>$teamId);
 			if($includeMatchInfo == true)
 			{
 				$params['includeMatchInfo'] = 'true';
@@ -1360,7 +1389,7 @@ class CHPPConnection
 		}
 		if(!isset($this->teamsOldCoaches[$teamId]) || $this->teamsOldCoaches[$teamId] === null)
 		{
-			$params = array('file'=>'players', 'version'=>'2.1', 'actionType'=>'viewOldCoaches', 'teamID'=>$teamId);
+			$params = array('file'=>'players', 'version'=>'2.2', 'actionType'=>'viewOldCoaches', 'teamID'=>$teamId);
 			if($includeMatchInfo == true)
 			{
 				$params['includeMatchInfo'] = 'true';
@@ -1404,7 +1433,7 @@ class CHPPConnection
 	{
 		if(!isset($this->players[$playerId]) || $this->players[$playerId] === null)
 		{
-			$params = array('file'=>'playerdetails', 'version'=>'2.0', 'playerID'=>$playerId);
+			$params = array('file'=>'playerdetails', 'version'=>'2.1', 'playerID'=>$playerId);
 			if($includeMatchInfo == true)
 			{
 				$params['includeMatchInfo'] = 'true';
@@ -1450,7 +1479,7 @@ class CHPPConnection
 			}
 			if(!isset($this->teamsMatches[$teamId][strtotime($showBeforeDate)]) || $this->teamsMatches[$teamId][strtotime($showBeforeDate)] === null)
 			{
-				$url = $this->buildUrl(array('file'=>'matches', 'teamID'=>$teamId, 'lastMatchDate'=>$showBeforeDate, 'version'=>'2.3'));
+				$url = $this->buildUrl(array('file'=>'matches', 'teamID'=>$teamId, 'lastMatchDate'=>$showBeforeDate, 'version'=>'2.6'));
 				$this->teamsMatches[$teamId][strtotime($showBeforeDate)] = new HTTeamMatches($this->fetchUrl($url));
 			}
 			return $this->teamsMatches[$teamId][strtotime($showBeforeDate)];
@@ -1497,7 +1526,7 @@ class CHPPConnection
 			}
 			if(!isset($this->youthTeamsMatches[$youthTeamId][strtotime($showBeforeDate)]) || $this->youthTeamsMatches[$youthTeamId][strtotime($showBeforeDate)] === null)
 			{
-				$url = $this->buildUrl(array('file'=>'matches', 'teamID'=>$youthTeamId, 'isYouth'=>'true', 'lastMatchDate'=>$showBeforeDate, 'version'=>'2.3'));
+				$url = $this->buildUrl(array('file'=>'matches', 'teamID'=>$youthTeamId, 'isYouth'=>'true', 'lastMatchDate'=>$showBeforeDate, 'version'=>'2.6'));
 				$this->youthTeamsMatches[$youthTeamId][strtotime($showBeforeDate)] = new HTTeamMatches($this->fetchUrl($url));
 			}
 			return $this->youthTeamsMatches[$youthTeamId][strtotime($showBeforeDate)];
@@ -1538,7 +1567,7 @@ class CHPPConnection
 	{
 		if(!isset($this->matchesDetails[$matchId]) || $this->matchesDetails[$matchId] === null)
 		{
-			$params = array('file'=>'matchdetails', 'version'=>'2.0', 'matchID'=>$matchId);
+			$params = array('file'=>'matchdetails', 'version'=>'2.3', 'sourceSystem'=>'hattrick', 'matchID'=>$matchId);
 			if($matchEvents === true)
 			{
 				$params['matchEvents'] = 'true';
@@ -1578,7 +1607,7 @@ class CHPPConnection
 	{
 		if(!isset($this->youthMatchesDetails[$matchId]) || $this->youthMatchesDetails[$matchId] === null)
 		{
-			$params = array('file'=>'matchdetails', 'version'=>'2.0', 'matchID'=>$matchId, 'isYouth'=>'true');
+			$params = array('file'=>'matchdetails', 'version'=>'2.3', 'sourceSystem'=>'youth', 'matchID'=>$matchId);
 			if($matchEvents === true)
 			{
 				$params['matchEvents'] = 'true';
@@ -1605,6 +1634,46 @@ class CHPPConnection
 	public function clearYouthMatchesDetails()
 	{
 		$this->youthMatchesDetails = array();
+	}
+
+	/**
+	 * Return HTMatch object
+	 *
+	 * @param Integer $matchId
+	 * @param Boolean $matchEvents
+	 * @return HTMatch
+	 */
+	public function getTournamentMatchDetails($matchId, $matchEvents = true)
+	{
+		if(!isset($this->tournamentMatchesDetails[$matchId]) || $this->tournamentMatchesDetails[$matchId] === null)
+		{
+			$params = array('file'=>'matchdetails', 'version'=>'2.3', 'sourceSystem'=>'htointegrated', 'matchID'=>$matchId);
+			if($matchEvents === true)
+			{
+				$params['matchEvents'] = 'true';
+			}
+			$url = $this->buildUrl($params);
+			$this->tournamentMatchesDetails[$matchId] = new HTMatch($this->fetchUrl($url));
+		}
+		return $this->tournamentMatchesDetails[$matchId];
+	}
+
+	/**
+	 * Delete cache of tournament match detail
+	 *
+	 * @param Integer $matchId
+	 */
+	public function clearTournamentMatchDetail($matchId)
+	{
+		$this->tournamentMatchesDetails[$matchId] = null;
+	}
+
+	/**
+	 * Delete cache of all tournament matches details
+	 */
+	public function clearTournamentMatchesDetails()
+	{
+		$this->tournamentMatchesDetails = array();
 	}
 
 	/**
@@ -1731,7 +1800,7 @@ class CHPPConnection
 		}
 		if(!isset($this->lineups[$matchId][$teamId]) || $this->lineups[$matchId][$teamId] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'matchlineup', 'version'=>'1.6', 'matchID'=>$matchId, 'teamID'=>$teamId));
+			$url = $this->buildUrl(array('file'=>'matchlineup', 'version'=>'1.8', 'sourceSystem'=>'hattrick', 'matchID'=>$matchId, 'teamID'=>$teamId));
 			$this->lineups[$matchId][$teamId] = new HTLineup($this->fetchUrl($url));
 		}
 		return $this->lineups[$matchId][$teamId];
@@ -1783,7 +1852,7 @@ class CHPPConnection
 		}
 		if(!isset($this->youthLineups[$matchId][$youthTeamId]) || $this->youthLineups[$matchId][$youthTeamId] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'matchlineup', 'version'=>'1.6', 'matchID'=>$matchId, 'teamID'=>$youthTeamId, 'isYouth'=>'true'));
+			$url = $this->buildUrl(array('file'=>'matchlineup', 'version'=>'1.8', 'matchID'=>$matchId, 'teamID'=>$youthTeamId, 'sourceSystem'=>'youth'));
 			$this->youthLineups[$matchId][$youthTeamId] = new HTLineup($this->fetchUrl($url));
 		}
 		return $this->youthLineups[$matchId][$youthTeamId];
@@ -1817,16 +1886,60 @@ class CHPPConnection
 	}
 
 	/**
+	 * Return tournament HTLineup object
+	 *
+	 * @param Integer $matchId
+	 * @param Integer $teamId
+	 * @return HTLineup
+	 */
+	public function getTournamentLineup($matchId, $teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getClub()->getTeamId();
+		}
+		if(!isset($this->tournamentLineups[$matchId][$teamId]) || $this->tournamentLineups[$matchId][$teamId] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'matchlineup', 'version'=>'1.8', 'sourceSystem'=>'htointegrated', 'matchID'=>$matchId, 'teamID'=>$teamId));
+			$this->tournamentLineups[$matchId][$teamId] = new HTLineup($this->fetchUrl($url));
+		}
+		return $this->tournamentLineups[$matchId][$teamId];
+	}
+
+	/**
+	 * Delete cache of tournament lineup
+	 *
+	 * @param Integer $matchId
+	 * @param Integer $teamId
+	 */
+	public function clearTournamentLineup($matchId, $teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getClub()->getTeamId();
+		}
+		$this->tournamentLineups[$matchId][$teamId] = null;
+	}
+
+	/**
+	 * Delete all caches of tournament lineups
+	 */
+	public function clearTournamentLineups()
+	{
+		$this->tournamentLineups = array();
+	}
+
+	/**
 	 * Add a match to HT-Live
 	 *
 	 * @param Integer $matchId
-	 * @param Boolean $isYouth
+	 * @param String $sourceSystem
 	 */
-	public function addLiveMatch($matchId, $isYouth = false)
+	public function addLiveMatch($matchId, $sourceSystem = 'hattrick')
 	{
 		if($this->liveNumber < 20)
 		{
-			$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'addMatch', 'matchID'=>$matchId, 'version'=>'1.6', 'isYouth'=>$isYouth));
+			$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'addMatch', 'matchID'=>$matchId, 'version'=>'1.8', 'sourceSystem'=>$sourceSystem));
 			$this->fetchUrl($url);
 			if($this->liveNumber === null)
 			{
@@ -1843,11 +1956,11 @@ class CHPPConnection
 	 * Delete a match in HT-Live
 	 *
 	 * @param Integer $matchId
-	 * @param Boolean $isYouth
+	 * @param String $sourceSystem
 	 */
-	public function deleteLiveMatch($matchId, $isYouth = false)
+	public function deleteLiveMatch($matchId, $sourceSystem = 'hattrick')
 	{
-		$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'deleteMatch', 'matchID'=>$matchId, 'version'=>'1.6', 'isYouth'=>$isYouth));
+		$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'deleteMatch', 'matchID'=>$matchId, 'version'=>'1.8', 'sourceSystem'=>$sourceSystem));
 		$this->fetchUrl($url);
 		$this->liveNumber--;
 		if($this->liveNumber <= 0)
@@ -1862,17 +1975,10 @@ class CHPPConnection
 	 */
 	public function clearAllLiveMatches()
 	{
-		$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'clearAll', 'version'=>'1.6'));
+		$url = $this->buildUrl(array('file'=>'live', 'actionType'=>'clearAll', 'version'=>'1.8'));
 		$this->fetchUrl($url);
 		$this->liveNumber = null;
 		$this->liveJson = null;
-	}
-
-	/**
-	 * @deprecated not used anymore
-	 */
-	protected function checkInitLive()
-	{
 	}
 
 	/**
@@ -1900,7 +2006,7 @@ class CHPPConnection
 			$action = 'viewAll';
 			$this->liveAllEvents = true;
 		}
-		$params = array('file'=>'live', 'actionType'=>$action, 'version'=>'1.6');
+		$params = array('file'=>'live', 'actionType'=>$action, 'version'=>'1.8');
 		if($includeStartingLineup === true)
 		{
 			$params['includeStartingLineup'] = 'true';
@@ -1918,7 +2024,7 @@ class CHPPConnection
 			$match = $liveObject->getMatch($i);
 			$json[] = array(
 				'matchId' => $match->getId(),
-				'isYouth' => $match->isYouth() ? 'true' : 'false',
+				'sourceSystem' => $match->getSourceSystem(),
 				'index' 	=> $match->getLastEventIndexShown()
 			);
 		}
@@ -1940,12 +2046,15 @@ class CHPPConnection
 		{
 			$id = $tab['matchId'];
 			$e = null;
-			foreach ($original as $i => $otab)
+			if(count($original))
 			{
-				if($otab['matchId'] == $id)
+				foreach ($original as $i => $otab)
 				{
-					$e = $i;
-					break;
+					if($otab['matchId'] == $id)
+					{
+						$e = $i;
+						break;
+					}
 				}
 			}
 			if($e !== null)
@@ -2202,7 +2311,7 @@ class CHPPConnection
 	{
 		if(!isset($this->worldCupGroups[$cupId][$season][$matchRound]) || $this->worldCupGroups[$cupId][$season][$matchRound] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'worldcup', 'actionType'=>'viewGroups', 'cupID'=>$cupId, 'season'=>$season, 'matchRound'=>$matchRound, 'version'=>'1.1'));
+			$url = $this->buildUrl(array('file'=>'worldcup', 'actionType'=>'viewGroups', 'cupID'=>$cupId, 'season'=>$season, 'matchRound'=>$matchRound, 'version'=>'1.2'));
 			$this->worldCupGroups[$cupId][$season][$matchRound] = new HTWorldCupGroup($this->fetchUrl($url));
 		}
 		return $this->worldCupGroups[$cupId][$season][$matchRound];
@@ -2240,7 +2349,7 @@ class CHPPConnection
 	{
 		if(!isset($this->worldCupMatches[$cupSeriesUnitID][$cupId][$season][$matchRound]) || $this->worldCupMatches[$cupSeriesUnitID][$cupId][$season][$matchRound] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'worldcup', 'actionType'=>'viewMatches', 'cupID'=>$cupId, 'season'=>$season, 'matchRound'=>$matchRound, 'cupSeriesUnitID'=>$cupSeriesUnitID, 'version'=>'1.1'));
+			$url = $this->buildUrl(array('file'=>'worldcup', 'actionType'=>'viewMatches', 'cupID'=>$cupId, 'season'=>$season, 'matchRound'=>$matchRound, 'cupSeriesUnitID'=>$cupSeriesUnitID, 'version'=>'1.2'));
 			$this->worldCupMatches[$cupSeriesUnitID][$cupId][$season][$matchRound] = new HTWorldCupMatches($this->fetchUrl($url));
 		}
 		return $this->worldCupMatches[$cupSeriesUnitID][$cupId][$season][$matchRound];
@@ -2485,15 +2594,52 @@ class CHPPConnection
 	 *
 	 * @param Integer $matchId
 	 * @return HTMatchOrders
+	 * @deprecated Use getSeniorMatchOrders() or getYouthMatchOrders()
 	 */
 	public function getMatchOrders($matchId, $isYouth = false)
 	{
-		if(!isset($this->matchOrders[$isYouth][$matchId]) || $this->matchOrders[$isYouth][$matchId] === null)
+		if($isYouth)
 		{
-			$url = $this->buildUrl(array('file'=>'matchorders', 'version'=>'1.8', 'matchID'=>$matchId, 'isYouth'=>$isYouth));
-			$this->matchOrders[$isYouth][$matchId] = new HTMatchOrders($this->fetchUrl($url));
+			return $this->getSeniorMatchOrders($matchId);
 		}
-		return $this->matchOrders[$isYouth][$matchId];
+		return $this->getYouthMatchOrders($matchId);
+	}
+
+	/**
+	 * Delete cache of match orders
+	 *
+	 * @param Integer $matchId
+	 * @deprecated Use clearSeniorMatchOrders()
+	 */
+	public function clearMatchOrders($matchId)
+	{
+		$this->clearSeniorMatchOrders($matchId);
+	}
+
+	/**
+	 * Delete all caches of matches orders
+	 *
+	 * @deprecated Use clearSeniorMatchesOrders()
+	 */
+	public function clearMatchesOrders()
+	{
+		$this->clearSeniorMatchesOrders();
+	}
+
+	/**
+	 * Return HTMatchOrders object
+	 *
+	 * @param Integer $matchId
+	 * @return HTMatchOrders
+	 */
+	public function getSeniorMatchOrders($matchId)
+	{
+		if(!isset($this->matchOrders[$matchId]) || $this->matchOrders[$matchId] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'matchorders', 'version'=>'2.1', 'matchID'=>$matchId, 'sourceSystem'=>'hattrick'));
+			$this->matchOrders[$matchId] = new HTMatchOrders($this->fetchUrl($url));
+		}
+		return $this->matchOrders[$matchId];
 	}
 
 	/**
@@ -2501,7 +2647,7 @@ class CHPPConnection
 	 *
 	 * @param Integer $matchId
 	 */
-	public function clearMatchOrders($matchId)
+	public function clearSeniorMatchOrders($matchId)
 	{
 		$this->matchOrders[$matchId] = null;
 	}
@@ -2509,9 +2655,77 @@ class CHPPConnection
 	/**
 	 * Delete all caches of matches orders
 	 */
-	public function clearMatchesOrders()
+	public function clearSeniorMatchesOrders()
 	{
 		$this->matchOrders = array();
+	}
+
+	/**
+	 * Return HTMatchOrders object
+	 *
+	 * @param Integer $matchId
+	 * @return HTMatchOrders
+	 */
+	public function getYouthMatchOrders($matchId)
+	{
+		if(!isset($this->youthMatchOrders[$matchId]) || $this->youthMatchOrders[$matchId] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'matchorders', 'version'=>'2.1', 'matchID'=>$matchId, 'sourceSystem'=>'youth'));
+			$this->youthMatchOrders[$matchId] = new HTMatchOrders($this->fetchUrl($url));
+		}
+		return $this->youthMatchOrders[$matchId];
+	}
+
+	/**
+	 * Delete cache of youth match orders
+	 *
+	 * @param Integer $matchId
+	 */
+	public function clearYouthMatchOrders($matchId)
+	{
+		$this->youthMatchOrders[$matchId] = null;
+	}
+
+	/**
+	 * Delete all caches of youth matches orders
+	 */
+	public function clearYouthMatchesOrders()
+	{
+		$this->youthMatchOrders = array();
+	}
+
+	/**
+	 * Return HTMatchOrders object
+	 *
+	 * @param Integer $matchId
+	 * @return HTMatchOrders
+	 */
+	public function getTournamentMatchOrders($matchId)
+	{
+		if(!isset($this->tournamentMatchOrders[$matchId]) || $this->tournamentMatchOrders[$matchId] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'matchorders', 'version'=>'2.1', 'matchID'=>$matchId, 'sourceSystem'=>'htointegrated'));
+			$this->tournamentMatchOrders[$matchId] = new HTMatchOrders($this->fetchUrl($url));
+		}
+		return $this->tournamentMatchOrders[$matchId];
+	}
+
+	/**
+	 * Delete cache of tournament match orders
+	 *
+	 * @param Integer $matchId
+	 */
+	public function clearTournamentMatchOrders($matchId)
+	{
+		$this->tournamentMatchOrders[$matchId] = null;
+	}
+
+	/**
+	 * Delete all caches of tournament matches orders
+	 */
+	public function clearTournamentMatchesOrders()
+	{
+		$this->tournamentMatchOrders = array();
 	}
 
 	/**
@@ -3419,7 +3633,7 @@ class CHPPConnection
 	{
 		if(!isset($this->allianceDetails[$allianceId]) || $this->allianceDetails[$allianceId] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'allianceDetails', 'allianceID'=>$allianceId, 'showRules'=>'true', 'showLoggedIn'=>'true', 'version'=>'1.3'));
+			$url = $this->buildUrl(array('file'=>'alliancedetails', 'allianceID'=>$allianceId, 'showRules'=>'true', 'showLoggedIn'=>'true', 'version'=>'1.4'));
 			$this->allianceDetails[$allianceId] = new HTAllianceDetails($this->fetchUrl($url));
 		}
 		return $this->allianceDetails[$allianceId];
@@ -3453,7 +3667,7 @@ class CHPPConnection
 	{
 		if(!isset($this->allianceMembers[$allianceId]) || $this->allianceMembers[$allianceId] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'allianceDetails', 'actionType'=>'members', 'allianceID'=>$allianceId, 'version'=>'1.3'));
+			$url = $this->buildUrl(array('file'=>'alliancedetails', 'actionType'=>'members', 'allianceID'=>$allianceId, 'version'=>'1.4'));
 			$this->allianceMembers[$allianceId] = new HTAllianceMembers($this->fetchUrl($url));
 		}
 		return $this->allianceMembers[$allianceId];
@@ -3493,7 +3707,7 @@ class CHPPConnection
 		}
 		if(!isset($this->allianceMembersLetters[$allianceId][$letter]) || $this->allianceMembersLetters[$allianceId][$letter] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'allianceDetails', 'actionType'=>'membersSubset', 'allianceID'=>$allianceId, 'subSet'=>$letter, 'version'=>'1.3'));
+			$url = $this->buildUrl(array('file'=>'alliancedetails', 'actionType'=>'membersSubset', 'allianceID'=>$allianceId, 'subSet'=>$letter, 'version'=>'1.4'));
 			$this->allianceMembersLetters[$allianceId][$letter] = new HTAllianceMembers($this->fetchUrl($url));
 		}
 		return $this->allianceMembersLetters[$allianceId][$letter];
@@ -3542,7 +3756,7 @@ class CHPPConnection
 	{
 		if(!isset($this->allianceRoles[$allianceId]) || $this->allianceRoles[$allianceId] === null)
 		{
-			$url = $this->buildUrl(array('file'=>'allianceDetails', 'actionType'=>'roles', 'allianceID'=>$allianceId, 'version'=>'1.3'));
+			$url = $this->buildUrl(array('file'=>'alliancedetails', 'actionType'=>'roles', 'allianceID'=>$allianceId, 'version'=>'1.4'));
 			$this->allianceRoles[$allianceId] = new HTAllianceRoles($this->fetchUrl($url));
 		}
 		return $this->allianceRoles[$allianceId];
@@ -3564,52 +3778,6 @@ class CHPPConnection
 	public function clearAlliancesRoles()
 	{
 		$this->allianceRoles = array();
-	}
-
-	/**
-	 * Return HTAllianceRoleDetails object
-	 *
-	 * @param Integer $allianceId
-	 * @return HTAllianceMembers
-	 */
-	public function getAllianceRoleDetails($allianceId, $roleId)
-	{
-		if(!isset($this->allianceRoleDetails[$allianceId][$roleId]) || $this->allianceRoleDetails[$allianceId][$roleId] === null)
-		{
-			$url = $this->buildUrl(array('file'=>'allianceDetails', 'actionType'=>'viewRole', 'allianceID'=>$allianceId, 'allianceRoleID'=>$roleId, 'version'=>'1.3'));
-			$this->allianceRoleDetails[$allianceId][$roleId] = new HTAllianceRoleDetails($this->fetchUrl($url));
-		}
-		return $this->allianceRoleDetails[$allianceId][$roleId];
-	}
-
-	/**
-	 * Delete cache of alliance role details
-	 *
-	 * @param Integer $allianceId
-	 * @param Integer $roleID
-	 */
-	public function clearAllianceRoleDetails($allianceId, $roleID)
-	{
-		$this->allianceRoleDetails[$allianceId][$roleID] = null;
-	}
-
-	/**
-	 * Delete cache of alliance roles details
-	 *
-	 * @param Integer $allianceId
-	 * @param Integer $roleID
-	 */
-	public function clearAllianceRolesDetails($allianceId)
-	{
-		$this->allianceRoleDetails[$allianceId] = null;
-	}
-
-	/**
-	 * Delete all cache of alliances roles
-	 */
-	public function clearAlliancesRolesDetails()
-	{
-		$this->allianceRoleDetails = array();
 	}
 
 	/**
@@ -3694,9 +3862,29 @@ class CHPPConnection
 	}
 
 	/**
-	 * Return HTHofPlayers object
+	 * Delete cache of hof players
+	 */
+	public function clearHofPlayers($teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getTeam()->getTeamId();
+		}
+		$this->hofPlayers[$teamId] = null;
+	}
+
+	/**
+	 * Delete cache of all achievements
+	 */
+	public function clearAllHofPlayers()
+	{
+		$this->hofPlayers = array();
+	}
+
+	/**
+	 * Return HTAvatars object
 	 *
-	 * @return HTHofPlayers
+	 * @return HTAvatars
 	 */
 	public function getAvatars()
 	{
@@ -3706,6 +3894,37 @@ class CHPPConnection
 			$this->avatars = new HTAvatars($this->fetchUrl($url));
 		}
 		return $this->avatars;
+	}
+
+	/**
+	 * Delete cache of avatars
+	 */
+	public function clearAvatars()
+	{
+		$this->avatars = null;
+	}
+
+	/**
+	 * Return HTYouthAvatars object
+	 *
+	 * @return HTYouthAvatars
+	 */
+	public function getYouthAvatars()
+	{
+		if(!isset($this->youthAvatars) || $this->youthAvatars === null)
+		{
+			$url = $this->buildUrl(array('file'=>'youthavatars', 'version'=>'1.0'));
+			$this->youthAvatars = new HTYouthAvatars($this->fetchUrl($url));
+		}
+		return $this->youthAvatars;
+	}
+
+	/**
+	 * Delete cache of avatars
+	 */
+	public function clearYouthAvatars()
+	{
+		$this->youthAvatars = null;
 	}
 
 	/**
@@ -4017,12 +4236,12 @@ class CHPPConnection
 	 * Return HTSetLineup object
 	 *
 	 * @param Integer $matchId
-	 * @param Boolean $isYouth
+	 * @param String $sourceSystem
 	 * @return HTSetLineup
 	 */
-	public function createNewLineup($matchId, $isYouth = false)
+	public function createNewLineup($matchId, $sourceSystem = HTMatch::SENIOR)
 	{
-		return new HTSetLineup($matchId, $isYouth);
+		return new HTSetLineup($matchId, $sourceSystem);
 	}
 
 	/**
@@ -4034,8 +4253,268 @@ class CHPPConnection
 	public function sendLineup($lineup)
 	{
 		$json = $lineup->getJson();
-		$url = $this->buildUrl(array('file'=>'matchorders', 'actionType'=>'setmatchorder', 'version'=>'1.8', 'matchID'=>$lineup->getMatchId(), 'isYouth'=>$lineup->isYouth()), array('lineup'=>$json));
+		$url = $this->buildUrl(array('file'=>'matchorders', 'actionType'=>'setmatchorder', 'version'=>'2.1', 'matchID'=>$lineup->getMatchId(), 'sourceSystem'=>$lineup->getSourceSystem()), array('lineup'=>$json));
 		return new HTLineupResult($this->fetchUrl($url, true, array('lineup'=>$json)));
+	}
+
+	/**
+	 * Return HTYouthTeam object
+	 *
+	 * @param Integer $id
+	 * @return HTYouthTeam
+	 */
+	public function getYouthTeam($id = null)
+	{
+		if($id === null)
+		{
+			$id = $this->getTeam()->getYouthTeamId();
+		}
+		if(!isset($this->youthTeams[$id]) || $this->youthTeams[$id] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'youthteamdetails', 'youthTeamId'=>$id, 'version'=>'1.0'));
+			$this->youthTeams[$id] = new HTYouthTeam($this->fetchUrl($url));
+		}
+		return $this->youthTeams[$id];
+	}
+
+	/**
+	 * Delete cache of youth team data
+	 *
+	 * @param Integer $id
+	 */
+	public function clearYouthTeam($id = null)
+	{
+		if($id === null)
+		{
+			$id = $this->getTeam()->getYouthTeamId();
+		}
+		$this->youthTeams[$id] = null;
+	}
+
+	/**
+	 * Clear cache of all youth teams
+	 */
+	public function clearYouthTeams()
+	{
+		$this->youthTeams = array();
+	}
+
+	/**
+	 * Return HTYouthScouts object
+	 *
+	 * @param Integer $teamId
+	 * @return HTYouthScouts
+	 */
+	public function getYouthScouts($teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getTeam()->getYouthTeamId();
+		}
+		if(!isset($this->youthScouts[$teamId]) || $this->youthScouts[$teamId] === null)
+		{
+			$url = $this->buildUrl(array('file'=>'youthteamdetails', 'youthTeamId'=>$teamId, 'version'=>'1.0', 'showScouts'=>'true'));
+			$this->youthScouts[$teamId] = new HTYouthScouts($this->fetchUrl($url));
+		}
+		return $this->youthScouts[$teamId];
+	}
+
+	/**
+	 * Delete cache of youth scout data
+	 *
+	 * @param Integer $teamId
+	 */
+	public function clearYouthScouts($teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getTeam()->getYouthTeamId();
+		}
+		$this->youthScouts[$teamId] = null;
+	}
+
+	/**
+	 * Clear cache of all youth scouts
+	 */
+	public function clearAllYouthScouts()
+	{
+		$this->youthScouts = array();
+	}
+
+	/**
+	 * Return HTYouthTeamPlayers object
+	 *
+	 * @param Integer $teamId
+	 * @param String $orderBy
+	 * @return HTYouthTeamPlayers
+	 */
+	public function getYouthTeamPlayers($teamId = null, $orderBy = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getTeam()->getYouthTeamId();
+		}
+		if(!isset($this->youthTeamsPlayers[$teamId][$orderBy]) || $this->youthTeamsPlayers[$teamId][$orderBy] === null)
+		{
+			$params = array('file'=>'youthplayerlist', 'youthTeamId'=>$teamId, 'version'=>'1.0', 'actionType'=>'list');
+			if($orderBy !== null)
+			{
+				$params['orderBy'] = $orderBy;
+			}
+			$url = $this->buildUrl($params);
+			$this->youthTeamsPlayers[$teamId][$orderBy] = new HTYouthTeamPlayers($this->fetchUrl($url));
+		}
+		return $this->youthTeamsPlayers[$teamId][$orderBy];
+	}
+
+	/**
+	 * Delete cache of youth team players data
+	 *
+	 * @param Integer $teamId
+	 */
+	public function clearYouthTeamPlayers($teamId = null)
+	{
+		if($teamId === null)
+		{
+			$teamId = $this->getTeam()->getYouthTeamId();
+		}
+		$this->youthTeamsPlayers[$teamId] = null;
+	}
+
+	/**
+	 * Clear cache of all youth teams players
+	 */
+	public function clearYouthTeamsPlayers()
+	{
+		$this->youthTeamsPlayers = array();
+	}
+
+	/**
+	 * Return HTYouthTeamPlayers object
+	 *
+	 * @param Boolean $showScoutCall
+	 * @param Boolean $showLastMatch
+	 * @param String $orderBy
+	 * @return HTYouthTeamPlayers
+	 */
+	public function getYouthTeamPlayersDetails($showScoutCall = false, $showLastMatch = false, $orderBy = null)
+	{
+		if(!isset($this->youthTeamsPlayersDetails[$showScoutCall][$showLastMatch][$orderBy]) || $this->youthTeamsPlayersDetails[$showScoutCall][$showLastMatch][$orderBy] === null)
+		{
+			$params = array('file'=>'youthplayerlist', 'version'=>'1.0', 'actionType'=>'details');
+			if($showScoutCall === true)
+			{
+				$params['showScoutCall'] = 'true';
+			}
+			if($showLastMatch === true)
+			{
+				$params['showLastMatch'] = 'true';
+			}
+			if($orderBy !== null)
+			{
+				$params['orderBy'] = $orderBy;
+			}
+			$url = $this->buildUrl($params);
+			$this->youthTeamsPlayersDetails[$showScoutCall][$showLastMatch][$orderBy] = new HTYouthTeamPlayers($this->fetchUrl($url));
+		}
+		return $this->youthTeamsPlayersDetails[$showScoutCall][$showLastMatch][$orderBy];
+	}
+
+	/**
+	 * Clear cache of youth teams players details
+	 */
+	public function clearYouthTeamsPlayersDetails()
+	{
+		$this->youthTeamsPlayersDetails = null;
+	}
+
+	/**
+	 * Return HTYouthTeamPlayers object
+	 *
+	 * @param Boolean $showScoutCall
+	 * @param Boolean $showLastMatch
+	 * @param String $orderBy
+	 * @return HTYouthTeamPlayers
+	 */
+	public function getYouthTeamPlayersUnlockskills($showScoutCall = false, $showLastMatch = false, $orderBy = null)
+	{
+		if(!isset($this->youthTeamsPlayersUnlockskills[$showScoutCall][$showLastMatch][$orderBy]) || $this->youthTeamsPlayersUnlockskills[$showScoutCall][$showLastMatch][$orderBy] === null)
+		{
+			$params = array('file'=>'youthplayerlist', 'version'=>'1.0', 'actionType'=>'unlockskills');
+			if($showScoutCall === true)
+			{
+				$params['showScoutCall'] = 'true';
+			}
+			if($showLastMatch === true)
+			{
+				$params['showLastMatch'] = 'true';
+			}
+			if($orderBy !== null)
+			{
+				$params['orderBy'] = $orderBy;
+			}
+			$url = $this->buildUrl($params);
+			$this->youthTeamsPlayersUnlockskills[$showScoutCall][$showLastMatch][$orderBy] = new HTYouthTeamPlayers($this->fetchUrl($url));
+		}
+		return $this->youthTeamsPlayersUnlockskills[$showScoutCall][$showLastMatch][$orderBy];
+	}
+
+	/**
+	 * Clear cache of youth teams players unlockskills
+	 */
+	public function clearYouthTeamsPlayersUnlockskills()
+	{
+		$this->youthTeamsPlayersUnlockskills = null;
+	}
+
+	/**
+	 * Return HTYouthPlayer object
+	 *
+	 * @param Integer $id
+	 * @param Boolean $unlockSkills
+	 * @param Boolean $showScoutCall
+	 * @param Boolean $showLastMatch
+	 * @return HTYouthPlayer
+	 */
+	public function getYouthPlayer($id, $unlockSkills = false, $showScoutCall = false, $showLastMatch = false)
+	{
+		if(!isset($this->youthPlayers[$id][$unlockSkills][$showScoutCall][$showLastMatch]) || $this->youthPlayers[$id][$unlockSkills][$showScoutCall][$showLastMatch] === null)
+		{
+			$params = array('file'=>'youthplayerdetails', 'youthPlayerId'=>$id, 'version'=>'1.0', 'actionType'=>'details');
+			if($unlockSkills === true)
+			{
+				$params['actionType'] = 'unlockskills';
+			}
+			if($showScoutCall === true)
+			{
+				$params['showScoutCall'] = 'true';
+			}
+			if($showLastMatch === true)
+			{
+				$params['showLastMatch'] = 'true';
+			}
+			$url = $this->buildUrl($params);
+			$this->youthPlayers[$id][$unlockSkills][$showScoutCall][$showLastMatch] = new HTYouthPlayer($this->fetchUrl($url));
+		}
+		return $this->youthPlayers[$id][$unlockSkills][$showScoutCall][$showLastMatch];
+	}
+
+	/**
+	 * Delete cache of youth player data
+	 *
+	 * @param Integer $id
+	 */
+	public function clearYouthPlayer($id = null)
+	{
+		$this->youthPlayers[$id] = null;
+	}
+
+	/**
+	 * Clear cache of all youth players
+	 */
+	public function clearYouthPlayers()
+	{
+		$this->youthPlayers = array();
 	}
 }
 class HTXml
@@ -4134,15 +4613,15 @@ class HTGlobal extends HTXml
 	 */
 	public function getFetchedDate($format = null)
 	{
-		if(!isset($this->fetchedDate) || $this->fetchedDate === null)
+		if(!isset($this->fetchedDate[$format]) || $this->fetchedDate[$format] === null)
 		{
-			$this->fetchedDate = $this->getXml()->getElementsByTagName('FetchedDate')->item(0)->nodeValue;
+			$this->fetchedDate[$format] = $this->getXml()->getElementsByTagName('FetchedDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->fetchedDate = HTFunction::convertDate($this->fetchedDate, $format);
+				$this->fetchedDate[$format] = HTFunction::convertDate($this->fetchedDate[$format], $format);
 			}
 		}
-		return $this->fetchedDate;
+		return $this->fetchedDate[$format];
 	}
 
 	/**
@@ -4290,6 +4769,111 @@ class HTCommonLeagueLevel extends HTGlobal
 		return $this->leagueLevelName;
 	}
 }
+class HTCommonAvatar extends HTXml
+{
+	protected $background = null;
+	protected $layerNumber = null;
+	protected $layer = null;
+	protected $html = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return background image url
+	 *
+	 * @return String
+	 */
+	public function getBackground()
+	{
+		if(!isset($this->background) || $this->background === null)
+		{
+			$this->background = $this->getXml()->getElementsByTagName('BackgroundImage')->item(0)->nodeValue;
+		}
+		return $this->background;
+	}
+
+	/**
+	 * Return player number
+	 *
+	 * @return Integer
+	 */
+	public function getLayerNumber()
+	{
+		if(!isset($this->layerNumber) || $this->layerNumber === null)
+		{
+			$this->layerNumber = $this->getXml()->getElementsByTagName('Layer')->length;
+		}
+		return $this->layerNumber	;
+	}
+
+	/**
+	 * Return HTLayer object
+	 *
+	 * @return HTLayer
+	 */
+	public function getLayer($index)
+	{
+		$index = round($index);
+		if($index > 0 && $index <= $this->getLayerNumber())
+		{
+			--$index;
+			if(!isset($this->layer[$index]) || $this->layer[$index] === null)
+			{
+				$xpath = new DOMXPath($this->getXml());
+				$nodeList = $xpath->query("//Layer");
+				$node = new DOMDocument('1.0', 'UTF-8');
+				$node->appendChild($node->importNode($nodeList->item($index), true));
+				$this->layer[$index] = new HTLayer($node);
+			}
+			return $this->layer[$index];
+		}
+		return null;
+	}
+
+	/**
+	 * Return avatar html code
+	 *
+	 * @param String $css
+	 * @param String $class
+	 * @return String
+	 */
+	public function getHtml($css = null, $class = null)
+	{
+		if(!isset($this->html[$css][$class]) || $this->html[$css][$class] === null)
+		{
+			$this->html[$css][$class] = '<div style="position:relative; height:155px; width:110px; background: url(http://www.hattrick.org'.$this->getBackground().'); ';
+			if($css !== null)
+			{
+				$this->html[$css][$class] .= $css;
+			}
+			$this->html[$css][$class] .= '"';
+			if($class !== null)
+			{
+				$this->html[$css][$class] .= ' class="'.$class.'"';
+			}
+			$this->html[$css][$class] .= '>';
+			for($l=1; $l<=$this->getLayerNumber(); $l++)
+			{
+				$layer = $this->getLayer($l);
+				$img = $layer->getImage();
+				if(strpos($img, 'hattrick.org') === false)
+				{
+					$img = 'http://www.hattrick.org'.$img;
+				}
+				$this->html[$css][$class] .= '<img src="'.$img.'" style="position:absolute; left:'.$layer->getX().'px; top:'.$layer->getY().'px;"/>';
+			}
+			$this->html[$css][$class] .= '</div>';
+		}
+		return $this->html[$css][$class];
+	}
+}
 class HTCheckToken extends HTGlobal
 {
 	private $token = null;
@@ -4320,15 +4904,15 @@ class HTCheckToken extends HTGlobal
 	 */
 	public function getCreationDate($format = null)
 	{
-		if(!isset($this->created) || $this->created === null)
+		if(!isset($this->created[$format]) || $this->created[$format] === null)
 		{
-			$this->created = $this->getXml()->getElementsByTagName('Created')->item(0)->nodeValue;
+			$this->created[$format] = $this->getXml()->getElementsByTagName('Created')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->created = HTFunction::convertDate($this->created, $format);
+				$this->created[$format] = HTFunction::convertDate($this->created[$format], $format);
 			}
 		}
-		return $this->created;
+		return $this->created[$format];
 	}
 
 	/**
@@ -4353,15 +4937,15 @@ class HTCheckToken extends HTGlobal
 	 */
 	public function getExpirationDate($format = null)
 	{
-		if(!isset($this->expires) || $this->expires === null)
+		if(!isset($this->expires[$format]) || $this->expires[$format] === null)
 		{
-			$this->expires = $this->getXml()->getElementsByTagName('Expires')->item(0)->nodeValue;
+			$this->expires[$format] = $this->getXml()->getElementsByTagName('Expires')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->expires = HTFunction::convertDate($this->expires, $format);
+				$this->expires[$format] = HTFunction::convertDate($this->expires[$format], $format);
 			}
 		}
-		return $this->expires;
+		return $this->expires[$format];
 	}
 
 	/**
@@ -4531,15 +5115,15 @@ class HTHofPlayer extends HTXml
 	 */
 	public function getNextBirthdayDate($format = null)
 	{
-		if(!isset($this->nextBirthday) || $this->nextBirthday === null)
+		if(!isset($this->nextBirthday[$format]) || $this->nextBirthday[$format] === null)
 		{
-			$this->nextBirthday = $this->getXml()->getElementsByTagName('NextBirthday')->item(0)->nodeValue;
+			$this->nextBirthday[$format] = $this->getXml()->getElementsByTagName('NextBirthday')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->nextBirthday = HTFunction::convertDate($this->nextBirthday, $format);
+				$this->nextBirthday[$format] = HTFunction::convertDate($this->nextBirthday[$format], $format);
 			}
 		}
-		return $this->nextBirthday;
+		return $this->nextBirthday[$format];
 	}
 
 	/**
@@ -4550,15 +5134,15 @@ class HTHofPlayer extends HTXml
 	 */
 	public function getArrivalDate($format = null)
 	{
-		if(!isset($this->arrivalDate) || $this->arrivalDate === null)
+		if(!isset($this->arrivalDate[$format]) || $this->arrivalDate[$format] === null)
 		{
-			$this->arrivalDate = $this->getXml()->getElementsByTagName('ArrivalDate')->item(0)->nodeValue;
+			$this->arrivalDate[$format] = $this->getXml()->getElementsByTagName('ArrivalDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->arrivalDate = HTFunction::convertDate($this->arrivalDate, $format);
+				$this->arrivalDate[$format] = HTFunction::convertDate($this->arrivalDate[$format], $format);
 			}
 		}
-		return $this->arrivalDate;
+		return $this->arrivalDate[$format];
 	}
 
 	/**
@@ -4583,15 +5167,15 @@ class HTHofPlayer extends HTXml
 	 */
 	public function getHofDate($format = null)
 	{
-		if(!isset($this->hofDate) || $this->hofDate === null)
+		if(!isset($this->hofDate[$format]) || $this->hofDate[$format] === null)
 		{
-			$this->hofDate = $this->getXml()->getElementsByTagName('HofDate')->item(0)->nodeValue;
+			$this->hofDate[$format] = $this->getXml()->getElementsByTagName('HofDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->hofDate = HTFunction::convertDate($this->hofDate, $format);
+				$this->hofDate[$format] = HTFunction::convertDate($this->hofDate[$format], $format);
 			}
 		}
-		return $this->hofDate;
+		return $this->hofDate[$format];
 	}
 
 	/**
@@ -4676,30 +5260,22 @@ class HTAvatars extends HTGlobal
 	{
 		if(!isset($this->playerById[$id]) || $this->playerById[$id] === null)
 		{
+			$this->playerById[$id] = null;
 			$xpath = new DOMXPath($this->getXml());
 			$nodeList = $xpath->query("//PlayerID[.='".$id."']");
-			$node = new DOMDocument('1.0', 'UTF-8');
-			$node->appendChild($node->importNode($nodeList->item(0)->parentNode, true));
-			$this->playerById[$id] = new HTPlayerAvatar($node);
+			if($nodeList->length)
+			{
+				$node = new DOMDocument('1.0', 'UTF-8');
+				$node->appendChild($node->importNode($nodeList->item(0)->parentNode, true));
+				$this->playerById[$id] = new HTPlayerAvatar($node);
+			}
 		}
 		return $this->playerById[$id];
 	}
 }
-class HTPlayerAvatar extends HTXml
+class HTPlayerAvatar extends HTCommonAvatar
 {
 	private $playerId = null;
-	private $background = null;
-	private $layerNumber = null;
-	private $layer = null;
-
-	/**
-	 * @param DOMDocument $xml
-	 */
-	public function __construct($xml)
-	{
-		$this->xmlText = $xml->saveXML();
-		$this->xml = $xml;
-	}
 
 	/**
 	 * Return player id
@@ -4714,43 +5290,100 @@ class HTPlayerAvatar extends HTXml
 		}
 		return $this->playerId;
 	}
+}
+class HTYouthAvatars extends HTGlobal
+{
+	private $youthTeamId = null;
+	private $playerNumber = null;
+	private $player = null;
+	private $playerById = null;
 
 	/**
-	 * Return player number
+	 * Return youth team id
 	 *
 	 * @return Integer
 	 */
-	public function getLayerNumber()
+	public function getYouthTeamId()
 	{
-		if(!isset($this->layerNumber) || $this->layerNumber === null)
+		if(!isset($this->youthTeamId) || $this->youthTeamId === null)
 		{
-			$this->layerNumber = $this->getXml()->getElementsByTagName('Layer')->length;
+			$this->youthTeamId = $this->getXml()->getElementsByTagName('YouthTeamId')->item(0)->nodeValue;
 		}
-		return $this->layerNumber	;
+		return $this->youthTeamId;
 	}
 
 	/**
-	 * Return HTLayer object
+	 * Return youth player number
 	 *
-	 * @return HTLayer
+	 * @return Integer
 	 */
-	public function getLayer($index)
+	public function getYouthPlayerNumber()
+	{
+		if(!isset($this->playerNumber) || $this->playerNumber === null)
+		{
+			$this->playerNumber = $this->getXml()->getElementsByTagName('YouthPlayer')->length;
+		}
+		return $this->playerNumber	;
+	}
+
+	/**
+	 * Return HTYouthPlayerAvatar object
+	 *
+	 * @return HTYouthPlayerAvatar
+	 */
+	public function getYouthPlayer($index)
 	{
 		$index = round($index);
-		if($index > 0 && $index <= $this->getLayerNumber())
+		if($index > 0 && $index <= $this->getYouthPlayerNumber())
 		{
 			--$index;
-			if(!isset($this->layer[$index]) || $this->layer[$index] === null)
+			if(!isset($this->player[$index]) || $this->player[$index] === null)
 			{
 				$xpath = new DOMXPath($this->getXml());
-				$nodeList = $xpath->query("//Layer");
+				$nodeList = $xpath->query("//YouthPlayer");
 				$node = new DOMDocument('1.0', 'UTF-8');
 				$node->appendChild($node->importNode($nodeList->item($index), true));
-				$this->layer[$index] = new HTLayer($node);
+				$this->player[$index] = new HTYouthPlayerAvatar($node);
 			}
-			return $this->layer[$index];
+			return $this->player[$index];
 		}
 		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerAvatar object
+	 *
+	 * @return HTYouthPlayerAvatar
+	 */
+	public function getYouthPlayerById($id)
+	{
+		if(!isset($this->playerById[$id]) || $this->playerById[$id] === null)
+		{
+			$xpath = new DOMXPath($this->getXml());
+			$nodeList = $xpath->query("//YouthPlayerID[.='".$id."']");
+			$node = new DOMDocument('1.0', 'UTF-8');
+			$node->appendChild($node->importNode($nodeList->item(0)->parentNode, true));
+			$this->playerById[$id] = new HTYouthPlayerAvatar($node);
+		}
+		return $this->playerById[$id];
+	}
+}
+class HTYouthPlayerAvatar extends HTCommonAvatar
+{
+	private $playerId = null;
+
+	/**
+	 * Return player id
+	 *
+	 * @return Integer
+	 */
+	public function getPlayerId()
+	{
+		if(!isset($this->playerId) || $this->playerId === null)
+		{
+			$this->playerId = $this->getXml()->getElementsByTagName('YouthPlayerID')->item(0)->nodeValue;
+		}
+		return $this->playerId;
 	}
 }
 class HTLayer extends HTXml
@@ -4823,11 +5456,11 @@ class HTClub extends HTCommonTeam
 	 */
 	public function getSpecialists($countryCurrency = null)
 	{
-		if(!isset($this->specialists) || $this->specialists === null)
+		if(!isset($this->specialists[$countryCurrency]) || $this->specialists[$countryCurrency] === null)
 		{
-			$this->specialists = new HTSpecialists($this->getXml(), $countryCurrency);
+			$this->specialists[$countryCurrency] = new HTSpecialists($this->getXml(), $countryCurrency);
 		}
-		return $this->specialists;
+		return $this->specialists[$countryCurrency];
 	}
 
 	/**
@@ -4862,15 +5495,20 @@ class HTYouthSquad extends HTXml
 	/**
 	 * Return invesment sum
 	 *
+	 * @param Integer $countryCurrency (Constant taken from HTMoney class)
 	 * @return Integer
 	 */
-	public function getInvestment()
+	public function getInvestment($countryCurrency = null)
 	{
-		if(!isset($this->investment) || $this->investment === null)
+		if(!isset($this->investment[$countryCurrency]) || $this->investment[$countryCurrency] === null)
 		{
-			$this->investment = $this->getXml()->getElementsByTagName('Investment')->item(0)->nodeValue;
+			$this->investment[$countryCurrency] = $this->getXml()->getElementsByTagName('Investment')->item(0)->nodeValue;
+			if($countryCurrency !== null)
+			{
+				$this->investment[$countryCurrency] = HTMoney::convert($this->investment[$countryCurrency], $countryCurrency);
+			}
 		}
-		return $this->investment;
+		return $this->investment[$countryCurrency];
 	}
 
 	/**
@@ -5274,15 +5912,15 @@ class HTTeam extends HTCommonTeam
 	 */
 	public function getSignupDate($format = null)
 	{
-		if(!isset($this->signupDate) || $this->signupDate === null)
+		if(!isset($this->signupDate[$format]) || $this->signupDate[$format] === null)
 		{
-			$this->signupDate = $this->getXml()->getElementsByTagName('SignupDate')->item(0)->nodeValue;
+			$this->signupDate[$format] = $this->getXml()->getElementsByTagName('SignupDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->signupDate = HTFunction::convertDate($this->signupDate, $format);
+				$this->signupDate[$format] = HTFunction::convertDate($this->signupDate[$format], $format);
 			}
 		}
-		return $this->signupDate;
+		return $this->signupDate[$format];
 	}
 
 	/**
@@ -5293,15 +5931,15 @@ class HTTeam extends HTCommonTeam
 	 */
 	public function getActivationDate($format = null)
 	{
-		if(!isset($this->activationDate) || $this->activationDate === null)
+		if(!isset($this->activationDate[$format]) || $this->activationDate[$format] === null)
 		{
-			$this->activationDate = $this->getXml()->getElementsByTagName('ActivationDate')->item(0)->nodeValue;
+			$this->activationDate[$format] = $this->getXml()->getElementsByTagName('ActivationDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->activationDate = HTFunction::convertDate($this->activationDate, $format);
+				$this->activationDate[$format] = HTFunction::convertDate($this->activationDate[$format], $format);
 			}
 		}
-		return $this->activationDate;
+		return $this->activationDate[$format];
 	}
 
 	/**
@@ -5312,15 +5950,15 @@ class HTTeam extends HTCommonTeam
 	 */
 	public function getLastLoginDate($format = null)
 	{
-		if(!isset($this->lastLoginDate) || $this->lastLoginDate === null)
+		if(!isset($this->lastLoginDate[$format]) || $this->lastLoginDate[$format] === null)
 		{
-			$this->lastLoginDate = $this->getXml()->getElementsByTagName('LastLoginDate')->item(0)->nodeValue;
+			$this->lastLoginDate[$format] = $this->getXml()->getElementsByTagName('LastLoginDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->lastLoginDate = HTFunction::convertDate($this->lastLoginDate, $format);
+				$this->lastLoginDate[$format] = HTFunction::convertDate($this->lastLoginDate[$format], $format);
 			}
 		}
-		return $this->lastLoginDate;
+		return $this->lastLoginDate[$format];
 	}
 
 	/**
@@ -5505,15 +6143,15 @@ class HTTeam extends HTCommonTeam
 	{
 		if($this->isBot())
 		{
-			if(!isset($this->botDate) || $this->botDate === null)
+			if(!isset($this->botDate[$format]) || $this->botDate[$format] === null)
 			{
-				$this->botDate = $this->getXml()->getElementsByTagName('BotSince')->item(0)->nodeValue;
+				$this->botDate[$format] = $this->getXml()->getElementsByTagName('BotSince')->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->botDate = HTFunction::convertDate($this->botDate, $format);
+					$this->botDate[$format] = HTFunction::convertDate($this->botDate[$format], $format);
 				}
 			}
-			return $this->botDate;
+			return $this->botDate[$format];
 		}
 		return null;
 	}
@@ -5527,7 +6165,10 @@ class HTTeam extends HTCommonTeam
 	{
 		if(!isset($this->isInCup) || $this->isInCup === null)
 		{
-			$this->isInCup = strtolower($this->getXml()->getElementsByTagName('StillInCup')->item(0)->nodeValue) == "true";
+			if($this->getXml()->getElementsByTagName('StillInCup')->length)
+			{
+				$this->isInCup = strtolower($this->getXml()->getElementsByTagName('StillInCup')->item(0)->nodeValue) == "true";
+			}
 		}
 		return $this->isInCup;
 	}
@@ -5833,23 +6474,23 @@ class HTTeam extends HTCommonTeam
 	{
 		if($this->isHtSupporter())
 		{
-			if(!isset($this->pressDate) || $this->pressDate === null)
+			if(!isset($this->pressDate[$format]) || $this->pressDate[$format] === null)
 			{
 				$node = $this->getXml()->getElementsByTagName('SendDate');
 				if($node !== null && $node->length)
 				{
-					$this->pressDate = $node->item(0)->nodeValue;
+					$this->pressDate[$format] = $node->item(0)->nodeValue;
 					if($format !== null)
 					{
-						$this->pressDate = HTFunction::convertDate($this->pressDate, $format);
+						$this->pressDate[$format] = HTFunction::convertDate($this->pressDate[$format], $format);
 					}
 				}
 				else
 				{
-					$this->pressDate = false;
+					$this->pressDate[$format] = false;
 				}
 			}
-			return $this->pressDate;
+			return $this->pressDate[$format];
 		}
 		return null;
 	}
@@ -5990,6 +6631,1854 @@ class HTTeam extends HTCommonTeam
 		return $this->isDeleted;
 	}
 }
+class HTYouthTeam extends HTGlobal
+{
+	private $id = null;
+	private $name = null;
+	private $shortName = null;
+	private $date = null;
+	private $countryId = null;
+	private $countryName = null;
+	private $regionId = null;
+	private $regionName = null;
+	private $arenaId = null;
+	private $arenaName = null;
+	private $leagueId = null;
+	private $leagueName = null;
+	private $leagueStatus = null;
+	private $motherId = null;
+	private $motherName = null;
+	private $trainerId = null;
+	private $nextMatchDate = null;
+
+	/**
+	 * Returns if youth team exist
+	 *
+	 * @return Boolean
+	 */
+	public function isValid()
+	{
+		return $this->getId() != 0;
+	}
+
+	/**
+	 * Return youth team id
+	 *
+	 * @return Integer
+	 */
+	public function getId()
+	{
+		if(!isset($this->id) || $this->id === null)
+		{
+			$this->id = $this->getXml()->getElementsByTagName('YouthTeamID')->item(0)->nodeValue;
+		}
+		return $this->id;
+	}
+
+	/**
+	 * Return youth team name
+	 *
+	 * @return String
+	 */
+	public function getName()
+	{
+		if(!isset($this->name) || $this->name === null)
+		{
+			$this->name = $this->getXml()->getElementsByTagName('YouthTeamName')->item(0)->nodeValue;
+		}
+		return $this->name;
+	}
+
+	/**
+	 * Return youth team short name
+	 *
+	 * @return String
+	 */
+	public function getShortName()
+	{
+		if(!isset($this->shortName) || $this->shortName === null)
+		{
+			$this->shortName = $this->getXml()->getElementsByTagName('ShortTeamName')->item(0)->nodeValue;
+		}
+		return $this->shortName;
+	}
+
+	/**
+	 * Return creation date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getCreationDate($format = null)
+	{
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
+		{
+			$this->date[$format] = $this->getXml()->getElementsByTagName('CreatedDate')->item(0)->nodeValue;
+			if($format !== null)
+			{
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
+			}
+		}
+		return $this->date[$format];
+	}
+
+	/**
+	 * Return country id
+	 *
+	 * @return Integer
+	 */
+	public function getCountryId()
+	{
+		if(!isset($this->countryId) || $this->countryId === null)
+		{
+			$this->countryId = $this->getXml()->getElementsByTagName('CountryID')->item(0)->nodeValue;
+		}
+		return $this->countryId;
+	}
+
+	/**
+	 * Return country name
+	 *
+	 * @return String
+	 */
+	public function getCountryName()
+	{
+		if(!isset($this->countryName) || $this->countryName === null)
+		{
+			$this->countryName = $this->getXml()->getElementsByTagName('CountryName')->item(0)->nodeValue;
+		}
+		return $this->countryName;
+	}
+
+	/**
+	 * Return region id
+	 *
+	 * @return Integer
+	 */
+	public function getRegionId()
+	{
+		if(!isset($this->regionId) || $this->regionId === null)
+		{
+			$this->regionId = $this->getXml()->getElementsByTagName('RegionID')->item(0)->nodeValue;
+		}
+		return $this->regionId;
+	}
+
+	/**
+	 * Return region name
+	 *
+	 * @return String
+	 */
+	public function getRegionName()
+	{
+		if(!isset($this->regionName) || $this->regionName === null)
+		{
+			$this->regionName = $this->getXml()->getElementsByTagName('RegionName')->item(0)->nodeValue;
+		}
+		return $this->regionName;
+	}
+
+	/**
+	 * Return arena id
+	 *
+	 * @return Integer
+	 */
+	public function getArenaId()
+	{
+		if(!isset($this->arenaId) || $this->arenaId === null)
+		{
+			$this->arenaId = $this->getXml()->getElementsByTagName('YouthArenaID')->item(0)->nodeValue;
+		}
+		return $this->arenaId;
+	}
+
+	/**
+	 * Return arena name
+	 *
+	 * @return String
+	 */
+	public function getArenaName()
+	{
+		if(!isset($this->arenaName) || $this->arenaName === null)
+		{
+			$this->arenaName = $this->getXml()->getElementsByTagName('YouthArenaName')->item(0)->nodeValue;
+		}
+		return $this->arenaName;
+	}
+
+	/**
+	 * Return league id
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueId()
+	{
+		if($this->isValid())
+		{
+			if(!isset($this->leagueId) || $this->leagueId === null)
+			{
+				$this->leagueId = $this->getXml()->getElementsByTagName('YouthLeagueID')->item(0)->nodeValue;
+			}
+			return $this->leagueId;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league name
+	 *
+	 * @return String
+	 */
+	public function getLeagueName()
+	{
+		if($this->isValid())
+		{
+			if(!isset($this->leagueName) || $this->leagueName === null)
+			{
+				$this->leagueName = $this->getXml()->getElementsByTagName('YouthLeagueName')->item(0)->nodeValue;
+			}
+			return $this->leagueName;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league status
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueStatus()
+	{
+		if($this->isValid())
+		{
+			if(!isset($this->leagueStatus) || $this->leagueStatus === null)
+			{
+				$this->leagueStatus = $this->getXml()->getElementsByTagName('YouthLeagueStatus')->item(0)->nodeValue;
+			}
+			return $this->leagueStatus;
+		}
+		return null;
+	}
+
+	/**
+	 * Return mother team id
+	 *
+	 * @return Integer
+	 */
+	public function getMotherTeamId()
+	{
+		if($this->isValid())
+		{
+			if(!isset($this->motherId) || $this->motherId === null)
+			{
+				$this->motherId = $this->getXml()->getElementsByTagName('MotherTeamID')->item(0)->nodeValue;
+			}
+			return $this->motherId;
+		}
+		return null;
+	}
+
+	/**
+	 * Return mother team name
+	 *
+	 * @return String
+	 */
+	public function getMotherTeamName()
+	{
+		if($this->isValid())
+		{
+			if(!isset($this->motherName) || $this->motherName === null)
+			{
+				$this->motherName = $this->getXml()->getElementsByTagName('MotherTeamName')->item(0)->nodeValue;
+			}
+			return $this->motherName;
+		}
+		return null;
+	}
+
+	/**
+	 * Return trainer id
+	 *
+	 * @return Integer
+	 */
+	public function getTrainerId()
+	{
+		if(!isset($this->trainerId) || $this->trainerId === null)
+		{
+			$this->trainerId = $this->getXml()->getElementsByTagName('YouthPlayerID')->item(0)->nodeValue;
+		}
+		return $this->trainerId;
+	}
+
+	/**
+	 * Return next training match date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getNextTrainingMatchDate($format = null)
+	{
+		if(!isset($this->nextMatchDate[$format]) || $this->nextMatchDate[$format] === null)
+		{
+			$this->nextMatchDate[$format] = $this->getXml()->getElementsByTagName('NextTrainingMatchDate')->item(0)->nodeValue;
+			if($format !== null)
+			{
+				$this->nextMatchDate[$format] = HTFunction::convertDate($this->nextMatchDate[$format], $format);
+			}
+		}
+		return $this->nextMatchDate[$format];
+	}
+}
+class HTYouthScouts extends HTGlobal
+{
+	private $scoutNumber = null;
+	private $scouts = null;
+
+	/**
+	 * Return number of scout
+	 *
+	 * @return Integer
+	 */
+	public function getScoutNumber()
+	{
+		if(!isset($this->scoutNumber) || $this->scoutNumber === null)
+		{
+			$xpath = new DOMXPath($this->getXml());
+			$nodeList = $xpath->query("//Scout");
+			$this->scoutNumber = $nodeList->length;
+		}
+		return $this->scoutNumber;
+	}
+
+	/**
+	 * Return HTYouthScout object
+	 *
+	 * @param Integer $number
+	 * @return HTYouthScout
+	 */
+	public function getScout($number)
+	{
+		$number = round($number);
+		if($number > 0 && $number <= $this->getScoutNumber())
+		{
+			--$number;
+			if(!isset($this->scouts[$number]) || $this->scouts[$number] === null)
+			{
+				$xpath = new DOMXPath($this->getXml());
+				$nodeList = $xpath->query('//Scout');
+				$scout = new DOMDocument('1.0', 'UTF-8');
+				$scout->appendChild($scout->importNode($nodeList->item($number), true));
+				$this->scouts[$number] = new HTYouthScout($scout);
+			}
+			return $this->scouts[$number];
+		}
+		return null;
+	}
+}
+class HTYouthScout extends HTXml
+{
+	private $id = null;
+	private $name = null;
+	private $age = null;
+	private $countryId = null;
+	private $countryName = null;
+	private $regionId = null;
+	private $regionName = null;
+	private $inCountryId = null;
+	private $inCountryName = null;
+	private $inRegionId = null;
+	private $inRegionName = null;
+	private $hiredDate = null;
+	private $lastCall = null;
+	private $typeSearch = null;
+	private $travel = null;
+	private $travelDate = null;
+	private $travelLength = null;
+	private $travelType = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return scout id
+	 *
+	 * @return Integer
+	 */
+	public function getId()
+	{
+		if(!isset($this->id) || $this->id === null)
+		{
+			$this->id = $this->getXml()->getElementsByTagName('YouthScoutID')->item(0)->nodeValue;
+		}
+		return $this->id;
+	}
+
+	/**
+	 * Return scout name
+	 *
+	 * @return String
+	 */
+	public function getName()
+	{
+		if(!isset($this->name) || $this->name === null)
+		{
+			$this->name = $this->getXml()->getElementsByTagName('ScoutName')->item(0)->nodeValue;
+		}
+		return $this->name;
+	}
+
+	/**
+	 * Return scout age
+	 *
+	 * @return Integer
+	 */
+	public function getAge()
+	{
+		if(!isset($this->age) || $this->age === null)
+		{
+			$this->age = $this->getXml()->getElementsByTagName('Age')->item(0)->nodeValue;
+		}
+		return $this->age;
+	}
+
+	/**
+	 * Return country id
+	 *
+	 * @return Integer
+	 */
+	public function getCountryId()
+	{
+		if(!isset($this->countryId) || $this->countryId === null)
+		{
+			$this->countryId = $this->getXml()->getElementsByTagName('CountryID')->item(0)->nodeValue;
+		}
+		return $this->countryId;
+	}
+
+	/**
+	 * Return country name
+	 *
+	 * @return String
+	 */
+	public function getCountryName()
+	{
+		if(!isset($this->countryName) || $this->countryName === null)
+		{
+			$this->countryName = $this->getXml()->getElementsByTagName('CountryName')->item(0)->nodeValue;
+		}
+		return $this->countryName;
+	}
+
+	/**
+	 * Return region id
+	 *
+	 * @return Integer
+	 */
+	public function getRegionId()
+	{
+		if(!isset($this->regionId) || $this->regionId === null)
+		{
+			$this->regionId = $this->getXml()->getElementsByTagName('RegionID')->item(0)->nodeValue;
+		}
+		return $this->regionId;
+	}
+
+	/**
+	 * Return region name
+	 *
+	 * @return String
+	 */
+	public function getRegionName()
+	{
+		if(!isset($this->regionName) || $this->regionName === null)
+		{
+			$this->regionName = $this->getXml()->getElementsByTagName('RegionName')->item(0)->nodeValue;
+		}
+		return $this->regionName;
+	}
+
+	/**
+	 * Return in country id
+	 *
+	 * @return Integer
+	 */
+	public function getInCountryId()
+	{
+		if(!isset($this->inCountryId) || $this->inCountryId === null)
+		{
+			$this->inCountryId = $this->getXml()->getElementsByTagName('CountryID')->item(1)->nodeValue;
+		}
+		return $this->inCountryId;
+	}
+
+	/**
+	 * Return in country name
+	 *
+	 * @return String
+	 */
+	public function getInCountryName()
+	{
+		if(!isset($this->inCountryName) || $this->inCountryName === null)
+		{
+			$this->inCountryName = $this->getXml()->getElementsByTagName('CountryName')->item(1)->nodeValue;
+		}
+		return $this->inCountryName;
+	}
+
+	/**
+	 * Return in region id
+	 *
+	 * @return Integer
+	 */
+	public function getInRegionId()
+	{
+		if(!isset($this->inRegionId) || $this->inRegionId === null)
+		{
+			$this->inRegionId = $this->getXml()->getElementsByTagName('RegionID')->item(1)->nodeValue;
+		}
+		return $this->inRegionId;
+	}
+
+	/**
+	 * Return in region name
+	 *
+	 * @return String
+	 */
+	public function getInRegionName()
+	{
+		if(!isset($this->inRegionName) || $this->inRegionName === null)
+		{
+			$this->inRegionName = $this->getXml()->getElementsByTagName('RegionName')->item(1)->nodeValue;
+		}
+		return $this->inRegionName;
+	}
+
+	/**
+	 * Return hired date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getHiredDate($format = null)
+	{
+		if(!isset($this->hiredDate[$format]) || $this->hiredDate[$format] === null)
+		{
+			$this->hiredDate[$format] = $this->getXml()->getElementsByTagName('HiredDate')->item(0)->nodeValue;
+			if($format !== null)
+			{
+				$this->hiredDate[$format] = HTFunction::convertDate($this->hiredDate[$format], $format);
+			}
+		}
+		return $this->hiredDate[$format];
+	}
+
+	/**
+	 * Return last call date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getLastCallDate($format = null)
+	{
+		if(!isset($this->lastCall[$format]) || $this->lastCall[$format] === null)
+		{
+			$this->lastCall[$format] = $this->getXml()->getElementsByTagName('LastCalled')->item(0)->nodeValue;
+			if($format !== null)
+			{
+				$this->lastCall[$format] = HTFunction::convertDate($this->lastCall[$format], $format);
+			}
+		}
+		return $this->lastCall[$format];
+	}
+
+	/**
+	 * Return if scout is in travel
+	 *
+	 * @return Boolean
+	 */
+	public function inTravel()
+	{
+		if(!isset($this->travel) || $this->travel === null)
+		{
+			$this->travel = $this->getXml()->getElementsByTagName('Travel')->item(0)->hasChildNodes();
+		}
+		return $this->travel;
+	}
+
+	/**
+	 * Return travel start date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getTravelStartDate($format = null)
+	{
+		if($this->inTravel())
+		{
+			if(!isset($this->travelDate[$format]) || $this->travelDate[$format] === null)
+			{
+				$this->travelDate[$format] = $this->getXml()->getElementsByTagName('TravelStartDate')->item(0)->nodeValue;
+				if($format !== null)
+				{
+					$this->travelDate[$format] = HTFunction::convertDate($this->travelDate[$format], $format);
+				}
+			}
+			return $this->travelDate[$format];
+		}
+		return null;
+	}
+
+	/**
+	 * Return travel length
+	 *
+	 * @return Integer
+	 */
+	public function getTravelLength()
+	{
+		if(!isset($this->travelLength) || $this->travelLength === null)
+		{
+			$this->travelLength = $this->getXml()->getElementsByTagName('TravelLength')->item(0)->nodeValue;
+		}
+		return $this->travelLength;
+	}
+
+	/**
+	 * Return travel type
+	 *
+	 * @return Integer
+	 */
+	public function getTravelType()
+	{
+		if(!isset($this->travelType) || $this->travelType === null)
+		{
+			$this->travelType = $this->getXml()->getElementsByTagName('TravelType')->item(0)->nodeValue;
+		}
+		return $this->travelType;
+	}
+
+	/**
+	 * Return player type search
+	 *
+	 * @return Integer
+	 */
+	public function getPlayerTypeSearch()
+	{
+		if(!isset($this->typeSearch) || $this->typeSearch === null)
+		{
+			$this->typeSearch = $this->getXml()->getElementsByTagName('PlayerTypeSearch')->item(0)->nodeValue;
+		}
+		return $this->typeSearch;
+	}
+}
+class HTYouthTeamPlayers extends HTGlobal
+{
+	private $playerNumber = null;
+	private $players = null;
+
+	/**
+	 * Return number of youth player
+	 *
+	 * @return Integer
+	 */
+	public function getYouthPlayerNumber()
+	{
+		if(!isset($this->playerNumber) || $this->playerNumber === null)
+		{
+			$xpath = new DOMXPath($this->getXml());
+			$nodeList = $xpath->query("//YouthPlayer");
+			$this->playerNumber = $nodeList->length;
+		}
+		return $this->playerNumber;
+	}
+
+	/**
+	 * Return HTYouthPlayer object
+	 *
+	 * @param Integer $number
+	 * @return HTYouthPlayer
+	 */
+	public function getYouthPlayer($number)
+	{
+		$number = round($number);
+		if($number > 0 && $number <= $this->getYouthPlayerNumber())
+		{
+			--$number;
+			if(!isset($this->players[$number]) || $this->players[$number] === null)
+			{
+				$xpath = new DOMXPath($this->getXml());
+				$nodeList = $xpath->query('//YouthPlayer');
+				$youth = new DOMDocument('1.0', 'UTF-8');
+				$youth->appendChild($youth->importNode($nodeList->item($number), true));
+				$this->players[$number] = new HTYouthPlayer($youth->saveXML());
+			}
+			return $this->players[$number];
+		}
+		return null;
+	}
+}
+class HTYouthPlayer extends HTGlobal
+{
+	private $hasDetails = null;
+	private $id = null;
+	private $firstname = null;
+	private $lastname = null;
+	private $nickname = null;
+	private $age = null;
+	private $days = null;
+	private $arrivaldate = null;
+	private $promotedin = null;
+	private $number = null;
+	private $statement = null;
+	private $notes = null;
+	private $category = null;
+	private $cards = null;
+	private $injury = null;
+	private $speciality = null;
+	private $careergoals = null;
+	private $hattrickgoals = null;
+	private $leaguegoals = null;
+	private $friendlygoals = null;
+	private $youthteamid = null;
+	private $youthteamname = null;
+	private $youthteamleagueid = null;
+	private $seniorteamid = null;
+	private $seniorteamname = null;
+	private $lastmatch = null;
+	private $scoutcall = null;
+	private $hasSkills = null;
+	private $keeperskill = null;
+	private $keeperskillmax = null;
+	private $defenderskill = null;
+	private $defenderskillmax = null;
+	private $playmakerskill = null;
+	private $playmakerskillmax = null;
+	private $wingerskill = null;
+	private $wingerskillmax = null;
+	private $scorerskill = null;
+	private $scorerskillmax = null;
+	private $passingskill = null;
+	private $passingskillmax = null;
+	private $setpiecesskill = null;
+	private $setpiecesskillmax = null;
+
+	/**
+	 * Return if details are available
+	 *
+	 * @return Boolean
+	 */
+	public function hasDetails()
+	{
+		if(!isset($this->hasDetails) || $this->hasDetails === null)
+		{
+			$this->hasDetails = $this->getXml()->getElementsByTagName('Age')->length;
+		}
+		return $this->hasDetails;
+	}
+
+	/**
+	 * Return youth player id
+	 *
+	 * @return Integer
+	 */
+	public function getId()
+	{
+		if(!isset($this->id) || $this->id === null)
+		{
+			$this->id = $this->getXml()->getElementsByTagName('YouthPlayerID')->item(0)->nodeValue;
+		}
+		return $this->id;
+	}
+
+	/**
+	 * Return youth player firstname
+	 *
+	 * @return String
+	 */
+	public function getFirstName()
+	{
+		if(!isset($this->firstname) || $this->firstname === null)
+		{
+			$this->firstname = $this->getXml()->getElementsByTagName('FirstName')->item(0)->nodeValue;
+		}
+		return $this->firstname;
+	}
+
+	/**
+	 * Return youth player lastname
+	 *
+	 * @return String
+	 */
+	public function getLastName()
+	{
+		if(!isset($this->lastname) || $this->lastname === null)
+		{
+			$this->lastname = $this->getXml()->getElementsByTagName('LastName')->item(0)->nodeValue;
+		}
+		return $this->lastname;
+	}
+
+	/**
+	 * Return youth player nickname
+	 *
+	 * @return String
+	 */
+	public function getNickName()
+	{
+		if(!isset($this->nickname) || $this->nickname === null)
+		{
+			$this->nickname = $this->getXml()->getElementsByTagName('NickName')->item(0)->nodeValue;
+		}
+		return $this->nickname;
+	}
+
+	/**
+	 * Return youth player age
+	 *
+	 * @return Integer
+	 */
+	public function getAge()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->age) || $this->age === null)
+			{
+				$this->age = $this->getXml()->getElementsByTagName('Age')->item(0)->nodeValue;
+			}
+			return $this->age;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth player age days
+	 *
+	 * @return Integer
+	 */
+	public function getDays()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->days) || $this->days === null)
+			{
+				$this->days = $this->getXml()->getElementsByTagName('AgeDays')->item(0)->nodeValue;
+			}
+			return $this->days;
+		}
+		return null;
+	}
+
+	/**
+	 * Return arrival date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getArrivalDate($format = null)
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->arrivaldate[$format]) || $this->arrivaldate[$format] === null)
+			{
+				$this->arrivaldate[$format] = $this->getXml()->getElementsByTagName('ArrivalDate')->item(0)->nodeValue;
+				if($format !== null)
+				{
+					$this->arrivaldate[$format] = HTFunction::convertDate($this->arrivaldate[$format], $format);
+				}
+			}
+			return $this->arrivaldate[$format];
+		}
+		return null;
+	}
+
+	/**
+	 * Return number of days when player can be promoted
+	 *
+	 * @return Integer
+	 */
+	public function getCanBePromotedIn()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->promotedin) || $this->promotedin === null)
+			{
+				$this->promotedin = $this->getXml()->getElementsByTagName('CanBePromotedIn')->item(0)->nodeValue;
+			}
+			return $this->promotedin;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth player number
+	 *
+	 * @return Integer
+	 */
+	public function getNumber()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->number) || $this->number === null)
+			{
+				$node = $this->getXml()->getElementsByTagName('PlayerNumber');
+				if($node !== null && $node->length)
+				{
+					$this->number = $node->item(0)->nodeValue;
+				}
+			}
+			return $this->number;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth player statement
+	 *
+	 * @return String
+	 */
+	public function getStatement()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->statement) || $this->statement === null)
+			{
+				$node = $this->getXml()->getElementsByTagName('Statement');
+				if($node !== null && $node->length)
+				{
+					$this->statement = $node->item(0)->nodeValue;
+				}
+			}
+			return $this->statement;
+		}
+		return null;
+	}
+
+	/**
+	 * Return notes
+	 *
+	 * @return String
+	 */
+	public function getNotes()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->notes) || $this->notes === null)
+			{
+				$node = $this->getXml()->getElementsByTagName('OwnerNotes');
+				if($node !== null && $node->length)
+				{
+					$this->notes = $node->item(0)->nodeValue;
+				}
+			}
+			return $this->notes;
+		}
+		return null;
+	}
+
+	/**
+	 * Return category id
+	 *
+	 * @return Integer
+	 */
+	public function getCategory()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->category) || $this->category === null)
+			{
+				$node = $this->getXml()->getElementsByTagName('PlayerCategoryID');
+				if($node !== null && $node->length)
+				{
+					$this->category = $node->item(0)->nodeValue;
+				}
+			}
+			return $this->category;
+		}
+		return null;
+	}
+
+	/**
+	 * Return cards number
+	 *
+	 * @return Integer
+	 */
+	public function getCardsNumber()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->cards) || $this->cards === null)
+			{
+				$this->cards = $this->getXml()->getElementsByTagName('Cards')->item(0)->nodeValue;
+			}
+			return $this->cards;
+		}
+		return null;
+	}
+
+	/**
+	 * Return injury level
+	 *
+	 * @return Integer
+	 */
+	public function getInjuryLevel()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->injury) || $this->injury === null)
+			{
+				$this->injury = $this->getXml()->getElementsByTagName('InjuryLevel')->item(0)->nodeValue;
+			}
+			return $this->injury;
+		}
+		return null;
+	}
+
+	/**
+	 * Return speciality id
+	 *
+	 * @return Integer
+	 */
+	public function getSpeciality()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->speciality) || $this->speciality === null)
+			{
+				$this->speciality = $this->getXml()->getElementsByTagName('Specialty')->item(0)->nodeValue;
+			}
+			return $this->speciality;
+		}
+		return null;
+	}
+
+	/**
+	 * Return career goals number
+	 *
+	 * @return Integer
+	 */
+	public function getCareerGoals()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->careergoals) || $this->careergoals === null)
+			{
+				$this->careergoals = $this->getXml()->getElementsByTagName('CareerGoals')->item(0)->nodeValue;
+			}
+			return $this->careergoals;
+		}
+		return null;
+	}
+
+	/**
+	 * Return career hattricks number
+	 *
+	 * @return Integer
+	 */
+	public function getCareerHattricks()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->hattrickgoals) || $this->hattrickgoals === null)
+			{
+				$this->hattrickgoals = $this->getXml()->getElementsByTagName('CareerHattricks')->item(0)->nodeValue;
+			}
+			return $this->hattrickgoals;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league goals number
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueGoals()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->leaguegoals) || $this->leaguegoals === null)
+			{
+				$this->leaguegoals = $this->getXml()->getElementsByTagName('LeagueGoals')->item(0)->nodeValue;
+			}
+			return $this->leaguegoals;
+		}
+		return null;
+	}
+
+	/**
+	 * Return friends goals number
+	 *
+	 * @return Integer
+	 */
+	public function getFriendlyGoals()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->friendlygoals) || $this->friendlygoals === null)
+			{
+				$this->friendlygoals = $this->getXml()->getElementsByTagName('FriendlyGoals')->item(0)->nodeValue;
+			}
+			return $this->friendlygoals;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth team id
+	 *
+	 * @return Integer
+	 */
+	public function getYouthTeamId()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->youthteamid) || $this->youthteamid === null)
+			{
+				$this->youthteamid = $this->getXml()->getElementsByTagName('YouthTeamID')->item(0)->nodeValue;
+			}
+			return $this->youthteamid;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth team name
+	 *
+	 * @return String
+	 */
+	public function getYouthTeamName()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->youthteamname) || $this->youthteamname === null)
+			{
+				$this->youthteamname = $this->getXml()->getElementsByTagName('YouthTeamName')->item(0)->nodeValue;
+			}
+			return $this->youthteamname;
+		}
+		return null;
+	}
+
+	/**
+	 * Return youth team league id
+	 *
+	 * @return Integer
+	 */
+	public function getYouthTeamLeagueId()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->youthteamleagueid) || $this->youthteamleagueid === null)
+			{
+				$this->youthteamleagueid = $this->getXml()->getElementsByTagName('YouthTeamLeagueID')->item(0)->nodeValue;
+			}
+			return $this->youthteamleagueid;
+		}
+		return null;
+	}
+
+	/**
+	 * Return senior team id
+	 *
+	 * @return Integer
+	 */
+	public function getSeniorTeamId()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->seniorteamid) || $this->seniorteamid === null)
+			{
+				$this->seniorteamid = $this->getXml()->getElementsByTagName('SeniorTeamID')->item(0)->nodeValue;
+			}
+			return $this->seniorteamid;
+		}
+		return null;
+	}
+
+	/**
+	 * Return senior team name
+	 *
+	 * @return String
+	 */
+	public function getSeniorTeamName()
+	{
+		if($this->hasDetails())
+		{
+			if(!isset($this->seniorteamname) || $this->seniorteamname === null)
+			{
+				$this->seniorteamname = $this->getXml()->getElementsByTagName('SeniorTeamName')->item(0)->nodeValue;
+			}
+			return $this->seniorteamname;
+		}
+		return null;
+	}
+
+	/**
+	 * Return is skills are available
+	 *
+	 * @return Boolean
+	 */
+	public function hasSkills()
+	{
+		if(!isset($this->hasSkills) || $this->hasSkills === null)
+		{
+			$this->hasSkills = $this->getXml()->getElementsByTagName('PlayerSkills')->length;
+		}
+		return $this->hasSkills;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getKeeperSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->keeperskill) || $this->keeperskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('KeeperSkill')->item(0), true));
+				$this->keeperskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->keeperskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getKeeperSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->keeperskillmax) || $this->keeperskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('KeeperSkillMax')->item(0), true));
+				$this->keeperskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->keeperskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getDefenderSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->defenderskill) || $this->defenderskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('DefenderSkill')->item(0), true));
+				$this->defenderskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->defenderskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getDefenderSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->defenderskillmax) || $this->defenderskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('DefenderSkillMax')->item(0), true));
+				$this->defenderskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->defenderskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getPlaymakerSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->playmakerskill) || $this->playmakerskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('PlaymakerSkill')->item(0), true));
+				$this->playmakerskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->playmakerskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getPlaymakerSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->playmakerskillmax) || $this->playmakerskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('PlaymakerSkillMax')->item(0), true));
+				$this->playmakerskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->playmakerskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getWingerSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->wingerskill) || $this->wingerskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('WingerSkill')->item(0), true));
+				$this->wingerskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->wingerskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getWingerSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->wingerskillmax) || $this->wingerskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('WingerSkillMax')->item(0), true));
+				$this->wingerskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->wingerskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getScorerSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->scorerskill) || $this->scorerskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('ScorerSkill')->item(0), true));
+				$this->scorerskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->scorerskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getScorerSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->scorerskillmax) || $this->scorerskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('ScorerSkillMax')->item(0), true));
+				$this->scorerskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->scorerskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getPassingSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->passingskill) || $this->passingskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('PassingSkill')->item(0), true));
+				$this->passingskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->passingskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getPassingSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->passingskillmax) || $this->passingskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('PassingSkillMax')->item(0), true));
+				$this->passingskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->passingskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getSetPiecesSkill()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->setpiecesskill) || $this->setpiecesskill === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('SetPiecesSkill')->item(0), true));
+				$this->setpiecesskill = new HTYouthPlayerSkill($skill);
+			}
+			return $this->setpiecesskill;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthPlayerSkill object
+	 *
+	 * @return HTYouthPlayerSkill
+	 */
+	public function getSetPiecesSkillMax()
+	{
+		if($this->hasSkills())
+		{
+			if(!isset($this->setpiecesskillmax) || $this->setpiecesskillmax === null)
+			{
+				$skill = new DOMDocument('1.0', 'UTF-8');
+				$skill->appendChild($skill->importNode($this->getXml()->getElementsByTagName('SetPiecesSkillMax')->item(0), true));
+				$this->setpiecesskillmax = new HTYouthPlayerSkill($skill);
+			}
+			return $this->setpiecesskillmax;
+		}
+		return null;
+	}
+
+	/**
+	 * Return HTYouthScoutCall object
+	 *
+	 * @return HTYouthScoutCall
+	 */
+	public function getScoutCall()
+	{
+		if(!isset($this->scoutcall) || $this->scoutcall === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('ScoutCall');
+			if($node !== null && $node->length)
+			{
+				$call = new DOMDocument('1.0', 'UTF-8');
+				$call->appendChild($call->importNode($node->item(0), true));
+				$this->scoutcall = new HTYouthScoutCall($call);
+			}
+		}
+		return $this->scoutcall;
+	}
+
+	/**
+	 * Return HTYouthPlayerLastMatch object
+	 *
+	 * @return HTYouthPlayerLastMatch
+	 */
+	public function getLastMatch()
+	{
+		if(!isset($this->lastmatch) || $this->lastmatch === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('LastMatch');
+			if($node !== null && $node->length)
+			{
+				$match = new DOMDocument('1.0', 'UTF-8');
+				$match->appendChild($match->importNode($node->item(0), true));
+				$this->lastmatch = new HTYouthPlayerLastMatch($match);
+			}
+		}
+		return $this->lastmatch;
+	}
+}
+class HTYouthPlayerLastMatch extends HTXml
+{
+	private $date = null;
+	private $id = null;
+	private $position = null;
+	private $minutes = null;
+	private $rating = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return match date
+	 *
+	 * @param String $format (php date() function format)
+	 * @return String
+	 */
+	public function getDate($format = null)
+	{
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
+		{
+			$this->date[$format] = $this->getXml()->getElementsByTagName('Date')->item(0)->nodeValue;
+			if($format !== null)
+			{
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
+			}
+		}
+		return $this->date[$format];
+	}
+
+	/**
+	 * Return match id
+	 *
+	 * @return Integer
+	 */
+	public function getId()
+	{
+		if(!isset($this->id) || $this->id === null)
+		{
+			$this->id = $this->getXml()->getElementsByTagName('YouthMatchID')->item(0)->nodeValue;
+		}
+		return $this->id;
+	}
+
+	/**
+	 * Return position code
+	 *
+	 * @return Integer
+	 */
+	public function getPosition()
+	{
+		if(!isset($this->position) || $this->position === null)
+		{
+			$this->position = $this->getXml()->getElementsByTagName('PositionCode')->item(0)->nodeValue;
+		}
+		return $this->position;
+	}
+
+	/**
+	 * Return number of played minute
+	 *
+	 * @return Integer
+	 */
+	public function getPlayedMinute()
+	{
+		if(!isset($this->minutes) || $this->minutes === null)
+		{
+			$this->minutes = $this->getXml()->getElementsByTagName('PlayedMinutes')->item(0)->nodeValue;
+		}
+		return $this->minutes;
+	}
+
+	/**
+	 * Return rating number
+	 *
+	 * @return Float
+	 */
+	public function getRating()
+	{
+		if(!isset($this->rating) || $this->rating === null)
+		{
+			$this->rating = $this->getXml()->getElementsByTagName('Rating')->item(0)->nodeValue;
+		}
+		return $this->rating;
+	}
+}
+class HTYouthScoutCall extends HTXml
+{
+	private $scoutId = null;
+	private $scoutName = null;
+	private $regionId = null;
+	private $commentNumber = null;
+	private $comments = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return scout id
+	 *
+	 * @return Integer
+	 */
+	public function getScoutId()
+	{
+		if(!isset($this->scoutId) || $this->scoutId === null)
+		{
+			$this->scoutId = $this->getXml()->getElementsByTagName('ScoutId')->item(0)->nodeValue;
+		}
+		return $this->scoutId;
+	}
+
+	/**
+	 * Return scout name
+	 *
+	 * @return String
+	 */
+	public function getScoutName()
+	{
+		if(!isset($this->scoutName) || $this->scoutName === null)
+		{
+			$this->scoutName = $this->getXml()->getElementsByTagName('ScoutName')->item(0)->nodeValue;
+		}
+		return $this->scoutName;
+	}
+
+	/**
+	 * Return scouting region id
+	 *
+	 * @return Integer
+	 */
+	public function getRegion()
+	{
+		if(!isset($this->regionId) || $this->regionId === null)
+		{
+			$this->regionId = $this->getXml()->getElementsByTagName('ScoutingRegionID')->item(0)->nodeValue;
+		}
+		return $this->regionId;
+	}
+
+	/**
+	 * Return number of comment
+	 *
+	 * @return Integer
+	 */
+	public function getCommentNumber()
+	{
+		if(!isset($this->commentNumber) || $this->commentNumber === null)
+		{
+			$this->commentNumber = $this->getXml()->getElementsByTagName('ScoutComment')->length;
+		}
+		return $this->commentNumber;
+	}
+
+	/**
+	 * Return HTYouthScoutComment object
+	 *
+	 * @return HTYouthScoutComment
+	 */
+	public function getComment($index)
+	{
+		$index = round($index);
+		if($index > 0 && $index <= $this->getCommentNumber())
+		{
+			--$index;
+			if(!isset($this->comments[$index]) || $this->comments[$index] === null)
+			{
+				$xpath = new DOMXPath($this->getXml());
+				$nodeList = $xpath->query("//ScoutComment");
+				$node = new DOMDocument('1.0', 'UTF-8');
+				$node->appendChild($node->importNode($nodeList->item($index), true));
+				$this->comments[$index] = new HTYouthScoutComment($node);
+			}
+			return $this->comments[$index];
+		}
+		return null;
+	}
+}
+class HTYouthScoutComment extends HTXml
+{
+	private $text = null;
+	private $type = null;
+	private $variation = null;
+	private $skilltype = null;
+	private $skilllevel = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return text
+	 *
+	 * @return String
+	 */
+	public function getText()
+	{
+		if(!isset($this->text) || $this->text === null)
+		{
+			$this->text = $this->getXml()->getElementsByTagName('CommentText')->item(0)->nodeValue;
+		}
+		return $this->text;
+	}
+
+	/**
+	 * Return type
+	 *
+	 * @return Integer
+	 */
+	public function getType()
+	{
+		if(!isset($this->type) || $this->type === null)
+		{
+			$this->type = $this->getXml()->getElementsByTagName('CommentType')->item(0)->nodeValue;
+		}
+		return $this->type;
+	}
+
+	/**
+	 * Return variation
+	 *
+	 * @return Integer
+	 */
+	public function getVariation()
+	{
+		if(!isset($this->variation) || $this->variation === null)
+		{
+			$this->variation = $this->getXml()->getElementsByTagName('CommentVariation')->item(0)->nodeValue;
+		}
+		return $this->variation;
+	}
+
+	/**
+	 * Return skill type
+	 *
+	 * @return Integer
+	 */
+	public function getSkillType()
+	{
+		if(!isset($this->skilltype) || $this->skilltype === null)
+		{
+			$this->skilltype = $this->getXml()->getElementsByTagName('CommentSkillType')->item(0)->nodeValue;
+		}
+		return $this->skilltype;
+	}
+
+	/**
+	 * Return skill level
+	 *
+	 * @return Integer
+	 */
+	public function getSkillLevel()
+	{
+		if(!isset($this->skilllevel) || $this->skilllevel === null)
+		{
+			$this->skilllevel = $this->getXml()->getElementsByTagName('CommentSkillLevel')->item(0)->nodeValue;
+		}
+		return $this->skilllevel;
+	}
+}
+class HTYouthPlayerSkill extends HTXml
+{
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return skill value
+	 *
+	 * @return Integer
+	 */
+	public function getValue()
+	{
+		return $this->getXml()->documentElement->nodeValue;
+	}
+
+	/**
+	 * Return if skill is available
+	 *
+	 * @return Boolean
+	 */
+	public function isAvailable()
+	{
+		return strtolower($this->getXml()->documentElement->getAttribute('IsAvailable')) == 'true';
+	}
+
+	/**
+	 * Return if skill can be trained anymore
+	 *
+	 * @return Boolean
+	 */
+	public function isMaxReached()
+	{
+		return strtolower($this->getXml()->documentElement->getAttribute('IsMaxReached')) == 'true';
+	}
+
+	/**
+	 * Return if skill can be unlocked
+	 *
+	 * @return Boolean
+	 */
+	public function mayUnlock()
+	{
+		return strtolower($this->getXml()->documentElement->getAttribute('MayUnlock')) == 'true';
+	}
+}
 class HTTrophy extends HTXml
 {
 	private $typeId = null;
@@ -6072,15 +8561,15 @@ class HTTrophy extends HTXml
 	 */
 	public function getGainedDate($format = null)
 	{
-		if(!isset($this->gainedDate) || $this->gainedDate === null)
+		if(!isset($this->gainedDate[$format]) || $this->gainedDate[$format] === null)
 		{
-			$this->gainedDate = $this->getXml()->getElementsByTagName('GainedDate')->item(0)->nodeValue;
+			$this->gainedDate[$format] = $this->getXml()->getElementsByTagName('GainedDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->gainedDate = HTFunction::convertDate($this->gainedDate, $format);
+				$this->gainedDate[$format] = HTFunction::convertDate($this->gainedDate[$format], $format);
 			}
 		}
-		return $this->gainedDate;
+		return $this->gainedDate[$format];
 	}
 
 	/**
@@ -6446,15 +8935,15 @@ class HTTeamSupported extends HTTeamSupporter
 	 */
 	public function getLastMatchDate($format = null)
 	{
-		if(!isset($this->lastMatchDate) || $this->lastMatchDate === null)
+		if(!isset($this->lastMatchDate[$format]) || $this->lastMatchDate[$format] === null)
 		{
-			$this->lastMatchDate = $this->getXml()->getElementsByTagName('LastMatchDate')->item(0)->nodeValue;
+			$this->lastMatchDate[$format] = $this->getXml()->getElementsByTagName('LastMatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->lastMatchDate = HTFunction::convertDate($this->lastMatchDate, $format);
+				$this->lastMatchDate[$format] = HTFunction::convertDate($this->lastMatchDate[$format], $format);
 			}
 		}
-		return $this->lastMatchDate;
+		return $this->lastMatchDate[$format];
 	}
 
 	/**
@@ -6563,15 +9052,15 @@ class HTTeamSupported extends HTTeamSupporter
 	 */
 	public function getNextMatchDate($format = null)
 	{
-		if(!isset($this->nextMatchDate) || $this->nextMatchDate === null)
+		if(!isset($this->nextMatchDate[$format]) || $this->nextMatchDate[$format] === null)
 		{
-			$this->nextMatchDate = $this->getXml()->getElementsByTagName('NextMatchMatchDate')->item(0)->nodeValue;
+			$this->nextMatchDate[$format] = $this->getXml()->getElementsByTagName('NextMatchMatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->nextMatchDate = HTFunction::convertDate($this->nextMatchDate, $format);
+				$this->nextMatchDate[$format] = HTFunction::convertDate($this->nextMatchDate[$format], $format);
 			}
 		}
-		return $this->nextMatchDate;
+		return $this->nextMatchDate[$format];
 	}
 
 	/**
@@ -6654,15 +9143,15 @@ class HTTeamSupported extends HTTeamSupporter
 	{
 		if($this->hasPressAnnouncement())
 		{
-			if(!isset($this->pressDate) || $this->pressDate === null)
+			if(!isset($this->pressDate[$format]) || $this->pressDate[$format] === null)
 			{
-				$this->pressDate = $this->getXml()->getElementsByTagName('PressAnnouncementSendDate')->item(0)->nodeValue;
+				$this->pressDate[$format] = $this->getXml()->getElementsByTagName('PressAnnouncementSendDate')->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->pressDate = HTFunction::convertDate($this->pressDate, $format);
+					$this->pressDate[$format] = HTFunction::convertDate($this->pressDate[$format], $format);
 				}
 			}
-			return $this->pressDate;
+			return $this->pressDate[$format];
 		}
 		return null;
 	}
@@ -7483,6 +9972,7 @@ class HTLeague extends HTCommonLeagueLevel
 	private $leagueId = null;
 	private $leagueName = null;
 	private $teams = array();
+	private $currentRound = null;
 
 	/**
 	 * Return league level
@@ -7563,6 +10053,20 @@ class HTLeague extends HTCommonLeagueLevel
 		}
 		return null;
 	}
+
+	/**
+	 * Return current match round
+	 *
+	 * @return Integer
+	 */
+	public function getCurrentMatchRound()
+	{
+		if(!isset($this->currentRound) || $this->currentRound === null)
+		{
+			$this->currentRound = $this->getXml()->getElementsByTagName('CurrentMatchRound')->item(0)->nodeValue;
+		}
+		return $this->currentRound;
+	}
 }
 class HTLeagueTeam extends HTXml
 {
@@ -7575,6 +10079,9 @@ class HTLeagueTeam extends HTXml
 	private $goalsFor = null;
 	private $goalsAgainst = null;
 	private $points = null;
+	private $won = null;
+	private $draws = null;
+	private $lost = null;
 
 	/**
 	 * @param DOMDocument $fullxml
@@ -7724,6 +10231,48 @@ class HTLeagueTeam extends HTXml
 	public function getGoalAverage()
 	{
 		return $this->getGoalsFor() - $this->getGoalsAgainst();
+	}
+
+	/**
+	 * Return total won matches
+	 *
+	 * @return Integer
+	 */
+	public function getWonNumber()
+	{
+		if(!isset($this->won) || $this->won === null)
+		{
+			$this->won = $this->getXml()->getElementsByTagName('Won')->item(0)->nodeValue;
+		}
+		return $this->won;
+	}
+
+	/**
+	 * Return total draws matches
+	 *
+	 * @return Integer
+	 */
+	public function getDrawsNumber()
+	{
+		if(!isset($this->draws) || $this->draws === null)
+		{
+			$this->draws = $this->getXml()->getElementsByTagName('Draws')->item(0)->nodeValue;
+		}
+		return $this->draws;
+	}
+
+	/**
+	 * Return total lost matches
+	 *
+	 * @return Integer
+	 */
+	public function getLostNumber()
+	{
+		if(!isset($this->lost) || $this->lost === null)
+		{
+			$this->lost = $this->getXml()->getElementsByTagName('Lost')->item(0)->nodeValue;
+		}
+		return $this->lost;
 	}
 }
 class HTLeagueSeason extends HTCommonLeagueLevel
@@ -8119,15 +10668,15 @@ class HTLeagueMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->matchDate) || $this->matchDate === null)
+		if(!isset($this->matchDate[$format]) || $this->matchDate[$format] === null)
 		{
-			$this->matchDate = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->matchDate[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->matchDate = HTFunction::convertDate($this->matchDate, $format);
+				$this->matchDate[$format] = HTFunction::convertDate($this->matchDate[$format], $format);
 			}
 		}
-		return $this->matchDate;
+		return $this->matchDate[$format];
 	}
 
 	/**
@@ -8249,15 +10798,6 @@ class HTWorldDetails extends HTGlobal
 	}
 
 	/**
-	 * @deprecated use getLeagueNumber() function instead
-	 * @return Integer
-	 */
-	public function getTotalLeague()
-	{
-		return $this->getLeagueNumber();
-	}
-
-	/**
 	 * Return number of league
 	 *
 	 * @return Integer
@@ -8280,7 +10820,7 @@ class HTWorldDetails extends HTGlobal
 	public function getLeague($number)
 	{
 		$number = round($number);
-		if($number > 0 && $number <= $this->getTotalLeague())
+		if($number > 0 && $number <= $this->getLeagueNumber())
 		{
 			--$number;
 			if(!isset($this->leagues[$number]) || $this->leagues[$number] === null)
@@ -8760,15 +11300,15 @@ class HTWorldLeague extends HTXml
 	 */
 	public function getTrainingDate($format = null)
 	{
-		if(!isset($this->trainingDate) || $this->trainingDate === null)
+		if(!isset($this->trainingDate[$format]) || $this->trainingDate[$format] === null)
 		{
-			$this->trainingDate = $this->getXml()->getElementsByTagName('TrainingDate')->item(0)->nodeValue;
+			$this->trainingDate[$format] = $this->getXml()->getElementsByTagName('TrainingDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->trainingDate = HTFunction::convertDate($this->trainingDate, $format);
+				$this->trainingDate[$format] = HTFunction::convertDate($this->trainingDate[$format], $format);
 			}
 		}
-		return $this->trainingDate;
+		return $this->trainingDate[$format];
 	}
 
 	/**
@@ -8779,15 +11319,15 @@ class HTWorldLeague extends HTXml
 	 */
 	public function getEconomyDate($format = null)
 	{
-		if(!isset($this->economyDate) || $this->economyDate === null)
+		if(!isset($this->economyDate[$format]) || $this->economyDate[$format] === null)
 		{
-			$this->economyDate = $this->getXml()->getElementsByTagName('EconomyDate')->item(0)->nodeValue;
+			$this->economyDate[$format] = $this->getXml()->getElementsByTagName('EconomyDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->economyDate = HTFunction::convertDate($this->economyDate, $format);
+				$this->economyDate[$format] = HTFunction::convertDate($this->economyDate[$format], $format);
 			}
 		}
-		return $this->economyDate;
+		return $this->economyDate[$format];
 	}
 
 	/**
@@ -8798,15 +11338,15 @@ class HTWorldLeague extends HTXml
 	 */
 	public function getCupMatchDate($format = null)
 	{
-		if(!isset($this->cupMatchDate) || $this->cupMatchDate === null)
+		if(!isset($this->cupMatchDate[$format]) || $this->cupMatchDate[$format] === null)
 		{
-			$this->cupMatchDate = $this->getXml()->getElementsByTagName('CupMatchDate')->item(0)->nodeValue;
+			$this->cupMatchDate[$format] = $this->getXml()->getElementsByTagName('CupMatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->cupMatchDate = HTFunction::convertDate($this->cupMatchDate, $format);
+				$this->cupMatchDate[$format] = HTFunction::convertDate($this->cupMatchDate[$format], $format);
 			}
 		}
-		return $this->cupMatchDate;
+		return $this->cupMatchDate[$format];
 	}
 
 	/**
@@ -8817,15 +11357,15 @@ class HTWorldLeague extends HTXml
 	 */
 	public function getSeriesMatchDate($format = null)
 	{
-		if(!isset($this->seriesMatchDate) || $this->seriesMatchDate === null)
+		if(!isset($this->seriesMatchDate[$format]) || $this->seriesMatchDate[$format] === null)
 		{
-			$this->seriesMatchDate = $this->getXml()->getElementsByTagName('SeriesMatchDate')->item(0)->nodeValue;
+			$this->seriesMatchDate[$format] = $this->getXml()->getElementsByTagName('SeriesMatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->seriesMatchDate = HTFunction::convertDate($this->seriesMatchDate, $format);
+				$this->seriesMatchDate[$format] = HTFunction::convertDate($this->seriesMatchDate[$format], $format);
 			}
 		}
-		return $this->seriesMatchDate;
+		return $this->seriesMatchDate[$format];
 	}
 
 	/**
@@ -9083,15 +11623,15 @@ class HTTraining extends HTCommonSubscriber
 	 */
 	public function getTrainerArrivalDate($format = null)
 	{
-		if(!isset($this->trainerArrivalDate) || $this->trainerArrivalDate === null)
+		if(!isset($this->trainerArrivalDate[$format]) || $this->trainerArrivalDate[$format] === null)
 		{
-			$this->trainerArrivalDate = $this->getXml()->getElementsByTagName('ArrivalDate')->item(0)->nodeValue;
+			$this->trainerArrivalDate[$format] = $this->getXml()->getElementsByTagName('ArrivalDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->trainerArrivalDate = HTFunction::convertDate($this->trainerArrivalDate, $format);
+				$this->trainerArrivalDate[$format] = HTFunction::convertDate($this->trainerArrivalDate[$format], $format);
 			}
 		}
-		return $this->trainerArrivalDate;
+		return $this->trainerArrivalDate[$format];
 	}
 
 	/**
@@ -9537,15 +12077,15 @@ class HTTeamTransferHistory extends HTCommonTeam
 	 */
 	public function getTeamActivatedDate($format = null)
 	{
-		if(!isset($this->activatedDate) || $this->activatedDate === null)
+		if(!isset($this->activatedDate[$format]) || $this->activatedDate[$format] === null)
 		{
-			$this->activatedDate = $this->getXml()->getElementsByTagName('ActivatedDate')->item(0)->nodeValue;
+			$this->activatedDate[$format] = $this->getXml()->getElementsByTagName('ActivatedDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->activatedDate = HTFunction::convertDate($this->activatedDate, $format);
+				$this->activatedDate[$format] = HTFunction::convertDate($this->activatedDate[$format], $format);
 			}
 		}
-		return $this->activatedDate;
+		return $this->activatedDate[$format];
 	}
 
 	/**
@@ -9652,15 +12192,15 @@ class HTTeamTransferHistory extends HTCommonTeam
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 
 	/**
@@ -9671,15 +12211,15 @@ class HTTeamTransferHistory extends HTCommonTeam
 	 */
 	public function getEndDate($format = null)
 	{
-		if(!isset($this->endDate) || $this->endDate === null)
+		if(!isset($this->endDate[$format]) || $this->endDate[$format] === null)
 		{
-			$this->endDate = $this->getXml()->getElementsByTagName('EndDate')->item(0)->nodeValue;
+			$this->endDate[$format] = $this->getXml()->getElementsByTagName('EndDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->endDate = HTFunction::convertDate($this->endDate, $format);
+				$this->endDate[$format] = HTFunction::convertDate($this->endDate[$format], $format);
 			}
 		}
-		return $this->endDate;
+		return $this->endDate[$format];
 	}
 }
 class HTPlayerTransferHistory extends HTGlobal
@@ -9699,15 +12239,15 @@ class HTPlayerTransferHistory extends HTGlobal
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 
 	/**
@@ -9718,15 +12258,15 @@ class HTPlayerTransferHistory extends HTGlobal
 	 */
 	public function getEndDate($format = null)
 	{
-		if(!isset($this->endDate) || $this->endDate === null)
+		if(!isset($this->endDate[$format]) || $this->endDate[$format] === null)
 		{
-			$this->endDate = $this->getXml()->getElementsByTagName('EndDate')->item(0)->nodeValue;
+			$this->endDate[$format] = $this->getXml()->getElementsByTagName('EndDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->endDate = HTFunction::convertDate($this->endDate, $format);
+				$this->endDate[$format] = HTFunction::convertDate($this->endDate[$format], $format);
 			}
 		}
-		return $this->endDate;
+		return $this->endDate[$format];
 	}
 
 	/**
@@ -9843,15 +12383,15 @@ class HTTransfer extends HTXml
 	 */
 	public function getDeadline($format = null)
 	{
-		if(!isset($this->deadline) || $this->deadline === null)
+		if(!isset($this->deadline[$format]) || $this->deadline[$format] === null)
 		{
-			$this->deadline = $this->getXml()->getElementsByTagName('Deadline')->item(0)->nodeValue;
+			$this->deadline[$format] = $this->getXml()->getElementsByTagName('Deadline')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->deadline = HTFunction::convertDate($this->deadline, $format);
+				$this->deadline[$format] = HTFunction::convertDate($this->deadline[$format], $format);
 			}
 		}
-		return $this->deadline;
+		return $this->deadline[$format];
 	}
 
 	/**
@@ -10144,7 +12684,6 @@ class HTTeamPlayer extends HTXml
 	private $setpieces = null;
 	private $categoryId = null;
 	private $lastmatch = null;
-	private $bestmatch = null;
 	private $loyalty = null;
 	private $bonus = null;
 
@@ -10699,15 +13238,15 @@ class HTTeamPlayer extends HTXml
 	 */
 	public function getNextBirthDay($format = null)
 	{
-		if(!isset($this->birthday) || $this->birthday === null)
+		if(!isset($this->birthday[$format]) || $this->birthday[$format] === null)
 		{
-			$this->birthday = date('Y-m-d', time()+((self::DAYSINYEAR-$this->getDays())*24*3600));
+			$this->birthday[$format] = date('Y-m-d', time()+((self::DAYSINYEAR-$this->getDays())*24*3600));
 			if($format !== null)
 			{
-				$this->birthday = HTFunction::convertDate($this->birthday, $format);
+				$this->birthday[$format] = HTFunction::convertDate($this->birthday[$format], $format);
 			}
 		}
-		return $this->birthday;
+		return $this->birthday[$format];
 	}
 
 	/**
@@ -10881,26 +13420,6 @@ class HTTeamPlayer extends HTXml
 	}
 
 	/**
-	 * Return HTPlayerMatch object
-	 *
-	 * @return HTPlayerMatch
-	 */
-	public function getBestMatch()
-	{
-		if(!isset($this->bestmatch) || $this->bestmatch === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('BestMatch')->item(0);
-			if($node !== null && $node->hasChildNodes())
-			{
-				$bestmatch = new DOMDocument('1.0', 'UTF-8');
-				$bestmatch->appendChild($bestmatch->importNode($node, true));
-				$this->bestmatch = new HTPlayerMatch($bestmatch);
-			}
-		}
-		return $this->bestmatch;
-	}
-
-	/**
 	 * Return player loyalty level
 	 *
 	 * @return Integer
@@ -11060,6 +13579,7 @@ class HTPlayer extends HTCommonSubscriber
 	private $cupGoals = null;
 	private $carrerGoals = null;
 	private $carrerHattricks = null;
+	private $friendlyGoals = null;
 	private $transferListed = null;
 	private $skillsAvailable = null;
 	private $stamina = null;
@@ -11075,7 +13595,6 @@ class HTPlayer extends HTCommonSubscriber
 	private $isTrainer = null;
 	private $birthday = null;
 	private $lastmatch = null;
-	private $bestmatch = null;
 	private $ownerNotes = null;
 	private $categoryId = null;
 	private $loyalty = null;
@@ -11699,7 +14218,7 @@ class HTPlayer extends HTCommonSubscriber
 	{
 		if(!isset($this->isTrainer) || $this->isTrainer === null)
 		{
-			$this->isTrainer = $this->getXml()->getElementsByTagName('TrainerData')->length > 0;
+			$this->isTrainer = $this->getXml()->getElementsByTagName('TrainerData')->item(0)->hasChildNodes();
 		}
 		return $this->isTrainer;
 	}
@@ -11748,15 +14267,15 @@ class HTPlayer extends HTCommonSubscriber
 	 */
 	public function getNextBirthDay($format = null)
 	{
-		if(!isset($this->birthday) || $this->birthday === null)
+		if(!isset($this->birthday[$format]) || $this->birthday[$format] === null)
 		{
-			$this->birthday = $this->getXml()->getElementsByTagName('NextBirthDay')->item(0)->nodeValue;
+			$this->birthday[$format] = $this->getXml()->getElementsByTagName('NextBirthDay')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->birthday = HTFunction::convertDate($this->birthday, $format);
+				$this->birthday[$format] = HTFunction::convertDate($this->birthday[$format], $format);
 			}
 		}
-		return $this->birthday;
+		return $this->birthday[$format];
 	}
 
 	/**
@@ -11816,26 +14335,6 @@ class HTPlayer extends HTCommonSubscriber
 	}
 
 	/**
-	 * Return HTPlayerMatch object
-	 *
-	 * @return HTPlayerMatch
-	 */
-	public function getBestMatch()
-	{
-		if(!isset($this->bestmatch) || $this->bestmatch === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('BestMatch')->item(0);
-			if($node !== null && $node->hasChildNodes())
-			{
-				$bestmatch = new DOMDocument('1.0', 'UTF-8');
-				$bestmatch->appendChild($bestmatch->importNode($node, true));
-				$this->bestmatch = new HTPlayerMatch($bestmatch);
-			}
-		}
-		return $this->bestmatch;
-	}
-
-	/**
 	 * Return player loyalty level
 	 *
 	 * @return Integer
@@ -11869,6 +14368,76 @@ class HTPlayer extends HTCommonSubscriber
 			}
 		}
 		return $this->bonus;
+	}
+
+	/**
+	 * Return player number goals in his career
+	 *
+	 * @return Integer
+	 */
+	public function getGoalsInCareer()
+	{
+		if(!isset($this->carrerGoals) || $this->carrerGoals === null)
+		{
+			$this->carrerGoals = $this->getXml()->getElementsByTagName('CareerGoals')->item(0)->nodeValue;
+		}
+		return $this->carrerGoals;
+	}
+
+	/**
+	 * Return player number goals in cup
+	 *
+	 * @return Integer
+	 */
+	public function getGoalsInCup()
+	{
+		if(!isset($this->cupGoals) || $this->cupGoals === null)
+		{
+			$this->cupGoals = $this->getXml()->getElementsByTagName('CupGoals')->item(0)->nodeValue;
+		}
+		return $this->cupGoals;
+	}
+
+	/**
+	 * Return player number goals in league
+	 *
+	 * @return Integer
+	 */
+	public function getGoalsInLeague()
+	{
+		if(!isset($this->leagueGoals) || $this->leagueGoals === null)
+		{
+			$this->leagueGoals = $this->getXml()->getElementsByTagName('LeagueGoals')->item(0)->nodeValue;
+		}
+		return $this->leagueGoals;
+	}
+
+	/**
+	 * Return player number hattricks in his career
+	 *
+	 * @return Integer
+	 */
+	public function getHattricksInCareer()
+	{
+		if(!isset($this->carrerHattricks) || $this->carrerHattricks === null)
+		{
+			$this->carrerHattricks = $this->getXml()->getElementsByTagName('CareerHattricks')->item(0)->nodeValue;
+		}
+		return $this->carrerHattricks;
+	}
+
+	/**
+	 * Return player number goals in friendly
+	 *
+	 * @return Integer
+	 */
+	public function getGoalsInFriendly()
+	{
+		if(!isset($this->friendlyGoals) || $this->friendlyGoals === null)
+		{
+			$this->friendlyGoals = $this->getXml()->getElementsByTagName('FriendliesGoals')->item(0)->nodeValue;
+		}
+		return $this->friendlyGoals;
 	}
 }
 class HTPlayerMatch extends HTXml
@@ -11925,15 +14494,15 @@ class HTPlayerMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('Date')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('Date')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -11986,9 +14555,119 @@ class HTTeamMatches extends HTCommonTeam
 	private $nextMatches = null;
 	private $lastMatch = null;
 	private $lastMatches = null;
+	private $isYouth = null;
+	private $leagueId = null;
+	private $leagueName = null;
+	private $leagueLevelUnitId = null;
+	private $leagueLevelUnitName = null;
+	private $leagueLevel = null;
 	const NOT_PLAYED = 'UPCOMING';
 	const PLAYED = 'FINISHED';
 	const PLAYING = 'ONGOING';
+
+	/**
+	 * Return if it's youth matches
+	 *
+	 * @return Boolean
+	 */
+	public function isYouth()
+	{
+		if(!isset($this->isYouth) || $this->isYouth === null)
+		{
+			$this->isYouth = strtolower($this->getXml()->getElementsByTagName('IsYouth')->item(0)->nodeValue) == 'true';
+		}
+		return $this->isYouth;
+	}
+
+	/**
+	 * Return league id
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueId()
+	{
+		if(!$this->isYouth())
+		{
+			if(!isset($this->leagueId) || $this->leagueId === null)
+			{
+				$this->leagueId = $this->getXml()->getElementsByTagName('LeagueID')->item(0)->nodeValue;
+			}
+			return $this->leagueId;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league name
+	 *
+	 * @return String
+	 */
+	public function getLeagueName()
+	{
+		if(!$this->isYouth())
+		{
+			if(!isset($this->leagueName) || $this->leagueName === null)
+			{
+				$this->leagueName = $this->getXml()->getElementsByTagName('LeagueName')->item(0)->nodeValue;
+			}
+			return $this->leagueName;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league level unit id
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueLevelUnitId()
+	{
+		if(!$this->isYouth())
+		{
+			if(!isset($this->leagueLevelUnitId) || $this->leagueLevelUnitId === null)
+			{
+				$this->leagueLevelUnitId = $this->getXml()->getElementsByTagName('LeagueLevelUnitID')->item(0)->nodeValue;
+			}
+			return $this->leagueLevelUnitId;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league level unit name
+	 *
+	 * @return String
+	 */
+	public function getLeagueLevelUnitName()
+	{
+		if(!$this->isYouth())
+		{
+			if(!isset($this->leagueLevelUnitName) || $this->leagueLevelUnitName === null)
+			{
+				$this->leagueLevelUnitName = $this->getXml()->getElementsByTagName('LeagueLevelUnitName')->item(0)->nodeValue;
+			}
+			return $this->leagueLevelUnitName;
+		}
+		return null;
+	}
+
+	/**
+	 * Return league level
+	 *
+	 * @return Integer
+	 */
+	public function getLeagueLevel()
+	{
+		if(!$this->isYouth())
+		{
+			if(!isset($this->leagueLevel) || $this->leagueLevel === null)
+			{
+				$this->leagueLevel = $this->getXml()->getElementsByTagName('LeagueLevel')->item(0)->nodeValue;
+			}
+			return $this->leagueLevel;
+		}
+		return null;
+	}
 
 	/**
 	 * Return number of matches in list
@@ -12117,6 +14796,11 @@ class HTTeamMatch extends HTXml
 	private $type = null;
 	private $ordersGiven = null;
 	private $status = null;
+	private $isTournament = null;
+	private $isYouth = null;
+	const TOURNAMENT = 'htointegrated';
+	const YOUTH = 'youth';
+	const SENIOR = 'hattrick';
 
 	/**
 	 * @param DOMDocument $xml
@@ -12125,6 +14809,34 @@ class HTTeamMatch extends HTXml
 	{
 		$this->xmlText = $xml->saveXML();
 		$this->xml = $xml;
+	}
+
+	/**
+	 * Return if it's youth match
+	 *
+	 * @return Boolean
+	 */
+	public function isYouth()
+	{
+		if(!isset($this->isYouth) || $this->isYouth === null)
+		{
+			$this->isYouth = strtolower($this->getXml()->getElementsByTagName('SourceSystem')->item(0)->nodeValue) == self::YOUTH;
+		}
+		return $this->isYouth;
+	}
+
+	/**
+	 * Return if it's tournament match
+	 *
+	 * @return Boolean
+	 */
+	public function isTournament()
+	{
+		if(!isset($this->isTournament) || $this->isTournament === null)
+		{
+			$this->isTournament = strtolower($this->getXml()->getElementsByTagName('SourceSystem')->item(0)->nodeValue) == self::TOURNAMENT;
+		}
+		return $this->isTournament;
 	}
 
 	/**
@@ -12205,15 +14917,15 @@ class HTTeamMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -12296,6 +15008,41 @@ class HTMatch extends HTGlobal
 	private $secondHalf = null;
 	private $eventNumber = null;
 	private $events = null;
+	private $injuriesNumber = null;
+	private $injuries = null;
+	private $isYouth = null;
+	private $isTournament = null;
+	const YOUTH = 'youth';
+	const TOURNAMENT = 'htointegrated';
+	const SENIOR = 'hattrick';
+
+	/**
+	 * Return if it's a youth match
+	 *
+	 * @return Boolean
+	 */
+	public function isYouth()
+	{
+		if(!isset($this->isYouth) || $this->isYouth === null)
+		{
+			$this->isYouth = $this->getXml()->getElementsByTagName('SourceSystem')->item(0)->nodeValue == self::YOUTH;
+		}
+		return $this->isYouth;
+	}
+
+	/**
+	 * Return if it's a tournament match
+	 *
+	 * @return Boolean
+	 */
+	public function isTournament()
+	{
+		if(!isset($this->isTournament) || $this->isTournament === null)
+		{
+			$this->isTournament = $this->getXml()->getElementsByTagName('SourceSystem')->item(0)->nodeValue == self::TOURNAMENT;
+		}
+		return $this->isTournament;
+	}
 
 	/**
 	 * Return match id
@@ -12333,15 +15080,15 @@ class HTMatch extends HTGlobal
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 
 	/**
@@ -12352,15 +15099,20 @@ class HTMatch extends HTGlobal
 	 */
 	public function getEndDate($format = null)
 	{
-		if(!isset($this->endDate) || $this->endDate === null)
-		{
-			$this->endDate = $this->getXml()->getElementsByTagName('FinishedDate')->item(0)->nodeValue;
-			if($format !== null)
-			{
-				$this->endDate = HTFunction::convertDate($this->endDate, $format);
-			}
-		}
-		return $this->endDate;
+		if(!isset($this->endDate[$format]) || $this->endDate[$format] === null)
+    {
+      $this->endDate[$format] = null;
+      $node =  $this->getXml()->getElementsByTagName('FinishedDate');
+      if($node->length)
+      {
+        $this->endDate[$format] = $node->item(0)->nodeValue;
+        if($format !== null)
+        {
+          $this->endDate[$format] = HTFunction::convertDate($this->endDate[$format], $format);
+        }
+      }
+    }
+		return $this->endDate[$format];
 	}
 
 	/**
@@ -12770,6 +15522,134 @@ class HTMatch extends HTGlobal
 		}
 		return null;
 	}
+
+	/**
+	 * Return number of injuries in the match
+	 *
+	 * @return Integer
+	 */
+	public function getTotalInjuries()
+	{
+		if(!isset($this->injuriesNumber) || $this->injuriesNumber === null)
+		{
+			$xpath = new DOMXPath($this->getXml());
+			$nodeList = $xpath->query('//Injury');
+			$this->injuriesNumber = $nodeList->length;
+		}
+		return $this->injuriesNumber;
+	}
+
+	/**
+	 * Return HTMatchInjury object
+	 *
+	 * @param Integer $number
+	 * @return HTMatchInjury
+	 */
+	public function getInjury($number)
+	{
+		$number = round($number);
+		if($number > 0 && $number <= $this->getTotalInjuries())
+		{
+			--$number;
+			if(!isset($this->injuries[$number]) || $this->injuries[$number] === null)
+			{
+				$xpath = new DOMXPath($this->getXml());
+				$nodeList = $xpath->query('//Injury');
+				$injury = new DOMDocument('1.0', 'UTF-8');
+				$injury->appendChild($injury->importNode($nodeList->item($number), true));
+				$this->injuries[$number] = new HTMatchInjury($injury);
+			}
+			return $this->injuries[$number];
+		}
+		return null;
+	}
+}
+class HTMatchInjury extends HTXml
+{
+	private $playerId = null;
+	private $playerName = null;
+	private $teamId = null;
+	private $type = null;
+	private $minute = null;
+
+	/**
+	 * @param DOMDocument $xml
+	 */
+	public function __construct($xml)
+	{
+		$this->xmlText = $xml->saveXML();
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Return player id
+	 *
+	 * @return Integer
+	 */
+	public function getPlayerId()
+	{
+		if(!isset($this->playerId) || $this->playerId === null)
+		{
+			$this->playerId = $this->getXml()->getElementsByTagName('InjuryPlayerID')->item(0)->nodeValue;
+		}
+		return $this->playerId;
+	}
+
+	/**
+	 * Return player name
+	 *
+	 * @return String
+	 */
+	public function getPlayerName()
+	{
+		if(!isset($this->playerName) || $this->playerName === null)
+		{
+			$this->playerName = $this->getXml()->getElementsByTagName('InjuryPlayerName')->item(0)->nodeValue;
+		}
+		return $this->playerName;
+	}
+
+	/**
+	 * Return player id
+	 *
+	 * @return Integer
+	 */
+	public function getTeamId()
+	{
+		if(!isset($this->teamId) || $this->teamId === null)
+		{
+			$this->teamId = $this->getXml()->getElementsByTagName('InjuryTeamID')->item(0)->nodeValue;
+		}
+		return $this->teamId;
+	}
+
+	/**
+	 * Return injury type
+	 *
+	 * @return Integer
+	 */
+	public function getType()
+	{
+		if(!isset($this->type) || $this->type === null)
+		{
+			$this->type = $this->getXml()->getElementsByTagName('InjuryType')->item(0)->nodeValue;
+		}
+		return $this->type;
+	}
+
+	/**
+	 * Return injury minute
+	 *
+	 * @return Integer
+	 */
+	public function getMinute()
+	{
+		if(!isset($this->minute) || $this->minute === null)
+		{
+			$this->minute = $this->getXml()->getElementsByTagName('InjuryMinute')->item(0)->nodeValue;
+		}
+		return $this->minute;
+	}
 }
 class HTMatchTeam extends HTXml
 {
@@ -13072,6 +15952,11 @@ class HTMatchArena extends HTXml
 	private $name = null;
 	private $weatherId = null;
 	private $spectators = null;
+	private $total = null;
+	private $terraces = null;
+	private $basic = null;
+	private $roof = null;
+	private $vip = null;
 
 	/**
 	 * @param DOMDocument $xml
@@ -13136,6 +16021,78 @@ class HTMatchArena extends HTXml
 			$this->spectators = $this->getXml()->getElementsByTagName('SoldTotal')->item(0)->nodeValue;
 		}
 		return $this->spectators;
+	}
+
+	/**
+	 * Return number of sold terraces
+	 *
+	 * @return Integer
+	 */
+	public function getSoldTerraces()
+	{
+		if(!isset($this->terraces) || $this->terraces === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('SoldTerraces');
+			if($node->length)
+			{
+				$this->terraces = $node->item(0)->nodeValue;
+			}
+		}
+		return $this->terraces;
+	}
+
+	/**
+	 * Return number of sold terraces
+	 *
+	 * @return Integer
+	 */
+	public function getSoldBasic()
+	{
+		if(!isset($this->basic) || $this->basic === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('SoldBasic');
+			if($node->length)
+			{
+				$this->basic = $node->item(0)->nodeValue;
+			}
+		}
+		return $this->basic;
+	}
+
+	/**
+	 * Return number of sold roof
+	 *
+	 * @return Integer
+	 */
+	public function getSoldRoof()
+	{
+		if(!isset($this->roof) || $this->roof === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('SoldRoof');
+			if($node->length)
+			{
+				$this->roof = $node->item(0)->nodeValue;
+			}
+		}
+		return $this->roof;
+	}
+
+	/**
+	 * Return number of sold VIP
+	 *
+	 * @return Integer
+	 */
+	public function getSoldVip()
+	{
+		if(!isset($this->vip) || $this->vip === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('SoldVIP');
+			if($node->length)
+			{
+				$this->vip = $node->item(0)->nodeValue;
+			}
+		}
+		return $this->vip;
 	}
 }
 class HTMatchGoal extends HTXml
@@ -13471,15 +16428,15 @@ class HTMatchArchiveMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -13629,15 +16586,15 @@ class HTLineup extends HTCommonTeam
 	 */
 	public function getMatchDate($format = null)
 	{
-		if(!isset($this->matchDate) || $this->matchDate === null)
+		if(!isset($this->matchDate[$format]) || $this->matchDate[$format] === null)
 		{
-			$this->matchDate = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->matchDate[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->matchDate = HTFunction::convertDate($this->matchDate, $format);
+				$this->matchDate[$format] = HTFunction::convertDate($this->matchDate[$format], $format);
 			}
 		}
-		return $this->matchDate;
+		return $this->matchDate[$format];
 	}
 
 	/**
@@ -14000,49 +16957,60 @@ class HTFinalLineup extends HTXml
 	/**
 	 * Return team total stars
 	 *
+	 * @param $includeSubstitutes Boolean
 	 * @return Float
 	 */
-	public function getTotalStars()
+	public function getTotalStars($includeSubstitutes = true)
 	{
-		if(!isset($this->totalStars) || $this->totalStars === null)
+		if(!isset($this->totalStars[$includeSubstitutes]) || $this->totalStars[$includeSubstitutes] === null)
 		{
 			$total = 0;
 			for($i=1; $i<=$this->getPlayersNumber(); $i++)
 			{
-				$total += $this->getPlayer($i)->getRatingStars();
+				$player = $this->getPlayer($i);
+				if($includeSubstitutes === true || ($includeSubstitutes === false && $player->getRole()>=100 && $player->getRole()<=113))
+				{
+					$total += $player->getRatingStars();
+				}
 			}
-			$this->totalStars = $total;
+			$this->totalStars[$includeSubstitutes] = $total;
 		}
-		return $this->totalStars;
+		return $this->totalStars[$includeSubstitutes];
 	}
 
 	/**
 	 * Return team total stars at end of match
 	 *
+	 * @param $includeSubstitutes Boolean
 	 * @return Float
 	 */
-	public function getTotalStarsAtEndOfMatch()
+	public function getTotalStarsAtEndOfMatch($includeSubstitutes = true)
 	{
-		if(!isset($this->totalStarsEndOfMatch) || $this->totalStarsEndOfMatch === null)
+		if(!isset($this->totalStarsEndOfMatch[$includeSubstitutes]) || $this->totalStarsEndOfMatch[$includeSubstitutes] === null)
 		{
 			$total = 0;
 			for($i=1; $i<=$this->getPlayersNumber(); $i++)
 			{
-				$total += $this->getPlayer($i)->getRatingStarsAtEndOfMatch();
+				$player = $this->getPlayer($i);
+				if($includeSubstitutes === true || ($includeSubstitutes === false && $player->getRole()>=100 && $player->getRole()<=113))
+				{
+					$total += $player->getRatingStarsAtEndOfMatch();
+				}
 			}
-			$this->totalStarsEndOfMatch = $total;
+			$this->totalStarsEndOfMatch[$includeSubstitutes] = $total;
 		}
-		return $this->totalStarsEndOfMatch;
+		return $this->totalStarsEndOfMatch[$includeSubstitutes];
 	}
 }
 class HTLineupPlayer extends HTXml
 {
 	private $id = null;
 	private $roleId = null;
-	private $name = null;
+	private $firstName = null;
+	private $lastName = null;
+	private $nickName = null;
 	private $ratingStars = null;
 	private $ratingStarsEnd = null;
-	private $position = null;
 	private $individualOrder = null;
 
 	/**
@@ -14089,11 +17057,55 @@ class HTLineupPlayer extends HTXml
 	 */
 	public function getName()
 	{
-		if(!isset($this->name) || $this->name === null)
+		$name = $this->getFirstName();
+		if($this->getNickName() !== null && $this->getNickName() !== '')
 		{
-			$this->name = $this->getXml()->getElementsByTagName('PlayerName')->item(0)->nodeValue;
+			$name .= ' '.$this->getNickName();
 		}
-		return $this->name;
+		$name .= ' '.$this->getLastName();
+		return $name;
+	}
+
+	/**
+	 * Return player first name
+	 *
+	 * @return String
+	 */
+	public function getFirstName()
+	{
+		if(!isset($this->firstName) || $this->firstName === null)
+		{
+			$this->firstName = $this->getXml()->getElementsByTagName('FirstName')->item(0)->nodeValue;
+		}
+		return $this->firstName;
+	}
+
+	/**
+	 * Return player last name
+	 *
+	 * @return String
+	 */
+	public function getLastName()
+	{
+		if(!isset($this->lastName) || $this->lastName === null)
+		{
+			$this->lastName = $this->getXml()->getElementsByTagName('LastName')->item(0)->nodeValue;
+		}
+		return $this->lastName;
+	}
+
+	/**
+	 * Return player nick name
+	 *
+	 * @return String
+	 */
+	public function getNickName()
+	{
+		if(!isset($this->nickName) || $this->nickName === null)
+		{
+			$this->nickName = $this->getXml()->getElementsByTagName('NickName')->item(0)->nodeValue;
+		}
+		return $this->nickName;
 	}
 
 	/**
@@ -14130,24 +17142,6 @@ class HTLineupPlayer extends HTXml
 			}
 		}
 		return $this->ratingStarsEnd;
-	}
-
-	/**
-	 * Return player position code
-	 *
-	 * @return Integer
-	 */
-	public function getPosition()
-	{
-		if(!isset($this->position) || $this->position === null)
-		{
-			$tmp = $this->getXml()->getElementsByTagName('PositionCode');
-			if($tmp->length)
-			{
-				$this->position = $tmp->item(0)->nodeValue;
-			}
-		}
-		return $this->position;
 	}
 
 	/**
@@ -14216,7 +17210,7 @@ class HTLive extends HTGlobal
 }
 class HTLiveMatch extends HTXml
 {
-	private $isYouth = null;
+	private $sourceSystem = null;
 	private $id = null;
 	private $date	= null;
 	private $homeTeamId = null;
@@ -14230,8 +17224,10 @@ class HTLiveMatch extends HTXml
 	private $eventsIndex = null;
 	private $substitutionsNumber = null;
 	private $substitutions = null;
-	private $startingLineup = null;
+	private $homeStartingLineup = null;
+	private $awayStartingLineup = null;
 	private $lastIndex = null;
+	private $nextMinute = null;
 
 	/**
 	 * @param DOMDocument $xml
@@ -14243,17 +17239,17 @@ class HTLiveMatch extends HTXml
 	}
 
 	/**
-	 * Is the match a youth match ?
+	 * Return match source system
 	 *
-	 * @return Boolean
+	 * @return String
 	 */
-	public function isYouth()
+	public function getSourceSystem()
 	{
-		if(!isset($this->isYouth) || $this->isYouth === null)
+		if(!isset($this->sourceSystem) || $this->sourceSystem === null)
 		{
-			$this->isYouth = strtolower($this->getXml()->getElementsByTagName('IsYouth')->item(0)->nodeValue) == "true";
+			$this->sourceSystem = $this->getXml()->getElementsByTagName('SourceSystem')->item(0)->nodeValue;
 		}
-		return $this->isYouth;
+		return $this->sourceSystem;
 	}
 
 	/**
@@ -14334,15 +17330,15 @@ class HTLiveMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -14483,19 +17479,39 @@ class HTLiveMatch extends HTXml
 	 *
 	 * @return HTStartingLineup
 	 */
-	public function getStartingLineup()
+	public function getHomeStartingLineup()
 	{
-		if(!isset($this->startingLineup) || $this->startingLineup === null)
+		if(!isset($this->homeStartingLineup) || $this->homeStartingLineup === null)
 		{
 			$nodeList = $this->getXml()->getElementsByTagName('StartingLineup');
 			if($nodeList->length)
 			{
 				$lineup = new DOMDocument('1.0', 'UTF-8');
 				$lineup->appendChild($lineup->importNode($nodeList->item(0), true));
-				$this->startingLineup = new HTStartingLineup($lineup);
+				$this->homeStartingLineup = new HTStartingLineup($lineup);
 			}
 		}
-		return $this->startingLineup;
+		return $this->homeStartingLineup;
+	}
+
+	/**
+	 * Returns HTStartingLineup object
+	 *
+	 * @return HTStartingLineup
+	 */
+	public function getAwayStartingLineup()
+	{
+		if(!isset($this->awayStartingLineup) || $this->awayStartingLineup === null)
+		{
+			$nodeList = $this->getXml()->getElementsByTagName('StartingLineup');
+			if($nodeList->length)
+			{
+				$lineup = new DOMDocument('1.0', 'UTF-8');
+				$lineup->appendChild($lineup->importNode($nodeList->item(1), true));
+				$this->awayStartingLineup = new HTStartingLineup($lineup);
+			}
+		}
+		return $this->awayStartingLineup;
 	}
 
 	/**
@@ -14515,6 +17531,24 @@ class HTLiveMatch extends HTXml
 		}
 		return $this->lastIndex;
 	}
+
+	/**
+	 * Return the minute for next event
+	 *
+	 * @return Integer
+	 */
+	public function getNextMinuteEvent()
+	{
+		if(!isset($this->nextMinute) || $this->nextMinute === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('NextEventMinute');
+			if($node->length)
+			{
+				$this->nextMinute = $node->item(0)->nodeValue;
+			}
+		}
+		return $this->nextMinute;
+	}
 }
 class HTLiveMatchEvent extends HTXml
 {
@@ -14523,6 +17557,8 @@ class HTLiveMatchEvent extends HTXml
 	private $subjectTeamId = null;
 	private $objectPlayerId = null;
 	private $key = null;
+	private $keyId = null;
+	private $variation = null;
 	private $text = null;
 	private $moreInfos = null;
 
@@ -14600,9 +17636,63 @@ class HTLiveMatchEvent extends HTXml
 	{
 		if(!isset($this->key) || $this->key === null)
 		{
-			$this->key = $this->getXml()->getElementsByTagName('EventKey')->item(0)->nodeValue;
+			$node = $this->getXml()->getElementsByTagName('EventKey');
+			if($node->length)
+			{
+				$this->key = $node->item(0)->nodeValue;
+			}
+			else
+			{
+				$this->key = $this->getKeyId().'_'.$this->getKeyVariation();
+			}
 		}
 		return $this->key;
+	}
+
+	/**
+	 * Return event key id
+	 *
+	 * @return Integer
+	 */
+	public function getKeyId()
+	{
+		if(!isset($this->keyId) || $this->keyId === null)
+		{
+			$node = $this->getXml()->getElementsByTagName('EventTypeID');
+			if($node->length)
+			{
+				$this->keyId = $node->item(0)->nodeValue;
+			}
+			else
+			{
+				$key = explode('_', $this->getKey());
+				$this->keyId = $key[0];
+			}
+		}
+		return $this->keyId;
+	}
+
+	/**
+	 * Return event key variation
+	 *
+	 * @return Integer
+	 */
+	public function getKeyVariation()
+	{
+		if(!isset($this->variation) || $this->variation === null)
+		{
+			$node =  $this->getXml()->getElementsByTagName('EventVariation');
+			if($node->length)
+			{
+				$this->variation = $node->item(0)->nodeValue;
+			}
+			else
+			{
+				$key = explode('_', $this->getKey());
+				$this->variation = $key[1];
+			}
+		}
+		return $this->variation;
 	}
 
 	/**
@@ -15162,29 +18252,29 @@ class HTNationalTeamDetail extends HTCommonTeam
 	}
 
 	/**
-	 * Return dress code
+	 * Return dress uri
 	 *
 	 * @return String
 	 */
-	public function getDressCode()
+	public function getDressURI()
 	{
 		if(!isset($this->dress) || $this->dress === null)
 		{
-			$this->dress = $this->getXml()->getElementsByTagName('Dress')->item(0)->nodeValue;
+			$this->dress = $this->getXml()->getElementsByTagName('DressURI')->item(0)->nodeValue;
 		}
 		return $this->dress;
 	}
 
 	/**
-	 * Return dress alternate code
+	 * Return dress alternate uri
 	 *
 	 * @return String
 	 */
-	public function getDressAlternateCode()
+	public function getDressAlternateURI()
 	{
 		if(!isset($this->dressAlternate) || $this->dressAlternate === null)
 		{
-			$this->dressAlternate = $this->getXml()->getElementsByTagName('DressAlternate')->item(0)->nodeValue;
+			$this->dressAlternate = $this->getXml()->getElementsByTagName('DressAlternateURI')->item(0)->nodeValue;
 		}
 		return $this->dressAlternate;
 	}
@@ -15864,15 +18954,15 @@ class HTWorldCupGroupRound extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 }
 class HTAlliances extends HTGlobal
@@ -16222,15 +19312,15 @@ class HTArenaCapacity extends HTXml
 	{
 		if($this->isLastRebuildDateAvailable())
 		{
-			if(!isset($this->lastRebuildDate) || $this->lastRebuildDate === null)
+			if(!isset($this->lastRebuildDate[$format]) || $this->lastRebuildDate[$format] === null)
 			{
-				$this->lastRebuildDate = $this->getXml()->getElementsByTagName('RebuiltDate')->item(0)->nodeValue;
+				$this->lastRebuildDate[$format] = $this->getXml()->getElementsByTagName('RebuiltDate')->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->lastRebuildDate = HTFunction::convertDate($this->lastRebuildDate, $format);
+					$this->lastRebuildDate[$format] = HTFunction::convertDate($this->lastRebuildDate[$format], $format);
 				}
 			}
-			return $this->lastRebuildDate;
+			return $this->lastRebuildDate[$format];
 		}
 		return null;
 	}
@@ -16243,19 +19333,19 @@ class HTArenaCapacity extends HTXml
 	 */
 	public function getExpansionDate($format = null)
 	{
-		if(!isset($this->expansionDate) || $this->expansionDate === null)
+		if(!isset($this->expansionDate[$format]) || $this->expansionDate[$format] === null)
 		{
 			$node = $this->getXml()->getElementsByTagName('ExpansionDate');
 			if($node !== null && $node->length)
 			{
-				$this->expansionDate = $this->getXml()->getElementsByTagName('ExpansionDate')->item(0)->nodeValue;
+				$this->expansionDate[$format] = $this->getXml()->getElementsByTagName('ExpansionDate')->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->expansionDate = HTFunction::convertDate($this->expansionDate, $format);
+					$this->expansionDate[$format] = HTFunction::convertDate($this->expansionDate[$format], $format);
 				}
 			}
 		}
-		return $this->expansionDate;
+		return $this->expansionDate[$format];
 	}
 
 	/**
@@ -16490,15 +19580,15 @@ class HTMatchOrders extends HTGlobal
 	{
 		if($this->isDataAvailable())
 		{
-			if(!isset($this->date) || $this->date === null)
+			if(!isset($this->date[$format]) || $this->date[$format] === null)
 			{
-				$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+				$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->date = HTFunction::convertDate($this->date, $format);
+					$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 				}
 			}
-			return $this->date;
+			return $this->date[$format];
 		}
 		return null;
 	}
@@ -16754,7 +19844,9 @@ class HTMatchOrdersPlayer extends HTXml
 {
 	private $id = null;
 	private $position = null;
-	private $name = null;
+	private $firstname = null;
+	private $lastname = null;
+	private $nickname = null;
 	private $individualOrder = null;
 
 	/**
@@ -16781,17 +19873,60 @@ class HTMatchOrdersPlayer extends HTXml
 	}
 
 	/**
-	 * Return player name
+	 * Return player full name
 	 *
 	 * @return String
 	 */
 	public function getName()
 	{
-		if(!isset($this->name) || $this->name === null)
+		$name = $this->getFirstName();
+		if($this->getNickName())
 		{
-			$this->name = $this->getXml()->getElementsByTagName('PlayerName')->item(0)->nodeValue;
+			$name .= ' '.$this->getNickName();
 		}
-		return $this->name;
+		return $name.' '.$this->getLastName();
+	}
+
+	/**
+	 * Return player first name
+	 *
+	 * @return String
+	 */
+	public function getFirstName()
+	{
+		if(!isset($this->firstname) || $this->firstname === null)
+		{
+			$this->firstname = $this->getXml()->getElementsByTagName('FirstName')->item(0)->nodeValue;
+		}
+		return $this->firstname;
+	}
+
+	/**
+	 * Return player first name
+	 *
+	 * @return String
+	 */
+	public function getLastName()
+	{
+		if(!isset($this->lastname) || $this->lastname === null)
+		{
+			$this->lastname = $this->getXml()->getElementsByTagName('LastName')->item(0)->nodeValue;
+		}
+		return $this->lastname;
+	}
+
+	/**
+	 * Return player nick name
+	 *
+	 * @return String
+	 */
+	public function getNickName()
+	{
+		if(!isset($this->nickname) || $this->nickname === null)
+		{
+			$this->nickname = $this->getXml()->getElementsByTagName('NickName')->item(0)->nodeValue;
+		}
+		return $this->nickname;
 	}
 
 	/**
@@ -17039,15 +20174,15 @@ class HTArenaMyStats extends HTGlobal
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('FirstDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('FirstDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 
 	/**
@@ -17058,15 +20193,15 @@ class HTArenaMyStats extends HTGlobal
 	 */
 	public function getEndDate($format = null)
 	{
-		if(!isset($this->endDate) || $this->endDate === null)
+		if(!isset($this->endDate[$format]) || $this->endDate[$format] === null)
 		{
-			$this->endDate = $this->getXml()->getElementsByTagName('LastDate')->item(0)->nodeValue;
+			$this->endDate[$format] = $this->getXml()->getElementsByTagName('LastDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->endDate = HTFunction::convertDate($this->endDate, $format);
+				$this->endDate[$format] = HTFunction::convertDate($this->endDate[$format], $format);
 			}
 		}
-		return $this->endDate;
+		return $this->endDate[$format];
 	}
 
 	/**
@@ -17272,15 +20407,15 @@ class HTArenasStats extends HTGlobal
 	 */
 	public function getStatsDate($format = null)
 	{
-		if(!isset($this->createDate) || $this->createDate === null)
+		if(!isset($this->createDate[$format]) || $this->createDate[$format] === null)
 		{
-			$this->createDate = $this->getXml()->getElementsByTagName('CreatedDate')->item(0)->nodeValue;
+			$this->createDate[$format] = $this->getXml()->getElementsByTagName('CreatedDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->createDate = HTFunction::convertDate($this->createDate, $format);
+				$this->createDate[$format] = HTFunction::convertDate($this->createDate[$format], $format);
 			}
 		}
-		return $this->createDate;
+		return $this->createDate[$format];
 	}
 
 	/**
@@ -17596,15 +20731,15 @@ class HTChallenge extends HTXml
 	 */
 	public function getMatchDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchTime')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchTime')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -17910,7 +21045,7 @@ class HTCup extends HTGlobal
 	{
 		if(!isset($this->round) || $this->round === null)
 		{
-			$this->round = $this->getXml()->getElementsByTagName('CupRound')->item(0)->nodeValue;
+			$this->round = $this->getXml()->getElementsByTagName('CupRound')->item(0)->nodeVale;
 		}
 		return $this->round;
 	}
@@ -18016,21 +21151,21 @@ class HTCupMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
 	 * Return home team id
 	 *
-	 * @return String
+	 * @return Integer
 	 */
 	public function getHomeTeamId()
 	{
@@ -18058,7 +21193,7 @@ class HTCupMatch extends HTXml
 	/**
 	 * Return away team id
 	 *
-	 * @return String
+	 * @return Integer
 	 */
 	public function getAwayTeamId()
 	{
@@ -18186,7 +21321,7 @@ class HTCupMatch extends HTXml
 	/**
 	 * Return home league name
 	 *
-	 * @return Integer
+	 * @return String
 	 */
 	public function getHomeLeagueName()
 	{
@@ -18204,7 +21339,7 @@ class HTCupMatch extends HTXml
 	/**
 	 * Return away league name
 	 *
-	 * @return Integer
+	 * @return String
 	 */
 	public function getAwayLeagueName()
 	{
@@ -18754,15 +21889,15 @@ class HTBookmarkPlayer extends HTBookmarkGlobal
 	 */
 	public function getDeadline($format = null)
 	{
-		if(!isset($this->deadline) || $this->deadline === null)
+		if(!isset($this->deadline[$format]) || $this->deadline[$format] === null)
 		{
-			$this->deadline = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
+			$this->deadline[$format] = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->deadline = HTFunction::convertDate($this->deadline, $format);
+				$this->deadline[$format] = HTFunction::convertDate($this->deadline[$format], $format);
 			}
 		}
-		return $this->deadline;
+		return $this->deadline[$format];
 	}
 }
 class HTBookmarksMatches extends HTBookmarksGlobal
@@ -18837,15 +21972,15 @@ class HTBookmarkMatch extends HTBookmarkGlobal
 	 */
 	public function getMatchDate($format = null)
 	{
-		if(!isset($this->matchDate) || $this->matchDate === null)
+		if(!isset($this->matchDate[$format]) || $this->matchDate[$format] === null)
 		{
-			$this->matchDate = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
+			$this->matchDate[$format] = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->matchDate = HTFunction::convertDate($this->matchDate, $format);
+				$this->matchDate[$format] = HTFunction::convertDate($this->matchDate[$format], $format);
 			}
 		}
-		return $this->matchDate;
+		return $this->matchDate[$format];
 	}
 }
 class HTBookmarksConfUsers extends HTBookmarksGlobal
@@ -19187,15 +22322,15 @@ class HTBookmarkYouthMatch extends HTBookmarkGlobal
 	 */
 	public function getYouthMatchDate($format = null)
 	{
-		if(!isset($this->matchDate) || $this->matchDate === null)
+		if(!isset($this->matchDate[$format]) || $this->matchDate[$format] === null)
 		{
-			$this->matchDate = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
+			$this->matchDate[$format] = $this->getXml()->getElementsByTagName('Text2')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->matchDate = HTFunction::convertDate($this->matchDate, $format);
+				$this->matchDate[$format] = HTFunction::convertDate($this->matchDate[$format], $format);
 			}
 		}
-		return $this->matchDate;
+		return $this->matchDate[$format];
 	}
 }
 class HTBookmarksYouthLeagues extends HTBookmarksGlobal
@@ -19567,15 +22702,15 @@ class HTTrainingEvent extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -19763,15 +22898,15 @@ class HTPlayerEvent extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -19948,15 +23083,15 @@ class HTAllianceDetails extends HTAllianceCommon
 	 */
 	public function getCreationDate($format = null)
 	{
-		if(!isset($this->creationDate) || $this->creationDate === null)
+		if(!isset($this->creationDate[$format]) || $this->creationDate[$format] === null)
 		{
-			$this->creationDate = $this->getXml()->getElementsByTagName('CreationDate')->item(0)->nodeValue;
+			$this->creationDate[$format] = $this->getXml()->getElementsByTagName('CreationDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->creationDate = HTFunction::convertDate($this->creationDate, $format);
+				$this->creationDate[$format] = HTFunction::convertDate($this->creationDate[$format], $format);
 			}
 		}
-		return $this->creationDate;
+		return $this->creationDate[$format];
 	}
 
 	/**
@@ -20371,19 +23506,19 @@ class HTAllianceDetails extends HTAllianceCommon
 	 */
 	public function getDissolutionDate($format = null)
 	{
-		if(!isset($this->dissolutionEndDate) || $this->dissolutionEndDate === null)
+		if(!isset($this->dissolutionEndDate[$format]) || $this->dissolutionEndDate[$format] === null)
 		{
 			$node = $this->getXml()->getElementsByTagName('DissolutionEndDate');
 			if($node !== null && $node->length)
 			{
-				$this->dissolutionEndDate = $node->item(0)->nodeValue;
+				$this->dissolutionEndDate[$format] = $node->item(0)->nodeValue;
 				if($format !== null)
 				{
-					$this->dissolutionEndDate = HTFunction::convertDate($this->dissolutionEndDate, $format);
+					$this->dissolutionEndDate[$format] = HTFunction::convertDate($this->dissolutionEndDate[$format], $format);
 				}
 			}
 		}
-		return $this->dissolutionEndDate;
+		return $this->dissolutionEndDate[$format];
 	}
 }
 class HTUser extends HTXml
@@ -20514,15 +23649,15 @@ class HTAllianceMember extends HTUser
 	 */
 	public function getShipDate($format = null)
 	{
-		if(!isset($this->shipDate) || $this->shipDate === null)
+		if(!isset($this->shipDate[$format]) || $this->shipDate[$format] === null)
 		{
-			$this->shipDate = $this->getXml()->getElementsByTagName('MemberShipDate')->item(0)->nodeValue;
+			$this->shipDate[$format] = $this->getXml()->getElementsByTagName('MemberShipDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->shipDate = HTFunction::convertDate($this->shipDate, $format);
+				$this->shipDate[$format] = HTFunction::convertDate($this->shipDate[$format], $format);
 			}
 		}
-		return $this->shipDate;
+		return $this->shipDate[$format];
 	}
 }
 class HTAllianceRoles extends HTAllianceCommon
@@ -20575,6 +23710,9 @@ class HTAllianceRole extends HTXml
 	private $name = null;
 	private $rank = null;
 	private $memberCount = null;
+	private $maxMembers = null;
+	private $request = null;
+	private $description = null;
 
 	/**
 	 * Return role id
@@ -20631,73 +23769,13 @@ class HTAllianceRole extends HTXml
 		}
 		return $this->memberCount;
 	}
-}
-class HTAllianceRoleDetails extends HTAllianceCommon
-{
-	private $roleId	= null;
-	private $roleName	= null;
-	private $maxMembers	= null;
-	private $rank	= null;
-	private $requestType	= null;
-	private $description	= null;
-	private $hasRightToAcceptRequests = null;
-	private $hasRightToSendNewsLetter = null;
-	private $hasRightToCreatePolls = null;
-	private $hasRightToEditPublicProperties = null;
-	private $hasRightToExcludeMembers = null;
-	private $hasRightToCreateRoles = null;
-	private $hasRightToEditRoles = null;
-	private $hasRightToModerate = null;
-	private $hasRightToEditRules = null;
 
 	/**
-	 * Return role id
+	 * Return maximum number of member
 	 *
 	 * @return Integer
 	 */
-	public function getRoleId()
-	{
-		if(!isset($this->roleId) || $this->roleId === null)
-		{
-			$this->roleId = $this->getXml()->getElementsByTagName('RoleID')->item(0)->nodeValue;
-		}
-		return $this->roleId;
-	}
-
-	/**
-	 * Return role name
-	 *
-	 * @return String
-	 */
-	public function getRoleName()
-	{
-		if(!isset($this->roleName) || $this->roleName === null)
-		{
-			$this->roleName = $this->getXml()->getElementsByTagName('RoleName')->item(0)->nodeValue;
-		}
-		return $this->roleName;
-	}
-
-	/**
-	 * Return role rank
-	 *
-	 * @return Integer
-	 */
-	public function getRank()
-	{
-		if(!isset($this->rank) || $this->rank === null)
-		{
-			$this->rank = $this->getXml()->getElementsByTagName('RoleRank')->item(0)->nodeValue;
-		}
-		return $this->rank;
-	}
-
-	/**
-	 * Return role max members
-	 *
-	 * @return Integer
-	 */
-	public function getMaxMembers()
+	public function getMaximumMember()
 	{
 		if(!isset($this->maxMembers) || $this->maxMembers === null)
 		{
@@ -20707,17 +23785,17 @@ class HTAllianceRoleDetails extends HTAllianceCommon
 	}
 
 	/**
-	 * Return role request type
+	 * Return the way to become member
 	 *
 	 * @return Integer
 	 */
 	public function getRequestType()
 	{
-		if(!isset($this->requestType) || $this->requestType === null)
+		if(!isset($this->request) || $this->request === null)
 		{
-			$this->requestType = $this->getXml()->getElementsByTagName('RoleRequestType')->item(0)->nodeValue;
+			$this->request = $this->getXml()->getElementsByTagName('RoleRequestType')->item(0)->nodeValue;
 		}
-		return $this->requestType;
+		return $this->request;
 	}
 
 	/**
@@ -20732,204 +23810,6 @@ class HTAllianceRoleDetails extends HTAllianceCommon
 			$this->description = $this->getXml()->getElementsByTagName('RoleDescription')->item(0)->nodeValue;
 		}
 		return $this->description;
-	}
-
-	/**
-	 * Does role have right to accept requests ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToAcceptRequests()
-	{
-		if(!isset($this->hasRightToAcceptRequests) || $this->hasRightToAcceptRequests === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToAcceptRequests');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToAcceptRequests = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToAcceptRequests = false;
-			}
-		}
-		return $this->hasRightToAcceptRequests;
-	}
-
-	/**
-	 * Does role have right to edit public properties ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToEditPublicProperties()
-	{
-		if(!isset($this->hasRightToEditPublicProperties) || $this->hasRightToEditPublicProperties === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToEditPublicProperties');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToEditPublicProperties = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToEditPublicProperties = false;
-			}
-		}
-		return $this->hasRightToEditPublicProperties;
-	}
-
-	/**
-	 * Does role have right to exclude members ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToExcludeMembers()
-	{
-		if(!isset($this->hasRightToExcludeMembers) || $this->hasRightToExcludeMembers === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToExcludeMembers');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToExcludeMembers = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToExcludeMembers = false;
-			}
-		}
-		return $this->hasRightToExcludeMembers;
-	}
-
-	/**
-	 * Does role have right to create roles ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToCreateRoles()
-	{
-		if(!isset($this->hasRightToCreateRoles) || $this->hasRightToCreateRoles === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToCreateRoles');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToCreateRoles = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToCreateRoles = false;
-			}
-		}
-		return $this->hasRightToCreateRoles;
-	}
-
-	/**
-	 * Does role have right to edit roles ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToEditRoles()
-	{
-		if(!isset($this->hasRightToEditRoles) || $this->hasRightToEditRoles === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToEditRoles');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToEditRoles = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToEditRoles = false;
-			}
-		}
-		return $this->hasRightToEditRoles;
-	}
-
-	/**
-	 * Does role have right to moderate ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToModerate()
-	{
-		if(!isset($this->hasRightToModerate) || $this->hasRightToModerate === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToModerate');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToModerate = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToModerate = false;
-			}
-		}
-		return $this->hasRightToModerate;
-	}
-
-	/**
-	 * Does role have right to send newsletter ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToSendNewsLetter()
-	{
-		if(!isset($this->hasRightToSendNewsLetter) || $this->hasRightToSendNewsLetter === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToSendNewsLetter');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToSendNewsLetter = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToSendNewsLetter = false;
-			}
-		}
-		return $this->hasRightToSendNewsLetter;
-	}
-
-	/**
-	 * Does role have right to create polls ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToCreatePolls()
-	{
-		if(!isset($this->hasRightToCreatePolls) || $this->hasRightToCreatePolls === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToCreatePolls');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToCreatePolls = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToCreatePolls = false;
-			}
-		}
-		return $this->hasRightToCreatePolls;
-	}
-
-	/**
-	 * Does role have right to edit rules ?
-	 *
-	 * @return Boolean
-	 */
-	public function hasRightToEditRules()
-	{
-		if(!isset($this->hasRightToEditRules) || $this->hasRightToEditRules === null)
-		{
-			$node = $this->getXml()->getElementsByTagName('HasRightToEditRules');
-			if($node !== null && $node->length)
-			{
-				$this->hasRightToEditRules = strtolower($node->item(0)->nodeValue) == "true";
-			}
-			else
-			{
-				$this->hasRightToEditRules = false;
-			}
-		}
-		return $this->hasRightToEditRules;
 	}
 }
 class HTFans extends HTGlobal
@@ -21275,15 +24155,15 @@ class HTFansUpcomingMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->matchDate) || $this->matchDate === null)
+		if(!isset($this->matchDate[$format]) || $this->matchDate[$format] === null)
 		{
-			$this->matchDate = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->matchDate[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->matchDate = HTFunction::convertDate($this->matchDate, $format);
+				$this->matchDate[$format] = HTFunction::convertDate($this->matchDate[$format], $format);
 			}
 		}
-		return $this->matchDate;
+		return $this->matchDate[$format];
 	}
 
 	/**
@@ -21443,15 +24323,15 @@ class HTAchievement extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('EventDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -21954,15 +24834,15 @@ class HTWorldCupMatch extends HTXml
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 
 	/**
@@ -21973,15 +24853,15 @@ class HTWorldCupMatch extends HTXml
 	 */
 	public function getEndDate($format = null)
 	{
-		if(!isset($this->endDate) || $this->endDate === null)
+		if(!isset($this->endDate[$format]) || $this->endDate[$format] === null)
 		{
-			$this->endDate = $this->getXml()->getElementsByTagName('FinishedDate')->item(0)->nodeValue;
+			$this->endDate[$format] = $this->getXml()->getElementsByTagName('FinishedDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->endDate = HTFunction::convertDate($this->endDate, $format);
+				$this->endDate[$format] = HTFunction::convertDate($this->endDate[$format], $format);
 			}
 		}
-		return $this->endDate;
+		return $this->endDate[$format];
 	}
 
 	/**
@@ -22051,15 +24931,15 @@ class HTWorldCupRound extends HTXml
 	 */
 	public function getStartDate($format = null)
 	{
-		if(!isset($this->startDate) || $this->startDate === null)
+		if(!isset($this->startDate[$format]) || $this->startDate[$format] === null)
 		{
-			$this->startDate = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
+			$this->startDate[$format] = $this->getXml()->getElementsByTagName('StartDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->startDate = HTFunction::convertDate($this->startDate, $format);
+				$this->startDate[$format] = HTFunction::convertDate($this->startDate[$format], $format);
 			}
 		}
-		return $this->startDate;
+		return $this->startDate[$format];
 	}
 }
 class HTNationalMatches extends HTGlobal
@@ -22165,15 +25045,15 @@ class HTNationalMatch extends HTXml
 	 */
 	public function getDate($format = null)
 	{
-		if(!isset($this->date) || $this->date === null)
+		if(!isset($this->date[$format]) || $this->date[$format] === null)
 		{
-			$this->date = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
+			$this->date[$format] = $this->getXml()->getElementsByTagName('MatchDate')->item(0)->nodeValue;
 			if($format !== null)
 			{
-				$this->date = HTFunction::convertDate($this->date, $format);
+				$this->date[$format] = HTFunction::convertDate($this->date[$format], $format);
 			}
 		}
-		return $this->date;
+		return $this->date[$format];
 	}
 
 	/**
@@ -22332,7 +25212,7 @@ class HTTeamFlag extends HTXml
 class HTSetLineup
 {
 	private $matchId;
-	private $isYouth;
+	private $sourceSystem;
 	private $errors = array();
 	private $goalkeeper = 0;
 	private $rightDefender = 0;
@@ -22455,12 +25335,23 @@ class HTSetLineup
 
 	/**
 	 * @param Integer $matchId
-	 * @param Boolean $isYouth
+	 * @param String $sourceSystem (use HTMatch constants)
 	 */
-	public function __construct($matchId, $isYouth)
+	public function __construct($matchId, $sourceSystem)
 	{
 		$this->matchId = $matchId;
-		$this->isYouth = $isYouth;
+		if(is_bool($sourceSystem))
+		{
+			if($sourceSystem === true)
+			{
+				$sourceSystem = HTMatch::YOUTH;
+			}
+			else
+			{
+				$sourceSystem = HTMatch::SENIOR;
+			}
+		}
+		$this->sourceSystem = $sourceSystem;
 	}
 
 	/**
@@ -22474,13 +25365,13 @@ class HTSetLineup
 	}
 
 	/**
-	 * Return if it's a youth match
+	 * Return if match source system
 	 *
-	 * @return unknown
+	 * @return String
 	 */
-	public function isYouth()
+	public function getSourceSystem()
 	{
-		return $this->isYouth;
+		return $this->sourceSystem;
 	}
 
 	/**
@@ -23404,8 +26295,10 @@ class HTLineupResult extends HTXml
 	 */
 	public function __construct($xml)
 	{
-		$this->xmlText = $xml->saveXML();
-		$this->xml = $xml;
+		$this->xmlText = $xml;
+		$dom = new DOMDocument('1.0', 'UTF-8');
+		$dom->loadXML($xml);
+		$this->xml = $dom;
 	}
 
 	/**

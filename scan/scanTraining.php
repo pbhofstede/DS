@@ -323,7 +323,7 @@ try {
 														if (($vSubstitutionLineup->getPlayerOutId() == $player->getId()) && ($vAantalMinuten > 0)) {
 															if ($vSubstitutionLineup->getNewPositionId() == 0) {
 																AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
-																//myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
+																myLog($log, "Rode kaart oude methode:".$player->getName()." positie = ".$vPosition);
 															}
 															else
 															{
@@ -374,8 +374,26 @@ try {
 														$vPosition = $vNewPosition;
 													}
 												}
+												$seniorMatch = $HT->getSeniorMatchDetails($match->getId(), FALSE);
+												$vKaarten = $seniorMatch->getTotalCards();
+												
+												for ($vKaartenIndex=1;$vKaartenIndex<=$vKaarten;$vKaartenIndex++) {
+												  $card = $seniorMatch->getCard($vKaartenIndex);
+													
+													if (($card->getType() == 2) &&
+													    ($card->getPlayerid() == $player->getId())) {
+														if ($card->getMinute() > 90) {
+															$vAantalMinuten = 0;
+														}
+														else {
+															$vAantalMinuten = 90 - $card->getMinute();
+														}
+													  AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
+														myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
+													}
+												}
 											}
-											//myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
+											myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
 										}
 									}
 								}
