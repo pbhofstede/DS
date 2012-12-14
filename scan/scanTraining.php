@@ -251,8 +251,49 @@ try {
 											(! $walkover)) {
 										if ((strtotime($match->getDate()) >= $prevTrainingdate) and
 												(strtotime($match->getDate()) < $thisTrainingdate)) {
-										
-											$lineup = $HT->getSeniorLineup($match->getId());
+												
+											$vMatchType = $match->getType();
+											/*										
+Value	Description
+1	League match
+2	Qualification match
+3	Cup match (standard league match)
+4	Friendly (normal rules)
+5	Friendly (cup rules)
+6	Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point).
+7	Hattrick Masters
+8	International friendly (normal rules)
+9	Internation friendly (cup rules)
+10	National teams competition match (normal rules)
+11	National teams competition match (cup rules)
+12	National teams friendly
+50	Tournament League match
+51	Tournament Playoff match
+100	Youth league match
+101	Youth friendly match
+102	RESERVED
+103	Youth friendly match (cup rules)
+104	RESERVED
+105	Youth international friendly match
+106	Youth international friendly match (Cup rules)
+107	RESERVED
+*/
+
+											if (($vMatchType == 1) ||
+											    ($vMatchType == 2) ||
+													($vMatchType == 3) ||
+													($vMatchType == 4) ||
+													($vMatchType == 5) ||
+													($vMatchType == 6) ||
+													($vMatchType == 7) ||
+													($vMatchType == 8) ||
+													($vMatchType == 9)) {
+												$lineup = $HT->getSeniorLineup($match->getId());
+											}
+											else {
+											  $lineup = NULL;
+											  //myLog($log, 'Geen trainingswedstrijd: '.$match->getId().' type: '.$vMatchType);
+											} 
 											
 											if ($lineup != NULL) {
 												$startingLineup = $lineup->getStartingLineup();
@@ -306,7 +347,8 @@ try {
 												}
 											}
 											
-											if (! $walkover) {
+											if ((! $walkover) &&
+													($lineup != NULL)) {
 												for ($vSubstitutionIndex=1;$vSubstitutionIndex<=$lineup->getSubstitutionNumber();$vSubstitutionIndex++) {
 													$vSubstitutionLineup = $lineup->getSubstitution($vSubstitutionIndex); 
 													
@@ -323,7 +365,7 @@ try {
 														if (($vSubstitutionLineup->getPlayerOutId() == $player->getId()) && ($vAantalMinuten > 0)) {
 															if ($vSubstitutionLineup->getNewPositionId() == 0) {
 																AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
-																myLog($log, "Rode kaart oude methode:".$player->getName()." positie = ".$vPosition);
+																//myLog($log, "Blessure zonder wissel:".$player->getName()." positie = ".$vPosition);
 															}
 															else
 															{
@@ -393,7 +435,7 @@ try {
 													}
 												}
 											}
-											myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
+											//myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
 										}
 									}
 								}
