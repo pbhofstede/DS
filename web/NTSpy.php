@@ -49,7 +49,7 @@ try {
 		$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 	  	$worlddetails = $HT->getWorldDetails(FALSE);
 	  	
-	  	$vCount = $worlddetails->getTotalLeague(); 
+	  	$vCount = $worlddetails->getLeagueNumber(); 
 	  	
 	  	if ($a == 0)
 	  	{
