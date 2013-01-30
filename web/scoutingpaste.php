@@ -176,7 +176,10 @@ if($scouting != NULL) {
 					$sortName = 'cmpIndexSP';
 				}
 
-				if ($_GET['index2'] == 'indexGK') {
+				if ($_GET['index2'] == '') {
+					$vIndex2Str = '';
+				}
+				else if ($_GET['index2'] == 'indexGK') {
 					$vIndex2Str = 'GK';
 				}
 				else if ($_GET['index2'] == 'indexDEF') {
@@ -260,7 +263,8 @@ if($scouting != NULL) {
 					echo '[th]sh[/th]';
 				}
 				echo '[th]index '.$vIndexStr.'[/th]';
-				if (! $u20) {
+				if ((! $u20) &&
+				   ($vIndex2Str <> '')) {
 					echo '[th]index '.$vIndex2Str.'[/th]';
 				}
 				echo '[th]spec[/th][/tr]<BR>';
@@ -333,7 +337,8 @@ if($scouting != NULL) {
 						//}
 						
 						echo '[td]'.$player->getIndexByName($vIndexStr).'[/td]';
-						if (! $u20) {
+						if ((! $u20) &&
+						    ($vIndex2Str <> '')) {
 							echo '[td]'.$player->getIndexByName($vIndex2Str).'[/td]';
 						}
 						echo '[td]'.$specs[$player->getSpeciality()].'[/td]';

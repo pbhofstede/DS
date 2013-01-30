@@ -59,6 +59,7 @@ if ($scouting != NULL) {
 			else {
 				echo '  Index 2:';
 				echo '<select name="index2">';
+				echo '<option value=""></option>';
 				echo '<option value="indexGK">GK</option>';
 				echo '<option value="indexCD">CD</option>';
 				echo '<option value="indexDEF">DEF</option>';
