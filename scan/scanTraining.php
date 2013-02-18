@@ -91,9 +91,9 @@ try {
 	  $a = $_GET['a'];
 	}
 	
-	if (($a >= 10) ||
+	if (($a >= 100) ||
     	(CoachDB::getSiteStats('training_running') == -1)) {
-		if ($a >= 10) {
+		if ($a >= 100) {
 		}
 		else {
 			myLog($log, "Training already running. This call is cancelled.");
@@ -102,11 +102,11 @@ try {
 	}
 	else {
 		if( !ini_get('safe_mode') ){
-		  myLog($log, "Safe mode off: setting time limit = 0");
+		  //myLog($log, "Safe mode off: setting time limit = 0");
 			set_time_limit(0);
 		} 
 		else {
-		  myLog($log, "Safe mode...");
+		  //myLog($log, "Safe mode...");
 		}	
 	
 		$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
@@ -124,14 +124,14 @@ try {
 														
 		$knownLastTrainingdate = strtotime(CoachDB::getLastTrainingdate());
 
-		myLog($log, "prevTrainingdate: ".$prevTrainingdate);
-		myLog($log, date("Y-m-d", $prevTrainingdate));
+		//myLog($log, "prevTrainingdate: ".$prevTrainingdate);
+		//myLog($log, date("Y-m-d", $prevTrainingdate));
 		
-		myLog($log, "This trainingdate: ".$thisTrainingdate);
-		myLog($log, date("Y-m-d", $thisTrainingdate));
+		//myLog($log, "This trainingdate: ".$thisTrainingdate);
+		//myLog($log, date("Y-m-d", $thisTrainingdate));
 		
-		myLog($log, "Known Last Trainingdate: ".$knownLastTrainingdate);
-		myLog($log, date("Y-m-d", $knownLastTrainingdate));
+		//myLog($log, "Known Last Trainingdate: ".$knownLastTrainingdate);
+		//myLog($log, date("Y-m-d", $knownLastTrainingdate));
 		
 		if ($knownLastTrainingdate < ($thisTrainingdate)) {
 			myLog($log, "Clearing last training...");
@@ -142,14 +142,13 @@ try {
 			myLog($log, "done");
 		}
 		$coaches = CoachDB::getUsersToScan(date("Y-m-d", $thisTrainingdate), $a);
-		myLog($log, "Start");
-		myLog($log, "Coaches: ".count($coaches));
+		myLog($log, "Start: ".$a." Aantal coaches: ".count($coaches));
 		$aantalScanned = count($coaches);
 		
-		if (count($coaches) > 0) {
+		if ($aantalScanned > 0) {
 			CoachDB::setTrainingRunning(TRUE);
 			
-			myLog($log, "Start");
+			//myLog($log, "Start");
 			
 			for ($count = 0; $count < count($coaches); $count++) {
 				try {
@@ -203,7 +202,7 @@ try {
 						
 						$i=1;
 						
-						myLog($log, $coach->getTeamname().'('.$coach->getId().') Aantal spelers:'.$TeamPlayers->getNumberPlayers());
+						//myLog($log, $coach->getTeamname().'('.$coach->getId().') Aantal spelers:'.$TeamPlayers->getNumberPlayers());
 						
 						while($i <= $TeamPlayers->getNumberPlayers()) {
 							$player = $TeamPlayers->getPlayer($i);
@@ -253,32 +252,7 @@ try {
 												(strtotime($match->getDate()) < $thisTrainingdate)) {
 												
 											$vMatchType = $match->getType();
-											/*										
-Value	Description
-1	League match
-2	Qualification match
-3	Cup match (standard league match)
-4	Friendly (normal rules)
-5	Friendly (cup rules)
-6	Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point).
-7	Hattrick Masters
-8	International friendly (normal rules)
-9	Internation friendly (cup rules)
-10	National teams competition match (normal rules)
-11	National teams competition match (cup rules)
-12	National teams friendly
-50	Tournament League match
-51	Tournament Playoff match
-100	Youth league match
-101	Youth friendly match
-102	RESERVED
-103	Youth friendly match (cup rules)
-104	RESERVED
-105	Youth international friendly match
-106	Youth international friendly match (Cup rules)
-107	RESERVED
-*/
-
+											
 											if (($vMatchType == 1) ||
 											    ($vMatchType == 2) ||
 													($vMatchType == 3) ||
@@ -431,7 +405,7 @@ Value	Description
 															$vAantalMinuten = 90 - $card->getMinute();
 														}
 													  AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
-														myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
+														//myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
 													}
 												}
 											}
@@ -447,7 +421,7 @@ Value	Description
 									$posIM = 0;
 									$posWG = 0;
 									$posSC = 0;
-									myLog($log, "WALKOVER!: ".$player->getName()."(".$player->getId().")");
+									//myLog($log, "WALKOVER!: ".$player->getName()."(".$player->getId().")");
 								}
 								
 								if (($training->getLastTrainingTrainingType() == $HT_TR_SP)) {
@@ -538,13 +512,13 @@ Value	Description
 						}
 					}
 					else {
-						myLog($log, $coach->getTeamname().'('.$coach->getId().') GEEN HTuserToken!');
+						//myLog($log, $coach->getTeamname().'('.$coach->getId().') GEEN HTuserToken!');
 					}
 				}
 				catch(HTError $e) {
 					$errpos = strpos($e, 'Access is denied');
 					if ($errpos !== false) {
-						myLog($log, " Access denied voor: ".$coach->getTeamname());
+						//myLog($log, " Access denied voor: ".$coach->getTeamname());
 						
 						$coach->setHTuserToken('');
 						$coach->setHTuserTokenSecret('');
@@ -553,7 +527,7 @@ Value	Description
 					else {
 						$errpos = strpos($e, 'An application error occurred on the server');
 						if ($errpos !== false) {
-							myLog($log, " Application error voor: ".$coach->getTeamname());
+							//myLog($log, " Application error voor: ".$coach->getTeamname());
 							
 							$coach->setHTuserToken('');
 							$coach->setHTuserTokenSecret('');
@@ -576,164 +550,168 @@ Value	Description
 				$HT->clearTraining();
 				$HT->clearTrainingStats();
 			}
-		}
-	
-		myLog($log, "Eind");
 		
-		myLog($log, "Start controle spelers zonder coach: ".$a);
-		$allPlayers = PlayerDB::getPlayerWithoutCoach($a);
-		if ($allPlayers != Null) {
-			$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
-				
-			$coach = CoachDB::LoginUser('Pays', '');
-			$HT->setOauthToken($coach->getHTuserToken());
-			$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
+	
+			//myLog($log, "Eind");
+			
+			$allPlayers = PlayerDB::getPlayerWithoutCoach($a);
+			if ($allPlayers != Null) {
+				myLog($log, "Start players without coach aantal: ".count($allPlayers));
+				$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
+					
+				$coach = CoachDB::LoginUser('Pays', '');
+				$HT->setOauthToken($coach->getHTuserToken());
+				$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 
-			foreach($allPlayers AS $player) {
-				if ($player != Null) {
-					myLog($log, "playerID = ".$player->getId());
-					try {
-						$HTplayer = $HT->getPlayer($player->getId());
-						
-						if ($HTplayer != Null) {
-							$aantalDagen = ($HTplayer->getAge() * 112) + $HTplayer->getDays();
-							$dateOfBirth =	strtotime('today -'.$aantalDagen.' days');
+				foreach($allPlayers AS $player) {
+					if ($player != Null) {
+						//myLog($log, "playerID = ".$player->getId());
+						try {
+							$HTplayer = $HT->getPlayer($player->getId());
 							
-							try {
-								$teamID = $HTplayer->getTeamId();
-							}
-							catch(HTError $e) {
-								$teamID = 0;
-							}
-							
-							if ($teamID <= 0) {	
-								myLog($log, "player deleted");
-								PlayerDB::deletePlayer($player->getId());
-							}
-							else {
-								$userID = 0;
-								//echo "teamID = ".$teamID."<BR>";
-								if ($teamID > 0) {
-									$team = $HT->getTeam($teamID);
-									$userID = $team->getUserId();
-									
-									if ($userID <= 0) {
-										$userID = -1;
-									}
-									//echo "userID = ".$userID."<BR>";
+							if ($HTplayer != Null) {
+								$aantalDagen = ($HTplayer->getAge() * 112) + $HTplayer->getDays();
+								$dateOfBirth =	strtotime('today -'.$aantalDagen.' days');
+								
+								try {
+									$teamID = $HTplayer->getTeamId();
+								}
+								catch(HTError $e) {
+									$teamID = 0;
 								}
 								
-								if ($HTplayer->isSkillsAvailable()) {
-									$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
-										$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $HTplayer->getKeeper(), 
-										$HTplayer->getDefender(), $HTplayer->getPlaymaker(), $HTplayer->getWinger(), $HTplayer->getPassing(), 
-										$HTplayer->getScorer(), $HTplayer->getSetPieces(), $HTplayer->getACaps(), $HTplayer->getU20Caps(), time());
+								if ($teamID <= 0) {	
+									//myLog($log, "player deleted");
+									PlayerDB::deletePlayer($player->getId());
 								}
 								else {
-									$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
-										$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $player->getKeeper(), 
-										$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
-										$player->getScorer(), $player->getSetPieces(), $player->getCaps(), $player->getCapsU20(), $player->getLastupdate());
-								}
-								
-								if ($userID > 0) {
-									$playercoach = CoachDB::getCoach($userID);
-									if ($playercoach == NULL) {
-										if ($team != NULL) {
-											if ($team->isBot()) {
-												CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
-													"user", "", "", "", "", "",
-													0, 0, 0, 0, 0, 0, 0, 0, 0, -1));										}
-											else {
-												myLog($log, "Last Login = ".$team->getLastLoginDate());
-												CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
-													"user", "", "", "", "", "",
-													0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0));
-											}
-											
+									$userID = 0;
+									//echo "teamID = ".$teamID."<BR>";
+									if ($teamID > 0) {
+										$team = $HT->getTeam($teamID);
+										$userID = $team->getUserId();
+										
+										if ($userID <= 0) {
+											$userID = -1;
 										}
+										//echo "userID = ".$userID."<BR>";
+									}
+									
+									if ($HTplayer->isSkillsAvailable()) {
+										$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
+											$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $HTplayer->getKeeper(), 
+											$HTplayer->getDefender(), $HTplayer->getPlaymaker(), $HTplayer->getWinger(), $HTplayer->getPassing(), 
+											$HTplayer->getScorer(), $HTplayer->getSetPieces(), $HTplayer->getACaps(), $HTplayer->getU20Caps(), time());
 									}
 									else {
-										if ($team != NULL) {
-											if ($team->isBot()) {
-												$playercoach->setbot(-1);
-												$playercoach->setlastHTlogin(date("d-m-y H:i", 0));
+										$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
+											$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $player->getKeeper(), 
+											$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
+											$player->getScorer(), $player->getSetPieces(), $player->getCaps(), $player->getCapsU20(), $player->getLastupdate());
+									}
+									
+									if ($userID > 0) {
+										$playercoach = CoachDB::getCoach($userID);
+										if ($playercoach == NULL) {
+											if ($team != NULL) {
+												if ($team->isBot()) {
+													CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
+														"user", "", "", "", "", "",
+														0, 0, 0, 0, 0, 0, 0, 0, 0, -1));										}
+												else {
+													//myLog($log, "Last Login = ".$team->getLastLoginDate());
+													CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
+														"user", "", "", "", "", "",
+														0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0));
+												}
+												
 											}
-											else {
-												$playercoach->setbot(0);
-												myLog($log, "last login = ".$team->getLastLoginDate());
-												$playercoach->setlastHTlogin($team->getLastLoginDate());
+										}
+										else {
+											if ($team != NULL) {
+												if ($team->isBot()) {
+													$playercoach->setbot(-1);
+													$playercoach->setlastHTlogin(date("d-m-y H:i", 0));
+												}
+												else {
+													$playercoach->setbot(0);
+													//myLog($log, "last login = ".$team->getLastLoginDate());
+													$playercoach->setlastHTlogin($team->getLastLoginDate());
+												}
+												CoachDB::updateCoach($playercoach);
 											}
-											CoachDB::updateCoach($playercoach);
 										}
 									}
 								}
 							}
 						}
+						catch(HTError $e) {
+							//myLog($log, "player deleted");
+							PlayerDB::deletePlayer($player->getId());
+						}
 					}
-					catch(HTError $e) {
-						myLog($log, "player deleted");
-						PlayerDB::deletePlayer($player->getId());
-					}
+					$HT->clearTeamsPlayers();
+					$HT->clearPlayers();
+					$HT->clearSeniorTeamsMatches();
+					$HT->clearSeniorMatchesDetails();
+					$HT->clearSeniorTeamsArchiveMatches();
+					$HT->clearSeniorLineups();
+					$HT->clearClub();
+					$HT->clearTeams();
+					$HT->clearEconomy();
+					$HT->clearTraining();
+					$HT->clearTrainingStats();
 				}
-				$HT->clearTeamsPlayers();
-				$HT->clearPlayers();
-				$HT->clearSeniorTeamsMatches();
-				$HT->clearSeniorMatchesDetails();
-				$HT->clearSeniorTeamsArchiveMatches();
-				$HT->clearSeniorLineups();
-				$HT->clearClub();
-				$HT->clearTeams();
-				$HT->clearEconomy();
-				$HT->clearTraining();
-				$HT->clearTrainingStats();
 			}
-		}
-		myLog($log, "Einde controle spelers zonder coach");
-		
-		if ($a >= 9) {
-			$datum = strtotime("-6 days", time());
+			//myLog($log, "Einde controle spelers zonder coach");
 			
-			myLog($log, "Start coachHTlogin");
-			try {
-				$allCoaches = CoachDB::getAllCoachesLoginUpdate(date("Y-m-d", $datum));
-				if ($allCoaches != Null) {
-					myLog($log, "coaches opgehaald: ".count($allCoaches));
-					
-					$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
+			if ($a < 100) {
+				$datum = strtotime("-6 days", time());
+				
+				try {
+					$allCoaches = CoachDB::getAllCoachesLoginUpdate(date("Y-m-d", $datum), $a);
+					if ($allCoaches != Null) {
+						myLog($log, "Start coachHTlogin aantal: ".count($allCoaches));
 						
-					$coach = CoachDB::LoginUser('Pays', '');
-					$HT->setOauthToken($coach->getHTuserToken());
-					$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
+						$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
+							
+						$coach = CoachDB::LoginUser('Pays', '');
+						$HT->setOauthToken($coach->getHTuserToken());
+						$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 
-					foreach($allCoaches AS $coach) {
-						if ($coach != Null) {
-							$team = $HT->getTeam($coach->getTeamid());
-							myLog($log, $coach->getTeamid(). " ");
-							if ($team != Null) {
-								$vLastHTlogin = strtotime($team->getLastLoginDate());
-								
-								if ($vLastHTlogin > 0) {
-									$coach->setlastHTlogin($team->getLastLoginDate());
-									myLog($log, date("d-m-y H:i", $vLastHTlogin));
-									CoachDB::updateCoach($coach);
+						foreach($allCoaches AS $coach) {
+							if ($coach != Null) {
+								try {
+									$team = $HT->getTeam($coach->getTeamid());
+									//myLog($log, $coach->getTeamid(). " ");
+									if ($team != Null) {
+										$vLastHTlogin = strtotime($team->getLastLoginDate());
+										
+										if ($vLastHTlogin > 0) {
+											$coach->setlastHTlogin($team->getLastLoginDate());
+											//myLog($log, date("d-m-y H:i", $vLastHTlogin));
+											CoachDB::updateCoach($coach);
+										}
+										else {
+											//myLog($log, "BOT");;
+											$coach->setbot(-1);
+											CoachDB::updateCoach($coach);
+										}
+									}
 								}
-								else {
-									myLog($log, "BOT");;
-									$coach->setbot(-1);
-									CoachDB::updateCoach($coach);
+								catch(HTError $e) {
+									myLog($log, "Error in coachHTlogin: ".$e);
 								}
 							}
 						}
 					}
 				}
-			}
-			catch(HTError $e) {
-				myLog($log, "Error: ".$e);
-			}
-			myLog($log, "Eind coachHTlogin");
-		}	
-		
+				catch(HTError $e) {
+					myLog($log, "Error: ".$e);
+				}
+				//myLog($log, "Eind coachHTlogin");
+			}	
+		}
 		CoachDB::setTrainingRunning(FALSE);
 
 		$a = $a + 1;

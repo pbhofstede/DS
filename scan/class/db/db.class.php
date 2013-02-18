@@ -7,7 +7,6 @@ class DB {
 	//Create the instance
 	private function __construct() {
 		try {
-			//self::$conn = new PDO("mysql:host=mysql.benw.eu;dbname=dutchscouts.nl", "dutchscouts.nl", "XqqCNaB5");
 			self::$conn = new PDO("mysql:host=localhost;dbname=dutchscouts.nl", "dutchscouts.nl", "XqqCNaB5");
 			
 			return self::$conn;

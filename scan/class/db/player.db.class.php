@@ -422,7 +422,7 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-			if ($row['id'] % 10 == $a) {
+			if ($row['id'] % 100 == $a) {
 				$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 					$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 					$row['form'], $row['stamina'], $row['experience'], 
@@ -450,7 +450,7 @@ class PlayerDB extends DB {
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {
-			if ($row['id'] % 10 == $a) {
+			if ($row['id'] % 100 == $a) {
 				$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 					$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 					$row['form'], $row['stamina'], $row['experience'], 

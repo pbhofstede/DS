@@ -74,25 +74,22 @@ class CoachDB extends DB {
 		return $coaches;
 	}
 	
-	public static function getAllCoachesLoginUpdate($datum) {	
+	public static function getAllCoachesLoginUpdate($datum, $a) {	
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE (bot = 0) and	((lastHTlogin is null) or (lastHTlogin < ?)) ORDER BY lastHTlogin ASC limit 0, 600");
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE (bot = 0) and	((lastHTlogin is null) or (lastHTlogin < ?)) ORDER BY lastHTlogin ASC limit 0, 1000");
 		$prepare->bindParam(1, $datum, PDO::PARAM_STR);
 		$prepare->execute();
 		
-		$coaches = array();
-		$count = 0;
+		$coaches = null;
 		
-		$row =	$prepare->fetch();
-		while ($row['id'] != NULL) {
-			$coaches[$count] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
-				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
-				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
-			
-			$count++;
-			$row =	$prepare->fetch();
+		foreach($prepare->fetchAll() AS $row) {
+		  if ($row['id'] % 100 == $a) {
+				$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
+					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
+					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
+					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
+			}
 		}
 		
 		return $coaches;
@@ -110,7 +107,7 @@ class CoachDB extends DB {
 		$coaches = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-		  if ($row['id'] % 10 == $a) {
+		  if ($row['id'] % 100 == $a) {
 				$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
 					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
