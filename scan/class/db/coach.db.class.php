@@ -77,19 +77,23 @@ class CoachDB extends DB {
 	public static function getAllCoachesLoginUpdate($datum, $a) {	
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
-			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE (bot = 0) and	((lastHTlogin is null) or (lastHTlogin < ?)) ORDER BY lastHTlogin ASC limit 0, 1000");
-		$prepare->bindParam(1, $datum, PDO::PARAM_STR);
+			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach ".
+			"  WHERE ".
+			"  (bot = 0) and ".			
+      "  (id mod 100 = ?) and ".
+			"  ((lastHTlogin is null) or (lastHTlogin < ?)) ".
+			"ORDER BY lastHTlogin ASC");
+		$prepare->bindParam(1, $a, PDO::PARAM_INT);
+		$prepare->bindParam(2, $datum, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		$coaches = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-		  if ($row['id'] % 100 == $a) {
-				$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
-					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
-					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
-			}
+			$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
+				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
+				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 		}
 		
 		return $coaches;
@@ -100,19 +104,23 @@ class CoachDB extends DB {
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
 			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach ".
-			"  WHERE (HTUserToken <> '') AND (HTUserTokenSecret <> '') AND ((LastTrainingDate is null) or (LastTrainingDate <> ?)) ORDER BY ID ASC");
-		$prepare->bindParam(1, $trainingsdate, PDO::PARAM_STR);
+			"  WHERE ".
+			"  (HTUserToken <> '') AND ".
+			"  (HTUserTokenSecret <> '') AND ".
+      "  (id mod 100 = ?) and ".
+			"  ((LastTrainingDate is null) or (LastTrainingDate <> ?)) ".
+			"ORDER BY ID ASC");
+		$prepare->bindParam(1, $a, PDO::PARAM_INT);
+		$prepare->bindParam(2, $trainingsdate, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		$coaches = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-		  if ($row['id'] % 100 == $a) {
-				$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
-					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
-					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
-					$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
-			}
+			$coaches[] = new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
+				$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'], 
+				$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 
+				$row['assistants'], $row['physios'], $row['doctors'], $row['lastHTlogin'], $row['bot'], $row['leagueID']);
 		}
 		
 		return $coaches;

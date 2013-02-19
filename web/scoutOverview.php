@@ -29,7 +29,7 @@ if($scouting != NULL) {
 	$datumMax = strtotime("-119 days", time());
 
 	//inactieve managers
-	$datumMinInlog = strtotime("-14 days", time());  
+	$datumMinInlog = strtotime("-20 days", time());  
 
 
 	$datumTraining = strtotime("-7 days", time()); 
@@ -287,7 +287,7 @@ if($scouting != NULL) {
 			
 			//Inactive
 			echo '<tr class="niveau1">';
-			echo '<td colspan="12">Inactieve managers (minimaal 2 weken niet ingelogd HT)</td>';
+			echo '<td colspan="12">Inactieve managers (minimaal 3 weken niet ingelogd HT)</td>';
 			echo '</tr>';
 			echo '<tr class="niveau2">';
 			echo '<td>Naam</td>';
