@@ -26,7 +26,7 @@ class PlayerLogDB extends DB {
 	}
 	
 	public static function getPlayerLogByPlayerByDate($id, $date) {
-		$prepare	=	parent::getConn()->prepare("SELECT `id`, `player`, `type`, `old`, `new`, `date` FROM playerLog WHERE player = ? AND ((`type` = 'defender') or (`type` = 'winger') or (`type` = 'passing') or (`type` = 'setPieces') or (`type` = 'scorer') or (`type` = 'playmaker') or (`type` = 'keeper') or ('type' = 'stamina') or ('type' = 'experience')) and (new > old) and (date >= FROM_UNIXTIME(?)) ORDER BY date DESC LIMIT 25");
+		$prepare	=	parent::getConn()->prepare("SELECT id, player, type, old, new, date FROM playerLog WHERE player = ? AND ((type = 'defender') or (type = 'winger') or (type = 'passing') or (type = 'setPieces') or (type = 'scorer') or (type = 'playmaker') or (type = 'keeper') or (type = 'stamina') or (type = 'experience')) and (new > old) and (date >= FROM_UNIXTIME(?)) ORDER BY date DESC LIMIT 25");
 		$prepare->bindParam(1, $id, PDO::PARAM_INT);
 		$prepare->bindParam(2, $date, PDO::PARAM_STR);
 		$prepare->execute();

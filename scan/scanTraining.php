@@ -472,7 +472,7 @@ try {
 								}
 								
 								$localPlayer->update($coach->getId(), $dateOfBirth, $player->getTsi(), $player->getSalary(), $player->getInjury(), 
-									$player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
+									$player->getForm(), $player->getStamina(), $player->getExperience(), $player->getKeeper(), 
 									$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
 									$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time());
 							
