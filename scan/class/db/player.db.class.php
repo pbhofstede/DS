@@ -27,6 +27,21 @@ class PlayerDB extends DB {
 			"delete from player WHERE player.id = ?");
 		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
 		$prepare->execute();
+		
+		$prepare		=	parent::getConn()->prepare(
+			"delete from playerComment WHERE playerId = ?");
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
+		
+		$prepare		=	parent::getConn()->prepare(
+			"delete from playerLog WHERE player = ?");
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
+		
+		$prepare		=	parent::getConn()->prepare(
+			"delete from playerTraining WHERE playerId = ?");
+		$prepare->bindParam(1, $playerId, PDO::PARAM_INT);
+		$prepare->execute();
 	}
 	
 	public static function getPlayerByName($playerName) {
