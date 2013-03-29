@@ -133,6 +133,114 @@ function cmpName($playerA, $playerB)
 		return 0;
 }
 
+function cmpSpec($playerA, $playerB)
+{
+ 	if ($playerA->getSpeciality() < $playerB->getSpeciality())
+ 		return 1;
+ 	else if ($playerA->getSpeciality() > $playerB->getSpeciality())
+ 		return -1;
+ 	else
+		return 0;
+}
+
+function cmpKe($playerA, $playerB)
+{
+ 	if ($playerA->getKeeper() < $playerB->getKeeper())
+ 		return 1;
+ 	else if ($playerA->getKeeper() > $playerB->getKeeper())
+ 		return -1;
+ 	else if ($playerA->getKeeperStr(true) < $playerB->getKeeperStr(true))
+		return 1;
+	else if ($playerA->getKeeperStr(true) > $playerB->getKeeperStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpVe($playerA, $playerB)
+{
+ 	if ($playerA->getDefender() < $playerB->getDefender())
+ 		return 1;
+ 	else if ($playerA->getDefender() > $playerB->getDefender())
+ 		return -1;
+ 	else if ($playerA->getDefenderStr(true) < $playerB->getDefenderStr(true))
+		return 1;
+	else if ($playerA->getDefenderStr(true) > $playerB->getDefenderStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpPo($playerA, $playerB)
+{
+ 	if ($playerA->getPlaymaker() < $playerB->getPlaymaker())
+ 		return 1;
+ 	else if ($playerA->getPlaymaker() > $playerB->getPlaymaker())
+ 		return -1;
+ 	else if ($playerA->getPlaymakerStr(true) < $playerB->getPlaymakerStr(true))
+		return 1;
+	else if ($playerA->getPlaymakerStr(true) > $playerB->getPlaymakerStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpVl($playerA, $playerB)
+{
+ 	if ($playerA->getWinger() < $playerB->getWinger())
+ 		return 1;
+ 	else if ($playerA->getWinger() > $playerB->getWinger())
+ 		return -1;
+ 	else if ($playerA->getWingerStr(true) < $playerB->getWingerStr(true))
+		return 1;
+	else if ($playerA->getWingerStr(true) > $playerB->getWingerStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpPa($playerA, $playerB)
+{
+ 	if ($playerA->getPassing() < $playerB->getPassing())
+ 		return 1;
+ 	else if ($playerA->getPassing() > $playerB->getPassing())
+ 		return -1;
+ 	else if ($playerA->getPassingStr(true) < $playerB->getPassingStr(true))
+		return 1;
+	else if ($playerA->getPassingStr(true) > $playerB->getPassingStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpSc($playerA, $playerB)
+{
+ 	if ($playerA->getScorer() < $playerB->getScorer())
+ 		return 1;
+ 	else if ($playerA->getScorer() > $playerB->getScorer())
+ 		return -1;
+ 	else if ($playerA->getScorerStr(true) < $playerB->getScorerStr(true))
+		return 1;
+	else if ($playerA->getScorerStr(true) > $playerB->getScorerStr(true))
+		return -1;
+	else
+		return 0;
+}
+
+function cmpSP($playerA, $playerB)
+{
+ 	if ($playerA->getSetPieces() < $playerB->getSetPieces())
+ 		return 1;
+ 	else if ($playerA->getSetPieces() > $playerB->getSetPieces())
+ 		return -1;
+ 	else if ($playerA->getSetPiecesStr(true) < $playerB->getSetPiecesStr(true))
+		return 1;
+	else if ($playerA->getSetPiecesStr(true) > $playerB->getSetPiecesStr(true))
+		return -1;
+	else
+		return 0;
+}
+
 function cmpUpdate($playerA, $playerB)
 {
  	if ($playerA->getLastUpdate() < $playerB->getLastUpdate())
@@ -165,14 +273,14 @@ if($scouting != NULL) {
 			echo '<tr class="niveau1">';
 			echo '<td>ID</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpName/'.$allPlayers.'/\'">Speler</td>';
-			echo '<td>Spec</td>';
-			echo '<td>Ke</td>';
-			echo '<td>Ve</td>';
-			echo '<td>Po</td>';
-			echo '<td>Vl</td>';
-			echo '<td>Pa</td>';
-			echo '<td>Sc</td>';
-			echo '<td>Sp</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpSpec/'.$allPlayers.'/\'">Spec</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpKe/'.$allPlayers.'/\'">Ke</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpVe/'.$allPlayers.'/\'">Ve</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpPo/'.$allPlayers.'/\'">Po</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpVl/'.$allPlayers.'/\'">Vl</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpPa/'.$allPlayers.'/\'">Pa</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpSc/'.$allPlayers.'/\'">Sc</td>';
+			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpSP/'.$allPlayers.'/\'">Sp</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpBirthday/'.$allPlayers.'/\'">Leeftijd</td>';
 			echo '<td onClick="top.location=\''.$config['url'].'/scouting/'.$_GET['a'].'/cmpUpdate/'.$allPlayers.'/\'">Update</td>';
 			echo '<td>Co%</td>';

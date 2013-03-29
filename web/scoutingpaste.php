@@ -272,8 +272,8 @@ if($scouting != NULL) {
 				foreach($playerList AS $player) {
 					if (($u20) ||
 					   ($player->getscoutid() == $scout->getId())) {
+						echo '[td]'.$player->getName().' [playerid='.$player->getID().'][/td]';
 						echo '[tr]';
-						echo '[td]'.$player->getName().'[/td]';
 						echo '[td]'.$player->getLeeftijdStr().'[/td]';
 						if ($vIndexStr == 'GK') {
 							echo '[td]'.$player->getKeeper().'[/td]';

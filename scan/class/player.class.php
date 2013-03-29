@@ -821,63 +821,119 @@ class Player {
 		return floor($aantalDagen / 7);
 	}
 	
-	public function getDefenderStr() {
-	  if ($this->getDefenderSubSkill() > 0) {
+	public function getDefenderStr($aVoorloopnul = false) {
+	  if ($this->getDefenderSubSkill() > 10) {
 		  return $this->getDefender().' +'.Round($this->getDefenderSubSkill(), 1);
+		}
+		else if ($this->getDefenderSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getDefender().' +'.Round($this->getDefenderSubSkill(), 1);
+			}
+			else {
+				return $this->getDefender().' +0'.Round($this->getDefenderSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getDefender();
 		}
 	}
 	
-	public function getPlaymakerStr() {
-	  if ($this->getPlaymakerSubSkill() > 0) {
+	public function getPlaymakerStr($aVoorloopnul = false) {
+	  if ($this->getPlaymakerSubSkill() >= 10) {
 		  return $this->getPlaymaker().' +'.Round($this->getPlaymakerSubSkill(), 1);
+		}
+		else if ($this->getPlaymakerSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getPlaymaker().' +'.Round($this->getPlaymakerSubSkill(), 1);
+			}
+			else {
+				return $this->getPlaymaker().' +0'.Round($this->getPlaymakerSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getPlaymaker();
 		}
 	}	
 	
-	public function getKeeperStr() {
-	  if ($this->getKeeperSubSkill() > 0) {
+	public function getKeeperStr($aVoorloopnul = false) {
+	  if ($this->getKeeperSubSkill() > 10) {
 		  return $this->getKeeper().' +'.Round($this->getKeeperSubSkill(), 1);
+		}
+		else if ($this->getKeeperSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getKeeper().' +'.Round($this->getKeeperSubSkill(), 1);
+			}
+			else {
+				return $this->getKeeper().' +0'.Round($this->getKeeperSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getKeeper();
 		}
 	}	
 	
-	public function getWingerStr() {
-	  if ($this->getWingerSubSkill() > 0) {
+	public function getWingerStr($aVoorloopnul = false) {
+	  if ($this->getWingerSubSkill() > 10) {
 		  return $this->getWinger().' +'.Round($this->getWingerSubSkill(), 1);
+		}
+		else if ($this->getWingerSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getWinger().' +'.Round($this->getWingerSubSkill(), 1);
+			}
+			else {
+				return $this->getWinger().' +0'.Round($this->getWingerSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getWinger();
 		}
 	}	
 	
-	public function getPassingStr() {
-	  if ($this->getPassingSubSkill() > 0) {
+	public function getPassingStr($aVoorloopnul = false) {
+	  if ($this->getPassingSubSkill() > 10) {
 		  return $this->getPassing().' +'.Round($this->getPassingSubSkill(), 1);
+		}
+		else if ($this->getPassingSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getPassing().' +'.Round($this->getPassingSubSkill(), 1);
+			}
+			else {
+				return $this->getPassing().' +0'.Round($this->getPassingSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getPassing();
 		}
 	}	
 	
-	public function getScorerStr() {
-	  if ($this->getScorerSubSkill() > 0) {
+	public function getScorerStr($aVoorloopnul = false) {
+	  if ($this->getScorerSubSkill() > 10) {
 		  return $this->getScorer().' +'.Round($this->getScorerSubSkill(), 1);
+		}
+		else if ($this->getScorerSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getScorer().' +'.Round($this->getScorerSubSkill(), 1);
+			}
+			else {
+				return $this->getScorer().' +0'.Round($this->getScorerSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getScorer();
 		}
 	}	
 	
-	public function getSetPiecesStr() {
+	public function getSetPiecesStr($aVoorloopnul = false) {
 	  if ($this->getSetPiecesSubSkill() > 0) {
 		  return $this->getSetPieces().' +'.Round($this->getSetPiecesSubSkill(), 1);
+		}
+		else if ($this->getSetPiecesSubSkill() > 0) {
+			if ($aVoorloopnul == false) {
+				return $this->getSetPieces().' +'.Round($this->getSetPiecesSubSkill(), 1);
+			}
+			else {
+				return $this->getSetPieces().' +0'.Round($this->getSetPiecesSubSkill(), 1);
+			}
 		}
 		else {
 		  return $this->getSetPieces();
