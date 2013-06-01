@@ -186,7 +186,7 @@ if ($user != NULL) {
 				echo '<td><input type="submit" name="submit" value="OK" /></td>';
 			echo '</tr>';
 		echo '</table>';
-	echo 'Indien de gekozen training keepen is mag voor het aantal assistenten het aantal keeperstrainers worden ingevuld.';	
+		
 		if(isset($_POST['submit'])) {
 			$datumFrom		=	explode('-', $_POST['from']);
 			$datumFrom		=	mktime(12, 0, 0, $datumFrom[1], $datumFrom[0], $datumFrom[2]);
