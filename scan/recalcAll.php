@@ -18,7 +18,8 @@ for ($i = 0; $i<=9; $i++) {
 				//if (! ($player->getu20()) &&
 				//	 ($player->getHasU20Age() <> '')) {
 				//	$player->setu20(TRUE);
-				if ($player->getu20()) { 	
+				if ((! $player->getu20()) &&
+				    ($player->getIsInteresting())) { 	
 					$player->calcIndicesAndUpdateToDB();
 					
 					$count++;

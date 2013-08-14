@@ -1142,20 +1142,14 @@ class Player {
 		}
 		else {
 			$index = CalculateTrainingWeeks($aVergLeeftijdDagen, 
-				0, 0, 7, 7, 6, 0, 0,
-				0, 0, $this->getPlaymaker(), $this->getWinger(), $this->getPassing(), 0, 0)
+				0, 4, 7, 7, 6, 0, 0,
+				0, min($this->getDefender(), 10), $this->getPlaymaker(), $this->getWinger(), $this->getPassing(), 0, 0)
 				+ 
 				$this->getPlaymakerSubSkill() + $this->getWingerSubSkill() + $this->getPassingSubSkill();
 			
-			if ($this->getDefender() >= 3) {
+			if ($this->getDefender() < 10) {
 			  $index = $index 
-								 + (($this->getDefender() - 3) * 2)
-								 + min($this->getDefenderSubSkill(), 2);
-			}
-			else {
-			  $index = $index 
-								 - (3 - $this->getDefender())
-								 + min($this->getDefenderSubSkill(), 1);
+								 + $this->getDefenderSubSkill();
 			}
 			$this->setIndexWG($index);
 		}
