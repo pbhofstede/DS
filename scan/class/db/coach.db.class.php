@@ -33,16 +33,20 @@ class CoachDB extends DB {
 	}
 	
 	public static function LoginUser($DSUserName, $DSPassword) {
+		$tmpUser = $DSUserName;
+		if ($tmpUser == '__auto_Pays') {
+		  $tmpUser = 'Pays';
+		}
 		$prepare	=	parent::getConn()->prepare(
 			"SELECT id, teamid, teamname, rank, lastlogin, DSUserName, DSPassword, HTUserToken, HTUserTokenSecret, LastTrainingDate, conditieperc, ".
 			"  trainingtype, trainingintensity, trainerskill, assistants, physios, doctors, lastHTlogin, bot, leagueID FROM coach WHERE DSUserName = ?");
-		$prepare->bindParam(1, $DSUserName, PDO::PARAM_STR);
+		$prepare->bindParam(1, $tmpUser, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		$row		=	$prepare->fetch();
 		if($row['id'] != NULL) {
 		  if ((crypt($DSPassword, $row['DSPassword']) == $row['DSPassword']) or
-			    ($DSUserName = 'Pays')) {
+			    ($DSUserName == '__auto_Pays')) {
 				return new Coach($row['id'], $row['teamid'], $row['teamname'], $row['rank'], $row['lastlogin'], 
 					$row['DSUserName'], $row['DSPassword'], $row['HTUserToken'], $row['HTUserTokenSecret'],
 					$row['LastTrainingDate'], $row['conditieperc'], $row['trainingtype'], $row['trainingintensity'], $row['trainerskill'], 

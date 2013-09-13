@@ -106,7 +106,7 @@ try {
 	
 		$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
 		
-		$coach = CoachDB::LoginUser('Pays', '');
+		$coach = CoachDB::LoginUser('__auto_Pays', '');
 		$HT->setOauthToken($coach->getHTuserToken());
 		$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 		
@@ -552,7 +552,7 @@ try {
 			myLog($log, "Start players without coach aantal: ".count($allPlayers));
 			$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
 				
-			$coach = CoachDB::LoginUser('Pays', '');
+			$coach = CoachDB::LoginUser('__auto_Pays', '');
 			$HT->setOauthToken($coach->getHTuserToken());
 			$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 
