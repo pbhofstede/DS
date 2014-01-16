@@ -460,9 +460,9 @@ class PlayerDB extends DB {
 				"   (GREATEST(indexGK, indexCD, indexDEF, indexWB, indexIM, indexWG, indexSC, indexDFW, indexSP) >  ".
 				"   	((((dateDIFF(now(), dateOfBirth) / 112) - 16) * -4) + (LEAST(GREATEST((dateDIFF('2004-12-01', dateOfBirth) / 112), 0), 12) * -8)))) ".
 				"ORDER BY player.ID ASC");
-		
+		$datum = date("Y-m-d", strtotime("-200 days", time()));
 		$prepare->bindParam(1, $a, PDO::PARAM_INT);
-		$prepare->bindParam(2, date("Y-m-d", strtotime("-200 days", time())), PDO::PARAM_STR);
+		$prepare->bindParam(2, $datum, PDO::PARAM_STR);
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {

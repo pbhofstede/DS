@@ -101,9 +101,9 @@ if (($user != NULL) &&
 	echo '<TR><TD><label>Specialiteit</label></TD><TD>';
 	echo '<select name="speciality">';
 			foreach($specialityArray AS $key => $value) {
-				if(empty($_GET['speciality']) && $key == '0') {
+				if (empty($_GET['speciality']) && $key == '0') {
 					echo '<option value="'.$key.'" selected>'.$value.'</option>';
-				} elseif($key == $_GET['speciality']) {
+				} elseif ((!empty($_GET['speciality'])) && ($key == $_GET['speciality'])) {
 					echo '<option value="'.$key.'" selected>'.$value.'</option>';
 				} else {
 					echo '<option value="'.$key.'">'.$value.'</option>';

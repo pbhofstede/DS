@@ -115,7 +115,6 @@ try {
 			if ($a == 0) {
 				PlayerDB::clearsundayTraining();
 			}
-			$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
 			$coaches = CoachDB::getCoachList();
 			myLog($log, "Start");
 			myLog($log, "Coaches: ".count($coaches));
@@ -133,6 +132,7 @@ try {
 						try {
 							$aantalScanned = $aantalScanned + 1;
 							
+							$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');	
 							$HT->setOauthToken($coach->getHTuserToken());
 							$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 						
@@ -491,11 +491,11 @@ Value	Description
 						$HT->clearSeniorMatchesDetails();
 						$HT->clearSeniorTeamsArchiveMatches();
 						$HT->clearSeniorLineups();
-						$HT->clearClub();
+						$HT->clearClubs();
 						$HT->clearTeams();
 						$HT->clearEconomy();
-						$HT->clearTraining();
-						$HT->clearTrainingStats();
+						$HT->clearTrainings();
+						$HT->clearTrainingsStats();
 					}
 				}
 			}

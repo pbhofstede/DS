@@ -149,7 +149,8 @@ try {
 				try {
 					$coach = $coaches[$count];
 					
-					if ($coach->getHTuserToken() <> '') {					
+					if ($coach->getHTuserToken() <> '') {
+						$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');					
 						$HT->setOauthToken($coach->getHTuserToken());
 						$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 						
@@ -215,14 +216,14 @@ try {
 									PlayerDB::insertPlayer(new Player($player->getId(), $coach->getId(), $player->getName(), $dateOfBirth, 
 										$player->getTsi(), $player->getSalary(), $player->getInjury(), $player->getAggressiveness(), 
 										$player->getAgreeability(), $player->getHonesty(), $player->getLeadership(), $player->getSpeciality(), 
-										$player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
+										$player->getForm(), $player->getStamina(), $player->getExperience(), $player->getKeeper(), 
 										$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
 										$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time(), time(),
 										0, 0, 0, 0, 0, 0, 0, 0, 0,
 										0, 0, 0, 0, 0, 0, 0,
 										0, 0, 0, 0, 0, 0, 0,
 										0, 0));
-								
+
 									$localPlayer = PlayerDB::getPlayer($player->getId());
 								}
 								
@@ -539,11 +540,11 @@ try {
 				$HT->clearSeniorMatchesDetails();
 				$HT->clearSeniorTeamsArchiveMatches();
 				$HT->clearSeniorLineups();
-				$HT->clearClub();
+				$HT->clearClubs();
 				$HT->clearTeams();
 				$HT->clearEconomy();
-				$HT->clearTraining();
-				$HT->clearTrainingStats();
+				$HT->clearTrainings();
+				$HT->clearTrainingsStats();
 			}
 		}
 			
@@ -615,7 +616,7 @@ try {
 												//myLog($log, "Last Login = ".$team->getLastLoginDate());
 												CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
 													"user", "", "", "", "", "",
-													0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0));
+													0, 0, 0, 0, 0, 0, 0, 0, $team->getLastLoginDate(), 0, $team->getLeagueId()));
 											}
 											
 										}
@@ -649,11 +650,11 @@ try {
 				$HT->clearSeniorMatchesDetails();
 				$HT->clearSeniorTeamsArchiveMatches();
 				$HT->clearSeniorLineups();
-				$HT->clearClub();
+				$HT->clearClubs();
 				$HT->clearTeams();
 				$HT->clearEconomy();
-				$HT->clearTraining();
-				$HT->clearTrainingStats();
+				$HT->clearTrainings();
+				$HT->clearTrainingsStats();
 			}
 		}
 		//myLog($log, "Einde controle spelers zonder coach");
@@ -665,7 +666,13 @@ try {
 				$allCoaches = CoachDB::getAllCoachesLoginUpdate(date("Y-m-d", $datum), $a);
 				if ($allCoaches != Null) {
 					myLog($log, "Start coachHTlogin aantal: ".count($allCoaches));
-
+					
+					$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
+		
+					$coach = CoachDB::LoginUser('__auto_Pays', '');
+					$HT->setOauthToken($coach->getHTuserToken());
+					$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
+					
 					foreach($allCoaches AS $coach) {
 						if ($coach != Null) {
 							try {
