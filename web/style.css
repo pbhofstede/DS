@@ -20,11 +20,8 @@ body {
 }
 
 .container {
-	position: relative;
-	
 	width: 1000px;
-	margin-left: -550px;
-	left: 50%;
+	margin: 0 auto;
 	
 	height: auto;
 	
@@ -87,7 +84,7 @@ body {
 	
 	background-color: #999999;
 
-	font-size: 13;
+	font-size: 13px;
 
 }
 
@@ -278,4 +275,4 @@ ol {
 	padding-left: 30px;
 }
 
-/*Rest*
+/*Rest*/

@@ -46,12 +46,18 @@ class Player {
 	private $u20;
 	private $trainingtype;
 	private $conditieperc;
+    private $teamID;
 	private $trainingintensity;
 	private $trainerskill;
 	private $assistants;
 	private $scoutid;
 	private $sundayTraining;
 	private $scout; //variabele om de scoutlichting runtime in op te slaan om de beste index te kunnen bepalen
+    private $leagueID;
+    private $bot;
+    private $formcoach;
+    private $doctors;
+    private $teamName;
 	
 	/**
 	* Constructs the player ID
@@ -64,13 +70,14 @@ class Player {
 	* @param int $salary
 	* @param int $injury
 	*/
-	public function __construct($id, $coach, $name, $dateOfBirth, $tsi, $salary, $injury, $aggressiveness, 
+	public function __construct($id, $coach, $teamID, $teamName, $name, $dateOfBirth, $tsi, $salary, $injury, $aggressiveness, 
 		$agreeability, $honesty, $leadership, $speciality, $form, $stamina, $experience, 
 		$keeper, $defender, $playmaker, $winger, $passing, $scorer, $setPieces, 
 		$caps, $capsU20, $added, $lastupdate,
 		$indexGK, $indexCD, $indexDEF, $indexWB, $indexIM, $indexWG, $indexSC, $indexDFW, $indexSP,
 		$keeperSubSkill, $defenderSubSkill, $playmakerSubSkill, $wingerSubSkill, $passingSubSkill, $scorerSubSkill, $setPiecesSubSkill,
-		$lasttraining, $u20, $trainingtype, $conditieperc, $trainingintensity, $trainerskill, $assistants, $scoutid, $sundayTraining) {
+		$lasttraining, $u20, $trainingtype, $conditieperc, $trainingintensity, $trainerskill, $assistants, $scoutid, $sundayTraining, $leagueID, $bot, $formcoach,
+        $doctors) {
 		$this->id		=	$id;
 		$this->coach		=	$coach;
 		$this->name		=	$name;
@@ -122,9 +129,15 @@ class Player {
 		$this->assistants = $assistants;
 		$this->scoutid = $scoutid;
 		$this->sundayTraining = $sundayTraining;
+        $this->teamID = $teamID;
+        $this->leagueID = $leagueID;
+        $this->bot = $bot;
+        $this->formcoach = $formcoach;
+        $this->doctors = $doctors;
+        $this->teamName = $teamName;
 	}
 	
-	public function update($coach, $dateOfBirth, $tsi, $salary, $injury, $form, $stamina, $experience, 
+	public function update($coach, $teamID, $dateOfBirth, $tsi, $salary, $injury, $form, $stamina, $experience, 
 		$keeper, $defender, $playmaker, $winger, $passing, $scorer, $setPieces, $caps, $capsU20, $newUpdateDate) {
 		$this->dateOfBirth	=	$dateOfBirth;
 		$this->tsi		=	$tsi;
@@ -132,6 +145,7 @@ class Player {
 		$this->injury		=	$injury;
 		$this->caps		=	$caps;
 		$this->capsU20		=	$capsU20;
+        $this->teamID       = $teamID;
 		
 		if($coach != $this->coach) {
 			PlayerLogDB::insertLog(new PlayerLog(NULL, $this->id, 'coach', $this->coach, $coach, time()));
@@ -371,6 +385,10 @@ class Player {
 	public function getForm() {
 		return $this->form;
 	}
+
+    public function getDoctors() {
+		return $this->doctors;
+	}
 	
 	public function getStamina() {
 		return $this->stamina;
@@ -378,6 +396,10 @@ class Player {
 	
 	public function getExperience() {
 		return $this->experience;
+	}
+
+    public function getTeamName() {
+		return $this->teamName;
 	}
 	
 	public function getKeeper() {
@@ -436,6 +458,13 @@ class Player {
 	}
 	public function setIndexCD($index) {
 		$this->indexCD = $index;
+	}
+
+    public function getTeamID() {
+		return $this->teamID;
+	}
+	public function setTeamID($teamID) {
+		$this->teamID = $teamID;
 	}
 	
 	public function getIndexDEF() {
@@ -957,6 +986,10 @@ class Player {
 		return $this->trainingintensity;
 	}
 
+    public function getFormCoach() {
+		return $this->formcoach;
+	}
+
 	public function getTrainerskill() {
 		return $this->trainerskill;
 	}
@@ -1248,6 +1281,15 @@ class Player {
 	public function getscoutid() {
 	  return $this->scoutid;
 	}
+
+    public function getLeagueID() {
+	  return $this->leagueID;
+	}
+
+    public function getBot() {
+	  return $this->bot;
+	}
+
 	
 	public function getsundayTraining() {
 	  return $this->sundayTraining;

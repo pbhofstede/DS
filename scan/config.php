@@ -23,9 +23,9 @@ require('class/playerLog.class.php');
 require('class/db/playerLog.db.class.php');
 
 if ($_SERVER["SERVER_NAME"] == 'localhost') {
-	$config['url']			=	'http://localhost/dutchscouts/scan';
-	$config['scan_url']		=	'http://localhost/dutchscouts/scan';
-  $config['urlweb']		=	'http://localhost/dutchscouts/web';
+	$config['url']			=	'http://localhost:801/dutchscouts/scan';
+	$config['scan_url']		=	'http://localhost:801/dutchscouts/scan';
+  $config['urlweb']		=	'http://localhost:801/dutchscouts/web';
 }
 else {
 	$config['url']			=	'http://www.dutchscouts.nl/scan';
@@ -46,14 +46,14 @@ $HT_TR_CTR = 11;
 $HT_TR_VLA = 12;
 
 $const_player_sql = 
-		"SELECT player.id, player.coach, player.name, player.dateOfBirth, player.tsi, player.salary, player.injury, player.aggressiveness, player.agreeability, player.honesty, player.leadership, ".
+		"SELECT player.id, player.coach, player.teamid, coachteams.teamname, player.name, player.dateOfBirth, player.tsi, player.salary, player.injury, player.aggressiveness, player.agreeability, player.honesty, player.leadership, ".
 			"  player.speciality, player.form, player.stamina, player.experience, ".
 			"  player.keeper, player.defender, player.playmaker, player.winger, player.passing, player.scorer, player.setPieces, ".
 			"  player.caps, player.capsU20, player.added, player.lastupdate, player.scoutid, ".
 			"  player.indexGK, player.indexCD, player.indexDEF, player.indexWB, player.indexIM, player.indexWG, player.indexSC, player.indexDFW, player.indexSP, ".
 			"  player.keeperSubSkill, player.defenderSubSkill, player.playmakerSubSkill, player.wingerSubSkill, player.passingSubSkill, player.scorerSubSkill, player.setPiecesSubSkill, ".
-			"  player.lasttraining, player.u20, coach.trainingtype, coach.conditieperc, coach.trainingintensity, coach.trainerskill, coach.assistants, player.sundayTraining ".
-			"FROM player left join coach on (coach.id = player.coach) ";
+			"  player.lasttraining, player.u20, coachteams.leagueid, coachteams.bot, coachteams.doctors, coachteams.trainingtype, coachteams.conditieperc, coachteams.trainingintensity, coachteams.trainerskill, coachteams.assistants, coachteams.formcoach, player.sundayTraining ".
+			"FROM player left join coach on (player.coach = coach.id) left join coachteams on (player.coach = coachteams.coachid and coachteams.teamid = coalesce(player.teamid, coach.teamid))";
 
 if(!empty($_GET['language'])) {
 	if($_GET['language'] == 'NL') {
@@ -72,6 +72,7 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['noHTPermission']	=	'<FONT COLOR=FF0000>DutchScouts heeft geen toegang meer tot uw spelersgegevens.</FONT><BR>Ga naar <u><a href=http://www.dutchscouts.nl/scan/loginHT.php>http://www.dutchscouts.nl</a></u> om DutchScouts opnieuw toegang te geven tot uw spelers.<br>';
 	
 	$language['name']		=	'Inlognaam';
+    $language['team']		=	'Team';
 	$language['password']	=   'Wachtwoord';
 	$language['retypepassword']=   'Herhaal wachtwoord';
 	$language['DSname']		=   'Inlognaam (DutchScouts)';
@@ -107,7 +108,7 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['conditie'] = 'Conditie';
 	$language['training'] = 'Soort training';
 	$language['trainingintensiteit'] = 'Trainingintensiteit';
-	$language['assistenten'] = 'Aantal assistenten';
+	$language['assistenten'] = 'Nivo assistenten';
 
 } elseif($_SESSION['language'] == 'US') {
 	$language['intro']		=	"Please fill in your DutchScouts username and password to login and upload the current state of your Dutch players for the U20 and NT. Please keep in mind that all players will be saved and that the shown players are just an overview of the scanned players in your team. If there is a candidate among them, you will be contacted by a scout.<br/><br/>If you don't have an account on DutchScouts, you need to register once and give DutchScouts access to your teamdata. Do so by clicking on the link 'New user or password forgotten'.</br></br><strong>Update:</br>You don't have to update your players after training. DutchScouts updates your players automatically as long as you don't revoke the DutchScouts CHPP-license.</strong><br/><br/><br/>";
@@ -118,6 +119,7 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['noHTPermission']	=	"<FONT COLOR=FF0000>DutchScouts hasn't got permission te read yours players anymore.</FONT><BR>Please go to <u><a href=http://www.dutchscouts.nl/scan/loginHT.php>http://www.dutchscouts.nl</a></u> to give DutchScouts access to your players.<br>";
 	
 	$language['name']		=	'Login name';
+    $language['team']		=	'Team';
 	$language['password']	=   'Password';
 	$language['retypepassword']=   'Retype password';
 	$language['DSname']		=   'Login name (DutchScouts)';
@@ -153,6 +155,6 @@ if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 	$language['conditie'] = 'Condition';
 	$language['training'] = 'Trainingtype';
 	$language['trainingintensiteit'] = 'Training intensity';
-	$language['assistenten'] = 'Number of assistants';
+	$language['assistenten'] = 'Level of assistants';
 }
 ?>

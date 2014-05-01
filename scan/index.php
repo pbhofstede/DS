@@ -55,6 +55,7 @@ include('config.php');
 			<div class="language">
 			  
 					<?php 
+                
 						if(empty($_SESSION['language']) || $_SESSION['language'] == 'NL') {
 							echo '<a href="'.$config['url'].'/NL/">';
 							echo '<img src="'.$config['url'].'/images/nl.png"/>';

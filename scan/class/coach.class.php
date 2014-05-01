@@ -10,16 +10,7 @@ class Coach {
 	private $HTuserToken;	//oAuth usertoken
 	private $HTuserTokenSecret;	//oAuth usertoken secret
 	private $LastTraining;
-	private $conditieperc;
-	private $trainingtype;
-	private $trainingintensity;
-	private $trainerskill;
-	private $assistants;
-	private $physios;
-	private $doctors;
 	private $lastHTlogin;
-	private $bot;
-	private $leagueID;
 	
 	/**
 	* Constructs the coach
@@ -29,7 +20,7 @@ class Coach {
 	*/
 	
 	public function __construct($id, $teamid, $teamname, $rank, $lastlogin, $DSUserName, $DSPassword, $HTuserToken, $HTuserTokenSecret, 
-		$LastTraining, $conditieperc, $trainingtype, $trainingintensity, $trainerskill, $assistants, $physios, $doctors, $lastHTlogin, $bot, $leagueID) {
+		$LastTraining, $lastHTlogin) {
 		$this->id		=	$id;
 		$this->teamid		=	$teamid;
 		$this->teamname		=	$teamname;
@@ -40,17 +31,20 @@ class Coach {
 		$this->HTuserToken = $HTuserToken;
 		$this->HTuserTokenSecret = $HTuserTokenSecret;
 		$this->LastTraining = $LastTraining;
-		$this->conditieperc = $conditieperc;
-		$this->trainingtype = $trainingtype;
-		$this->trainingintensity = $trainingintensity;
-		$this->trainerskill = $trainerskill;
-		$this->assistants = $assistants;
-		$this->physios = $physios;
-		$this->doctors = $doctors;
 		$this->lastHTlogin = $lastHTlogin;
-		$this->bot = $bot;
-		$this->leagueID = $leagueID;
 	}
+
+    public function getTeams($HT){
+        $primTeam = $HT->getPrimaryTeam();
+        //$secTeam = $HT->getSecondaryTeam();
+        $secTeam = $HT->getPrimaryTeam();
+
+        $list[] = $primTeam;
+        if ($secTeam !== NULL){
+            $list[] = $secTeam;    
+        }
+        return $list;
+    }
 	
 	public function getScout() {
 		return CoachDB::getScout($this->id);
@@ -134,56 +128,7 @@ class Coach {
 	public function getLastTraining() {
 		return $this->LastTraining;
 	}
-	
-	public function setconditieperc($conditieperc) {
-		$this->conditieperc=$conditieperc;
-	}	
-	public function getconditieperc() {
-		return $this->conditieperc;
-	}
-	
-	public function settrainingtype($trainingtype) {
-		$this->trainingtype=$trainingtype;
-	}	
-	public function gettrainingtype() {
-		return $this->trainingtype;
-	}	
-	
-	public function settrainingintensity($trainingintensity) {
-		$this->trainingintensity=$trainingintensity;
-	}	
-	public function gettrainingintensity() {
-		return $this->trainingintensity;
-	}
-	
-	public function settrainerskill($trainerskill) {
-		$this->trainerskill=$trainerskill;
-	}	
-	public function gettrainerskill() {
-		return $this->trainerskill;
-	}
-	
-	public function setassistants($assistants) {
-		$this->assistants=$assistants;
-	}	
-	public function getassistants() {
-		return $this->assistants;
-	}
-	
-	public function setphysios($physios) {
-		$this->physios=$physios;
-	}	
-	public function getphysios() {
-		return $this->physios;
-	}
-	
-	public function setdoctors($doctors) {
-		$this->doctors=$doctors;
-	}	
-	public function getdoctors() {
-		return $this->doctors;
-	}
-	
+			
 	public function getLastlogin() {
 		return $this->lastlogin;
 	}
@@ -197,8 +142,114 @@ class Coach {
 	public function getlastHTlogin() {
 		return $this->lastHTlogin;
 	}
-	
-	public function setbot($bot) {
+}
+
+class CoachTeam {
+    private $coachid;
+    private $teamid;
+    private $teamname;
+    private $LastTraining;
+    private $conditieperc;
+    private $trainingtype;
+    private $trainingintensity;
+    private $trainerskill;
+    private $assistants;
+    private $doctors;
+    private $formcoach;
+    private $bot;
+    private $leagueID;
+    private $isNew;
+
+    public function __construct($coachid, $teamid, $teamname, 
+		$LastTraining, $conditieperc, $trainingtype, $trainingintensity, $trainerskill, $assistants, $doctors, $formcoach, $bot, $leagueID) {
+		$this->coachid		=	$coachid;
+		$this->teamid		=	$teamid;
+		$this->teamname		=	$teamname;
+		$this->LastTraining = $LastTraining;
+		$this->conditieperc = $conditieperc;
+		$this->trainingtype = $trainingtype;
+		$this->trainingintensity = $trainingintensity;
+		$this->trainerskill = $trainerskill;
+		$this->assistants = $assistants;
+		$this->doctors = $doctors;
+        $this->formcoach = $formcoach;
+		$this->bot = $bot;
+		$this->leagueID = $leagueID;
+    }
+
+    public function setCoachId($coachid) {
+		$this->coachid=$coachid;
+	}	
+	public function getCoachID() {
+		return $this->coachid;
+	}
+    public function setTeamId($teamid) {
+		$this->teamid=$teamid;
+	}	
+	public function getTeamID() {
+		return $this->teamid;
+	}
+    public function setTeamName($teamname) {
+		$this->teamname=$teamname;
+	}	
+	public function getTeamName() {
+		return $this->teamname;
+	}
+    public function setLastTraining($lasttraining) {
+		$this->LastTraining=$lasttraining;
+	}	
+	public function getLastTraining() {
+		return $this->LastTraining;
+	}
+    public function setConditiePerc($conditieperc) {
+		$this->conditieperc=$conditieperc;
+	}	
+	public function getConditiePerc() {
+		return $this->conditieperc;
+	}
+    public function settrainingtype($trainingtype) {
+		$this->trainingtype=$trainingtype;
+	}	
+	public function gettrainingtype() {
+		return $this->trainingtype;
+	}	
+    public function settrainingintensity($trainingintensity) {
+		$this->trainingintensity=$trainingintensity;
+	}	
+	public function gettrainingintensity() {
+		return $this->trainingintensity;
+	}
+    public function settrainerskill($trainerskill) {
+		$this->trainerskill=$trainerskill;
+	}	
+	public function gettrainerskill() {
+		return $this->trainerskill;
+	}
+    public function setassistants($assistants) {
+		$this->assistants=$assistants;
+	}	
+	public function getassistants() {
+		return $this->assistants;
+	}
+    public function setdoctors($doctors) {
+		$this->doctors=$doctors;
+	}	
+	public function getdoctors() {
+		return $this->doctors;
+	}
+    public function setIsNew($isNew) {
+		$this->isNew=$isNew;
+	}	
+	public function getIsNew() {
+		return $this->isNew;
+	}
+    public function setFormCoach($formcoach) {
+		$this->formcoach=$formcoach;
+	}	
+	public function getFormCoach() {
+		return $this->formcoach;
+	}
+    public function setbot($bot) {
 		$this->bot=$bot;
 	}	
 	public function getbot() {

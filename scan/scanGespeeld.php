@@ -135,311 +135,313 @@ try {
 							$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');	
 							$HT->setOauthToken($coach->getHTuserToken());
 							$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
-						
-							$training = $coach->gettrainingtype();
-											
-							$TeamPlayers = $HT->getTeamPlayers(null, false);
-							$team = $HT->getTeam();
-							
-							$coach->setleagueID($team->getLeagueId());
-						
-							$i=1;
-							
-							myLog($log, $coach->getTeamname().'('.$coach->getId().')');
-						
-							$idlist	= '';
-					
-							while($i <= $TeamPlayers->getNumberPlayers()) {
-								$player = $TeamPlayers->getPlayer($i);
-							
-								if($player->getCountryId() == 12) {
-									$aantalDagen = ($player->getAge() * 112) + $player->getDays();
-									$dateOfBirth	=	strtotime('today -'.$aantalDagen.' days');
-							
-									$pos = 'onbekend';
-									$mins = 0;
-									$idlist = $idlist.$player->getId().",";
-								
-									$localPlayer = PlayerDB::getPlayer($player->getId());
-									if($localPlayer == NULL) {		
-										PlayerDB::insertPlayer(new Player($player->getId(), $coach->getId(), $player->getName(), $dateOfBirth, 
-											$player->getTsi(), $player->getSalary(), $player->getInjury(), $player->getAggressiveness(), 
-											$player->getAgreeability(), $player->getHonesty(), $player->getLeadership(), $player->getSpeciality(), 
-											$player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
-											$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
-											$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time(), time(),
-											0, 0, 0, 0, 0, 0, 0, 0, 0,
-											0, 0, 0, 0, 0, 0, 0,
-											0, 0, 0, 0, 0, 0, 0,
-											0, 0));
-											
-										$localPlayer = PlayerDB::getPlayer($player->getId());
-										$localPlayer->calcIndicesAndUpdateToDB();
-									}
-										
-									$matches = $HT->getSeniorTeamMatches();
-									
-									$posGK = 0;
-									$posCD = 0;
-									$posWB = 0;
-									$posIM = 0;
-									$posWG = 0;
-									$posSC = 0;
-									$posSP = 0.8;
-									
-									$walkover = FALSE;
-									
-									for($vCount=1;$vCount<=$matches->getNumberMatches();$vCount++) {
-										$match = $matches->getMatch($vCount);
-										
-										if (($match != NULL) &&
-												(! $walkover)) {
-											if ((strtotime($match->getDate()) >= $knownLastTrainingdate) and
-													(strtotime($match->getDate()) < $dinsdagMiddagNaTraining)) {
-											
-												$vMatchType = $match->getType();
-											/*										
-Value	Description
-1	League match
-2	Qualification match
-3	Cup match (standard league match)
-4	Friendly (normal rules)
-5	Friendly (cup rules)
-6	Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point).
-7	Hattrick Masters
-8	International friendly (normal rules)
-9	Internation friendly (cup rules)
-10	National teams competition match (normal rules)
-11	National teams competition match (cup rules)
-12	National teams friendly
-50	Tournament League match
-51	Tournament Playoff match
-100	Youth league match
-101	Youth friendly match
-102	RESERVED
-103	Youth friendly match (cup rules)
-104	RESERVED
-105	Youth international friendly match
-106	Youth international friendly match (Cup rules)
-107	RESERVED
-*/
+						    
+                            $teams = $coach->getTeams($HT);
+                            $idlist	= '';
+                            foreach($teams as $team) {
 
-												if (($vMatchType == 1) ||
-														($vMatchType == 2) ||
-														($vMatchType == 3) ||
-														($vMatchType == 4) ||
-														($vMatchType == 5) ||
-														($vMatchType == 6) ||
-														($vMatchType == 7) ||
-														($vMatchType == 8) ||
-														($vMatchType == 9)) {
-												  $lineup = $HT->getSeniorLineup($match->getId());
-												}
-												else {
-													$lineup = NULL;
-													//myLog($log, 'Geen trainingswedstrijd: '.$match->getId().' type: '.$vMatchType);
-												} 
-												
-												if ($lineup != NULL) {
-													$startingLineup = $lineup->getStartingLineup();
-													$vPosition = 0;
-													
-													if ($startingLineup != NULL) {
-														$walkover = $startingLineup->getPlayersNumber() < 9;
-														
-														if (! $walkover) {
-															for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
-																$vLineupPlayer = $startingLineup->getPlayer($vLineUpindex);
-																
-																if ($vLineupPlayer != NULL) {
-																	if ($vLineupPlayer->getId() == $player->getId()) {
-																		if ($vLineupPlayer->getRole() >= 100) {
-																			$vPosition = $vLineupPlayer->getRole();
-																			//myLog($log, $player->getName()." start op ".$vPosition);
-																			AddPlayTime($vPosition, 90, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
-																		}
-																		else {
-																			if ($vLineupPlayer->getRole() == 17) {
-																				$posSP = 1;
-																			}
-																			else if ($vLineupPlayer->getRole() == 18) {
-																				$vAanvoerder = 1;
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-												
-												if ((! $walkover) &&
-												    ($lineup != NULL)) {
-													for ($vSubstitutionIndex=1;$vSubstitutionIndex<=$lineup->getSubstitutionNumber();$vSubstitutionIndex++) {
-														$vSubstitutionLineup = $lineup->getSubstitution($vSubstitutionIndex); 
-														
-														if ($vSubstitutionLineup != NULL) {												
-															$vNewPosition = $vPosition;
-															
-															if ($vSubstitutionLineup->getMinute() > 90) {
-																$vAantalMinuten = 0;
-															}
-															else {
-																$vAantalMinuten = 90 - $vSubstitutionLineup->getMinute();
-															}
-															
-															if (($vSubstitutionLineup->getPlayerOutId() == $player->getId()) && ($vAantalMinuten > 0)) {
-																if ($vSubstitutionLineup->getNewPositionId() == 0) {
-																	AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
-																	//myLog($log, "Blessure zonder wissel:".$player->getName()." positie = ".$vPosition);
-																}
-																else
-																{
-																	if ($vSubstitutionLineup->getNewPositionId() <> $vPosition) {
-																		AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
-																		
-																		if ($vSubstitutionLineup->getPlayerInId() == $vSubstitutionLineup->getPlayerOutId()) {
-																			AddPlayTime($vSubstitutionLineup->getNewPositionId(), $vAantalMinuten, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
-																		}
-																		$vNewPosition = $vSubstitutionLineup->getNewPositionId();
-																	}
-																	else {
-																		AddPlayTime($vSubstitutionLineup->getNewPositionId(), $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
-																	}
-																}
-																//myLog($log, $player->getName()." UIT op ".$vSubstitutionLineup->getMinute()." plek: ".$vSubstitutionLineup->getNewPositionId()); 
-															}
-															
-															if (($vSubstitutionLineup->getPlayerInId() == $player->getId()) && ($vAantalMinuten > 0)) {
-																$vNewPosition = $vSubstitutionLineup->getNewPositionId();
-																
-																if (($vPosition > 0) &&
-																		(($vSubstitutionLineup->getPlayerInId() <> $vSubstitutionLineup->getPlayerOutId())) or
-																		 ($vPosition <> $vNewPosition)) {
-																	//als hij reeds stond opgesteld, dan is er een positiewisseling
-																	//nu moet helaas uitgezocht worden aan de hand van de positie van de speler waarmee hij wisselt wat zijn nieuwe positie wordt...
-																	AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
-																	
-																	
-																	for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
-																		$vLineupPlayer = $startingLineup->getPlayer($vLineUpindex);
-																	
-																		if ($vLineupPlayer != NULL) {
-																			if ($vLineupPlayer->getId() == $vSubstitutionLineup->getPlayerOutId()) {
-																				if ($vLineupPlayer->getRole() >= 100) {
-																					$vNewPosition = $vLineupPlayer->getRole();
-																					break;
-																				}
-																			}
-																		}
-																	}
-																}
-																AddPlayTime($vNewPosition, $vAantalMinuten, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
-																//myLog($log, $player->getName()." IN op ".$vSubstitutionLineup->getMinute()." plek: ".$vPosition.' -> '.$vNewPosition);
-																$vPosition = $vNewPosition;
-															}
-															
-															$vPosition = $vNewPosition;
-														}
-													}
-													$seniorMatch = $HT->getSeniorMatchDetails($match->getId(), FALSE);
-													$vKaarten = $seniorMatch->getTotalCards();
-													
-													for ($vKaartenIndex=1;$vKaartenIndex<=$vKaarten;$vKaartenIndex++) {
-														$card = $seniorMatch->getCard($vKaartenIndex);
-														
-														if (($card->getType() == 2) &&
-																($card->getPlayerid() == $player->getId())) {
-															if ($card->getMinute() > 90) {
-																$vAantalMinuten = 0;
-															}
-															else {
-																$vAantalMinuten = 90 - $card->getMinute();
-															}
-															AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
-															myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
-														}
-													}
-												}
-												//myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
-											}
-										}
-										
-										if ($walkover) {
-											$posGK = 0;
-											$posCD = 0;
-											$posWB = 0;
-											$posIM = 0;
-											$posWG = 0;
-											$posSC = 0;
-											myLog($log, "WALKOVER!: ".$player->getName()."(".$player->getId().")");
-										}
-									
-										$localPlayer->setsundayTraining(0);
-										
-										if (($training == $HT_TR_SP)) {
-											if (($posSP < 1) && ($posGK > 0)) {
-												$posSP = 0.8 + ($posGK / 90 * 0.2);											
-											}
-											if ($posSP > 1) {
-												$posSP = 1;
-											}
-											$localPlayer->addSundayTraining($HT_TR_SP, $posSP, $posGK + $posCD + $posWB + $posIM + $posWG + $posSC);	
-										}
-										else if (($training == $HT_TR_DEF) && (($posCD + $posWB) > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_DEF, 1, $posCD + $posWB);	
-										}
-										else if (($training == $HT_TR_SCO) && ($posSC > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_SCO, 1, $posSC);	
-										}
-										else if (($training == $HT_TR_CRO) && ($posWG > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_CRO, 1, $posWG);	
-										}
-										else if (($training == $HT_TR_CRO) && ($posWB > 0)) {
-											if (($posWB + $posWG) > 90) {
-												$posWB = $posWB - (($posWB + $posWG) - 90);
-											}
-											$localPlayer->addSundayTraining($HT_TR_CRO, 0.5, $posWB);	
-										}
-										else if (($training == $HT_TR_SHO)) {
-											$localPlayer->addSundayTraining($HT_TR_SHO, 1, $posGK + $posCD + $posWB + $posIM + $posWG + $posSC);	
-										}
-										else if (($training == $HT_TR_PAS) && (($posIM + $posWG + $posSC) > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_PAS, 1, $posIM + $posWG + $posSC);	
-										}
-										else if (($training == $HT_TR_PM) && ($posIM > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_PM, 1, $posIM);	
-										}
-										else if (($training == $HT_TR_PM) && ($posWG > 0)) {
-											if (($posWG + $posIM) > 90) {
-												$posWG = $posWG - (($posWG + $posIM) - 90);
-											}
-											$localPlayer->addSundayTraining($HT_TR_PM, 0.5, $posWG);	
-										}
-										else if (($training == $HT_TR_GK) && ($posGK > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_GK, 1, $posGK);	
-										}
-										else if (($training == $HT_TR_OPM) && (($posCD + $posWB + $posIM + $posWG) > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_OPM, 1, $posCD + $posWB + $posIM + $posWG);	
-										}
-										else if (($training == $HT_TR_CTR) && (($posGK + $posCD + $posWB + $posIM + $posWG) > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_CTR, 1, $posGK + $posCD + $posWB + $posIM + $posWG);	
-										}
-										else if (($training == $HT_TR_VLA) && (($posWG + $posSC) > 0)) {
-											$localPlayer->addSundayTraining($HT_TR_VLA, 1, $posWG + $posSC);	
-										}
-										
-										$localPlayer->update($coach->getId(), $dateOfBirth, $player->getTsi(), $player->getSalary(), $player->getInjury(), 
-											$player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
-											$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
-											$player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time());
-							
-										$localPlayer->calcIndicesAndUpdateToDB();
-									} 
-								}
-								$i++;
-							}
+                                $teamID = $team->getTeamID();
+                                $coachteam = CoachDB::getCoachTeam($coach->getId(), $teamID); 
+                                $coachteam->setleagueID($team->getLeagueId());
+
+							    $training = $coachteam->gettrainingtype();
+							    $TeamPlayers = $HT->getTeamPlayers($teamID, false);
 						
+							    $i=1;
+							
+							    myLog($log, $team->getTeamname().'('.$coach->getId().')');							
+					
+							    while($i <= $TeamPlayers->getNumberPlayers()) {
+								    $player = $TeamPlayers->getPlayer($i);
+							
+								    if($player->getCountryId() == 12) {
+									    $aantalDagen = ($player->getAge() * 112) + $player->getDays();
+									    $dateOfBirth	=	strtotime('today -'.$aantalDagen.' days');
+							
+									    $pos = 'onbekend';
+									    $mins = 0;
+									    $idlist = $idlist.$player->getId().",";
+								
+									    $localPlayer = PlayerDB::getPlayer($player->getId());
+									    if($localPlayer == NULL) {		
+										    PlayerDB::insertPlayer(new Player($player->getId(), $coach->getId(), $teamID, NULL, $player->getName(), $dateOfBirth, 
+											    $player->getTsi(), $player->getSalary(), $player->getInjury(), $player->getAggressiveness(), 
+											    $player->getAgreeability(), $player->getHonesty(), $player->getLeadership(), $player->getSpeciality(), 
+											    $player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
+											    $player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
+											    $player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time(), time(),
+											    0, 0, 0, 0, 0, 0, 0, 0, 0,
+											    0, 0, 0, 0, 0, 0, 0,
+											    0, 0, 0, 0, 0, 0, 0,
+											    0, 0));
+											
+										    $localPlayer = PlayerDB::getPlayer($player->getId());
+										    $localPlayer->calcIndicesAndUpdateToDB();
+									    }
+										
+									    $matches = $HT->getSeniorTeamMatches($teamID);
+									
+									    $posGK = 0;
+									    $posCD = 0;
+									    $posWB = 0;
+									    $posIM = 0;
+									    $posWG = 0;
+									    $posSC = 0;
+									    $posSP = 0.8;
+									
+									    $walkover = FALSE;
+									
+									    for($vCount=1;$vCount<=$matches->getNumberMatches();$vCount++) {
+										    $match = $matches->getMatch($vCount);
+										
+										    if (($match != NULL) &&
+												    (! $walkover)) {
+											    if ((strtotime($match->getDate()) >= $knownLastTrainingdate) and
+													    (strtotime($match->getDate()) < $dinsdagMiddagNaTraining)) {
+											
+												    $vMatchType = $match->getType();
+											    /*										
+    Value	Description
+    1	League match
+    2	Qualification match
+    3	Cup match (standard league match)
+    4	Friendly (normal rules)
+    5	Friendly (cup rules)
+    6	Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point).
+    7	Hattrick Masters
+    8	International friendly (normal rules)
+    9	Internation friendly (cup rules)
+    10	National teams competition match (normal rules)
+    11	National teams competition match (cup rules)
+    12	National teams friendly
+    50	Tournament League match
+    51	Tournament Playoff match
+    100	Youth league match
+    101	Youth friendly match
+    102	RESERVED
+    103	Youth friendly match (cup rules)
+    104	RESERVED
+    105	Youth international friendly match
+    106	Youth international friendly match (Cup rules)
+    107	RESERVED
+    */
+
+												    if (($vMatchType == 1) ||
+														    ($vMatchType == 2) ||
+														    ($vMatchType == 3) ||
+														    ($vMatchType == 4) ||
+														    ($vMatchType == 5) ||
+														    ($vMatchType == 6) ||
+														    ($vMatchType == 7) ||
+														    ($vMatchType == 8) ||
+														    ($vMatchType == 9)) {
+												      $lineup = $HT->getSeniorLineup($match->getId(), $teamID);
+												    }
+												    else {
+													    $lineup = NULL;
+													    //myLog($log, 'Geen trainingswedstrijd: '.$match->getId().' type: '.$vMatchType);
+												    } 
+												
+												    if ($lineup != NULL) {
+													    $startingLineup = $lineup->getStartingLineup();
+													    $vPosition = 0;
+													
+													    if ($startingLineup != NULL) {
+														    $walkover = $startingLineup->getPlayersNumber() < 9;
+														
+														    if (! $walkover) {
+															    for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
+																    $vLineupPlayer = $startingLineup->getPlayer($vLineUpindex);
+																
+																    if ($vLineupPlayer != NULL) {
+																	    if ($vLineupPlayer->getId() == $player->getId()) {
+																		    if ($vLineupPlayer->getRole() >= 100) {
+																			    $vPosition = $vLineupPlayer->getRole();
+																			    //myLog($log, $player->getName()." start op ".$vPosition);
+																			    AddPlayTime($vPosition, 90, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
+																		    }
+																		    else {
+																			    if ($vLineupPlayer->getRole() == 17) {
+																				    $posSP = 1;
+																			    }
+																			    else if ($vLineupPlayer->getRole() == 18) {
+																				    $vAanvoerder = 1;
+																			    }
+																		    }
+																	    }
+																    }
+															    }
+														    }
+													    }
+												    }
+												
+												    if ((! $walkover) &&
+												        ($lineup != NULL)) {
+													    for ($vSubstitutionIndex=1;$vSubstitutionIndex<=$lineup->getSubstitutionNumber();$vSubstitutionIndex++) {
+														    $vSubstitutionLineup = $lineup->getSubstitution($vSubstitutionIndex); 
+														
+														    if ($vSubstitutionLineup != NULL) {												
+															    $vNewPosition = $vPosition;
+															
+															    if ($vSubstitutionLineup->getMinute() > 90) {
+																    $vAantalMinuten = 0;
+															    }
+															    else {
+																    $vAantalMinuten = 90 - $vSubstitutionLineup->getMinute();
+															    }
+															
+															    if (($vSubstitutionLineup->getPlayerOutId() == $player->getId()) && ($vAantalMinuten > 0)) {
+																    if ($vSubstitutionLineup->getNewPositionId() == 0) {
+																	    AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
+																	    //myLog($log, "Blessure zonder wissel:".$player->getName()." positie = ".$vPosition);
+																    }
+																    else
+																    {
+																	    if ($vSubstitutionLineup->getNewPositionId() <> $vPosition) {
+																		    AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
+																		
+																		    if ($vSubstitutionLineup->getPlayerInId() == $vSubstitutionLineup->getPlayerOutId()) {
+																			    AddPlayTime($vSubstitutionLineup->getNewPositionId(), $vAantalMinuten, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
+																		    }
+																		    $vNewPosition = $vSubstitutionLineup->getNewPositionId();
+																	    }
+																	    else {
+																		    AddPlayTime($vSubstitutionLineup->getNewPositionId(), $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
+																	    }
+																    }
+																    //myLog($log, $player->getName()." UIT op ".$vSubstitutionLineup->getMinute()." plek: ".$vSubstitutionLineup->getNewPositionId()); 
+															    }
+															
+															    if (($vSubstitutionLineup->getPlayerInId() == $player->getId()) && ($vAantalMinuten > 0)) {
+																    $vNewPosition = $vSubstitutionLineup->getNewPositionId();
+																
+																    if (($vPosition > 0) &&
+																		    (($vSubstitutionLineup->getPlayerInId() <> $vSubstitutionLineup->getPlayerOutId())) or
+																		     ($vPosition <> $vNewPosition)) {
+																	    //als hij reeds stond opgesteld, dan is er een positiewisseling
+																	    //nu moet helaas uitgezocht worden aan de hand van de positie van de speler waarmee hij wisselt wat zijn nieuwe positie wordt...
+																	    AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);
+																	
+																	
+																	    for($vLineUpindex=1;$vLineUpindex<=$startingLineup->getPlayersNumber();$vLineUpindex++) {
+																		    $vLineupPlayer = $startingLineup->getPlayer($vLineUpindex);
+																	
+																		    if ($vLineupPlayer != NULL) {
+																			    if ($vLineupPlayer->getId() == $vSubstitutionLineup->getPlayerOutId()) {
+																				    if ($vLineupPlayer->getRole() >= 100) {
+																					    $vNewPosition = $vLineupPlayer->getRole();
+																					    break;
+																				    }
+																			    }
+																		    }
+																	    }
+																    }
+																    AddPlayTime($vNewPosition, $vAantalMinuten, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC);  
+																    //myLog($log, $player->getName()." IN op ".$vSubstitutionLineup->getMinute()." plek: ".$vPosition.' -> '.$vNewPosition);
+																    $vPosition = $vNewPosition;
+															    }
+															
+															    $vPosition = $vNewPosition;
+														    }
+													    }
+													    $seniorMatch = $HT->getSeniorMatchDetails($match->getId(), FALSE);
+													    $vKaarten = $seniorMatch->getTotalCards();
+													
+													    for ($vKaartenIndex=1;$vKaartenIndex<=$vKaarten;$vKaartenIndex++) {
+														    $card = $seniorMatch->getCard($vKaartenIndex);
+														
+														    if (($card->getType() == 2) &&
+																    ($card->getPlayerid() == $player->getId())) {
+															    if ($card->getMinute() > 90) {
+																    $vAantalMinuten = 0;
+															    }
+															    else {
+																    $vAantalMinuten = 90 - $card->getMinute();
+															    }
+															    AddPlayTime($vPosition, $vAantalMinuten * -1, $posGK, $posCD, $posWB, $posIM, $posWG, $posSC); 
+															    myLog($log, "Rode kaart:".$player->getName()." positie = ".$vPosition);
+														    }
+													    }
+												    }
+												    //myLog($log, $player->getName().": ".$vPosition." / ".$posGK." / ".$posCD." / ".$posWB." / ".$posIM." / ".$posWG." / ".$posSC);
+											    }
+										    }
+										
+										    if ($walkover) {
+											    $posGK = 0;
+											    $posCD = 0;
+											    $posWB = 0;
+											    $posIM = 0;
+											    $posWG = 0;
+											    $posSC = 0;
+											    myLog($log, "WALKOVER!: ".$player->getName()."(".$player->getId().")");
+										    }
+									
+										    $localPlayer->setsundayTraining(0);
+										
+										    if (($training == $HT_TR_SP)) {
+											    if (($posSP < 1) && ($posGK > 0)) {
+												    $posSP = 0.8 + ($posGK / 90 * 0.2);											
+											    }
+											    if ($posSP > 1) {
+												    $posSP = 1;
+											    }
+											    $localPlayer->addSundayTraining($HT_TR_SP, $posSP, $posGK + $posCD + $posWB + $posIM + $posWG + $posSC);	
+										    }
+										    else if (($training == $HT_TR_DEF) && (($posCD + $posWB) > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_DEF, 1, $posCD + $posWB);	
+										    }
+										    else if (($training == $HT_TR_SCO) && ($posSC > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_SCO, 1, $posSC);	
+										    }
+										    else if (($training == $HT_TR_CRO) && ($posWG > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_CRO, 1, $posWG);	
+										    }
+										    else if (($training == $HT_TR_CRO) && ($posWB > 0)) {
+											    if (($posWB + $posWG) > 90) {
+												    $posWB = $posWB - (($posWB + $posWG) - 90);
+											    }
+											    $localPlayer->addSundayTraining($HT_TR_CRO, 0.5, $posWB);	
+										    }
+										    else if (($training == $HT_TR_SHO)) {
+											    $localPlayer->addSundayTraining($HT_TR_SHO, 1, $posGK + $posCD + $posWB + $posIM + $posWG + $posSC);	
+										    }
+										    else if (($training == $HT_TR_PAS) && (($posIM + $posWG + $posSC) > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_PAS, 1, $posIM + $posWG + $posSC);	
+										    }
+										    else if (($training == $HT_TR_PM) && ($posIM > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_PM, 1, $posIM);	
+										    }
+										    else if (($training == $HT_TR_PM) && ($posWG > 0)) {
+											    if (($posWG + $posIM) > 90) {
+												    $posWG = $posWG - (($posWG + $posIM) - 90);
+											    }
+											    $localPlayer->addSundayTraining($HT_TR_PM, 0.5, $posWG);	
+										    }
+										    else if (($training == $HT_TR_GK) && ($posGK > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_GK, 1, $posGK);	
+										    }
+										    else if (($training == $HT_TR_OPM) && (($posCD + $posWB + $posIM + $posWG) > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_OPM, 1, $posCD + $posWB + $posIM + $posWG);	
+										    }
+										    else if (($training == $HT_TR_CTR) && (($posGK + $posCD + $posWB + $posIM + $posWG) > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_CTR, 1, $posGK + $posCD + $posWB + $posIM + $posWG);	
+										    }
+										    else if (($training == $HT_TR_VLA) && (($posWG + $posSC) > 0)) {
+											    $localPlayer->addSundayTraining($HT_TR_VLA, 1, $posWG + $posSC);	
+										    }
+										
+										    $localPlayer->update($coach->getId(), $teamID, $dateOfBirth, $player->getTsi(), $player->getSalary(), $player->getInjury(), 
+											    $player->getForm(), $player->getStamina(), $player->getExperience (), $player->getKeeper(), 
+											    $player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
+											    $player->getScorer(), $player->getSetPieces(), $player->getACaps(), $player->getU20Caps(), time());
+							
+										    $localPlayer->calcIndicesAndUpdateToDB();
+									    } 
+								    }
+								    $i++;
+							    }
+						    } // foreach
 							try {
 								$vLastHTlogin = strtotime($team->getLastLoginDate());
 								
@@ -447,9 +449,10 @@ Value	Description
 									$coach->setlastHTlogin($team->getLastLoginDate());
 								}
 								else {
-									$coach->setbot(-1);
+									$coachteam->setbot(-1);
 								}
 								CoachDB::updateCoach($coach);
+                                CoachDB::updateCoachTeam($coachteam);
 							
 								if (strlen($idlist) == 0) {
 									$idlist = "0,";
@@ -496,6 +499,8 @@ Value	Description
 						$HT->clearEconomy();
 						$HT->clearTrainings();
 						$HT->clearTrainingsStats();
+                        $HT->ClearPrimaryTeam();
+                        $HT->clearSecondaryTeam();
 					}
 				}
 			}

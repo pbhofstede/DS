@@ -45,7 +45,7 @@ if ($user != NULL) {
 				echo 'Speler: '.$player->getName().'<br />';
 				
 				if($player->getCoach() != NULL) {
-					echo 'Eigenaar: '.$player->getCoach()->getTeamname().' ('.$player->getCoach()->getTeamid().')<br /><br />';
+					echo 'Eigenaar: '.$player->getTeamName().' ('.$player->getTeamID().')<br /><br />';
 				} else {
 					echo 'Eigenaar: onbekend<br /><br />';
 				}
@@ -190,7 +190,7 @@ if ($user != NULL) {
 				
 				//Concurrenten
 				if (($player->getU20()) ||
-				    ($coach->getleagueID() <> 14)) {
+				    ($player->getleagueID() <> 14)) {
 						
 				}
 				else {

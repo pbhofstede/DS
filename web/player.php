@@ -61,7 +61,7 @@ if (($user != NULL) &&
 		echo '<tr class="none">';
 				
 		$U20 = $player->getHasU20Age();
-		echo "<td width='15%' valign='top'>Speler ID:<BR>Naam:<BR>Team ID:<BR>Team:<BR><BR>Conditie %:<BR>Type training:<BR>Training intensiteit:<BR>Vaardigheid trainer:<BR>Assistenten:<BR>Fysio's:<BR>Dokters:<BR><BR>";
+		echo "<td width='15%' valign='top'>Speler ID:<BR>Naam:<BR>Team ID:<BR>Team:<BR><BR>Conditie %:<BR>Type training:<BR>Training intensiteit:<BR>Vaardigheid trainer:<BR>Nivo assistenten:<BR>Nivo vormcoach:<BR>Nivo dokter:<BR><BR>";
 		echo 'Leeftijd:<BR>TSI:<BR>Salaris:<BR>Vorm:<BR>Conditie:<BR><BR>Specialiteit:';
 				
 		if ($player->getU20() <> '') {
@@ -75,22 +75,22 @@ if (($user != NULL) &&
 		
 		$vCoach = $player->getCoach();
 		if($vCoach != NULL) {
-			if ($vCoach->getbot() == -1) {
+			if ($player->getbot() == -1) {
 				echo 'BOT...<br /><BR><br /><BR><br /><br /><BR><br /><br /><BR>';
 			}
 			else {
-				echo $vCoach->getTeamid().'<BR>'.$vCoach->getTeamname().'<br/><br/>';
+				echo $player->getTeamid().'<BR>'.$player->getTeamname().'<br/><br/>';
 							
-				echo ''.$vCoach->getconditieperc().'<BR>';
-				if ($vCoach->gettrainingtype() > 0) {
-					echo ''.$language[$vCoach->gettrainingtype()].' ('.$player->getlasttraining().'%)';
+				echo ''.$player->getconditieperc().'<BR>';
+				if ($player->gettrainingtype() > 0) {
+					echo ''.$language[$player->gettrainingtype()].' ('.$player->getlasttraining().'%)';
 				}
 				echo '<BR>';
-				echo ''.$vCoach->gettrainingintensity().'<BR>';
-				echo ''.$vCoach->gettrainerskill().'<BR>';
-				echo ''.$vCoach->getassistants().'<BR>';
-				echo ''.$vCoach->getphysios().'<BR>';
-				echo ''.$vCoach->getdoctors().'<BR>';
+				echo ''.$player->gettrainingintensity().'<BR>';
+				echo ''.$player->gettrainerskill().'<BR>';
+				echo ''.$player->getassistants().'<BR>';
+				echo ''.$player->getFormCoach().'<BR>';
+				echo ''.$player->getdoctors().'<BR>';
 			}
 			
 	
@@ -152,7 +152,7 @@ if (($user != NULL) &&
 		echo date('d-m-Y', $player->getLastupdate()).'<br />';
 		
 		if ($vCoach != NULL) {
-			if ($vCoach->getbot() == -1) {
+			if ($player->getbot() == -1) {
 				echo 'BOT...';
 			}
 			else if (strtotime($vCoach->getlastHTlogin()) > 0) {

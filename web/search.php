@@ -249,18 +249,20 @@ if (($user != NULL) &&
 							}
 							else {
 								$team = $HT->getTeam($teamID);
+                                $coachTeam =  CoachDB::getCoachTeam($coach->getId(), $teamID); 
 								$userID = $team->getUserId();
+                                $coachTeam->setTeamName($team->getTeamName());
 								//echo "userID = ".$userID."<BR>";
 								
 								if ($player != NULL) {
 									if ($HTplayer->isSkillsAvailable()) {
-										$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
+										$player->update($userID, $teamID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
 											$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $HTplayer->getKeeper(), 
 											$HTplayer->getDefender(), $HTplayer->getPlaymaker(), $HTplayer->getWinger(), $HTplayer->getPassing(), 
 											$HTplayer->getScorer(), $HTplayer->getSetPieces(), $HTplayer->getACaps(), $HTplayer->getU20Caps(), time());
 									}
 									else {
-										$player->update($userID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
+										$player->update($userID, $teamID, $dateOfBirth, $HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), 
 											$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $player->getKeeper(), 
 											$player->getDefender(), $player->getPlaymaker(), $player->getWinger(), $player->getPassing(), 
 											$player->getScorer(), $player->getSetPieces(), $player->getCaps(), $player->getCapsU20(), $player->getLastupdate());
@@ -271,6 +273,7 @@ if (($user != NULL) &&
 								if ($playercoach == NULL) {
 									if ($team != NULL) {
 										if ($team->isBot()) {
+                                            $coachTeam->setbot(-1);
 											CoachDB::insertCoach(new Coach($userID, $teamID, $HTplayer->getTeamname(), 
 												"user", "", "", "", "", "",
 												0, 0, 0, 0, 0, 0, 0, 0, 0, -1, $team->getLeagueId()));
@@ -293,11 +296,11 @@ if (($user != NULL) &&
 								else {
 									if ($team != NULL) {
 										if ($team->isBot()) {
-											$playercoach->setbot(-1);
+											$coachTeam->setbot(-1);
 											$playercoach->setlastHTlogin(date("d-m-y H:i", 0));
 										}
 										else {
-											$playercoach->setbot(0);
+											$coachTeam->setbot(0);
 											$playercoach->setlastHTlogin($team->getLastLoginDate());
 										}
 										CoachDB::updateCoach($playercoach);
@@ -310,10 +313,10 @@ if (($user != NULL) &&
 								else {
 									$coachID = 0;
 								}
-								
+								CoachDB::updateCoachTeam($coachTeam);
 								if ($player == Null) {
 									if ($HTplayer->isSkillsAvailable()) {
-										$player = new Player($HTplayer->getId(), $coachID, $HTplayer->getName(), $dateOfBirth, 
+										$player = new Player($HTplayer->getId(), $coachID, $teamID, NULL, $HTplayer->getName(), $dateOfBirth, 
 											$HTplayer->getTsi(), $HTplayer->getSalary(), $HTplayer->getInjury(), $HTplayer->getAggressiveness(), 
 											$HTplayer->getAgreeability(), $HTplayer->getHonesty(), $HTplayer->getLeadership(), $HTplayer->getSpeciality(), 
 											$HTplayer->getForm(), $HTplayer->getStamina(), $HTplayer->getExperience (), $HTplayer->getKeeper(), 

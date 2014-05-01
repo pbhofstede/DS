@@ -57,20 +57,20 @@ $HT_TR_VLA = 12;
 $specs   = array(NULL, "T", "Q", "P", "U", "H", "R");
 
 $const_player_sql = 
-		"SELECT player.id, player.coach, player.name, player.dateOfBirth, player.tsi, player.salary, player.injury, player.aggressiveness, player.agreeability, player.honesty, player.leadership, ".
+		"SELECT player.id, player.coach, player.teamid, coachteams.teamname, player.name, player.dateOfBirth, player.tsi, player.salary, player.injury, player.aggressiveness, player.agreeability, player.honesty, player.leadership, ".
 			"  player.speciality, player.form, player.stamina, player.experience, ".
 			"  player.keeper, player.defender, player.playmaker, player.winger, player.passing, player.scorer, player.setPieces, ".
 			"  player.caps, player.capsU20, player.added, player.lastupdate, player.scoutid, ".
 			"  player.indexGK, player.indexCD, player.indexDEF, player.indexWB, player.indexIM, player.indexWG, player.indexSC, player.indexDFW, player.indexSP, ".
 			"  player.keeperSubSkill, player.defenderSubSkill, player.playmakerSubSkill, player.wingerSubSkill, player.passingSubSkill, player.scorerSubSkill, player.setPiecesSubSkill, ".
-			"  player.lasttraining, player.u20, coach.trainingtype, coach.conditieperc, coach.trainingintensity, coach.trainerskill, coach.assistants, player.sundayTraining ".
-			"FROM player left join coach on (coach.id = player.coach) ";
+			"  player.lasttraining, player.u20, coachteams.leagueid, coachteams.bot, coachteams.doctors, coachteams.trainingtype, coachteams.conditieperc, coachteams.trainingintensity, coachteams.trainerskill, coachteams.assistants, coachteams.formcoach, player.sundayTraining ".
+			"FROM player left join coach on (player.coach = coach.id) left join coachteams on (player.coach = coachteams.coachid and coachteams.teamid = coalesce(player.teamid, coach.teamid))";
 
 
 if ($_SERVER["SERVER_NAME"] == 'localhost') {
-	$config['url']			=	'http://localhost/dutchscouts/web';
-	$config['scan_url']		=	'http://localhost/dutchscouts/scan';
-  $config['urlweb']		=	'http://localhost/dutchscouts/web';
+	$config['url']			=	'http://localhost:801/dutchscouts/web';
+	$config['scan_url']		=	'http://localhost:801/dutchscouts/scan';
+  $config['urlweb']		=	'http://localhost:801/dutchscouts/web';
 }
 else {
 	$config['url']			=	'http://www.dutchscouts.nl/web';

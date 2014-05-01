@@ -11,14 +11,15 @@ class PlayerDB extends DB {
 		
 		$row =	$prepare->fetch();
 		if($row['id'] != NULL) {
-			return new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), 
+			return new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), 
 				$row['tsi'], $row['salary'], $row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], 
 				$row['leadership'], $row['speciality'], $row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 	}
 	
@@ -54,14 +55,15 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-			$list[]		=	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), 
+			$list[]		=	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), 
 				$row['tsi'], $row['salary'], $row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], 
 				$row['leadership'], $row['speciality'], $row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		return $list;
@@ -76,14 +78,15 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-			$list[]		=	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), 
+			$list[]		=	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), 
 				$row['tsi'], $row['salary'], $row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], 
 				$row['leadership'], $row['speciality'], $row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		return $list;
@@ -91,7 +94,7 @@ class PlayerDB extends DB {
 	
 	
 	public static function insertPlayer($player) {
-		$prepare		=	parent::getConn()->prepare("INSERT INTO player (id, coach, name, dateOfBirth, tsi, salary, injury, aggressiveness, agreeability, honesty, leadership, speciality, form, stamina, experience, keeper, defender, playmaker, winger, passing, scorer, setPieces, caps, capsU20, added, lastupdate, u20) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?)");
+		$prepare		=	parent::getConn()->prepare("INSERT INTO player (id, coach, teamid, name, dateOfBirth, tsi, salary, injury, aggressiveness, agreeability, honesty, leadership, speciality, form, stamina, experience, keeper, defender, playmaker, winger, passing, scorer, setPieces, caps, capsU20, added, lastupdate, u20) VALUES (?, ?, ?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?)");
 		$id=$player->getId();
 		$coachID=$player->getCoachId();
 		$name=$player->getName();
@@ -118,6 +121,7 @@ class PlayerDB extends DB {
 		$U20caps=$player->getCapsU20();
 		$dateAdded=$player->getAdded();
 		$lastupdate=$player->getLastupdate();
+        $teamID=$player->getTeamID();
 		
 		if (! ($player->getU20()) && 
 		    ($player->getHasU20Age() <> ''))
@@ -133,31 +137,32 @@ class PlayerDB extends DB {
 		
 		$prepare->bindParam(1, $id, PDO::PARAM_INT);
 		$prepare->bindParam(2, $coachID, PDO::PARAM_INT);
-		$prepare->bindParam(3, $name, PDO::PARAM_STR);
-		$prepare->bindParam(4, $gebdat, PDO::PARAM_INT);
-		$prepare->bindParam(5, $tsi, PDO::PARAM_INT);
-		$prepare->bindParam(6, $salary, PDO::PARAM_INT);
-		$prepare->bindParam(7, $injury, PDO::PARAM_INT);
-		$prepare->bindParam(8, $aggr, PDO::PARAM_INT);
-		$prepare->bindParam(9, $agre, PDO::PARAM_INT);
-		$prepare->bindParam(10, $hone, PDO::PARAM_INT);
-		$prepare->bindParam(11, $lead, PDO::PARAM_INT);
-		$prepare->bindParam(12, $spec, PDO::PARAM_INT);
-		$prepare->bindParam(13, $form, PDO::PARAM_INT);
-		$prepare->bindParam(14, $stamina, PDO::PARAM_INT);
-		$prepare->bindParam(15, $exp, PDO::PARAM_INT);
-		$prepare->bindParam(16, $keep, PDO::PARAM_INT);
-		$prepare->bindParam(17, $def, PDO::PARAM_INT);
-		$prepare->bindParam(18, $pm, PDO::PARAM_INT);
-		$prepare->bindParam(19, $wing, PDO::PARAM_INT);
-		$prepare->bindParam(20, $pass, PDO::PARAM_INT);
-		$prepare->bindParam(21, $sco, PDO::PARAM_INT);
-		$prepare->bindParam(22, $sp, PDO::PARAM_INT);
-		$prepare->bindParam(23, $caps, PDO::PARAM_INT);
-		$prepare->bindParam(24, $U20caps, PDO::PARAM_INT);
-		$prepare->bindParam(25, $dateAdded, PDO::PARAM_STR);
-		$prepare->bindParam(26, $lastupdate, PDO::PARAM_STR);
-    $prepare->bindParam(27, $u20Int, PDO::PARAM_INT);
+        $prepare->bindParam(3, $teamID, PDO::PARAM_INT);
+		$prepare->bindParam(4, $name, PDO::PARAM_STR);
+		$prepare->bindParam(5, $gebdat, PDO::PARAM_INT);
+		$prepare->bindParam(6, $tsi, PDO::PARAM_INT);
+		$prepare->bindParam(7, $salary, PDO::PARAM_INT);
+		$prepare->bindParam(8, $injury, PDO::PARAM_INT);
+		$prepare->bindParam(9, $aggr, PDO::PARAM_INT);
+		$prepare->bindParam(10, $agre, PDO::PARAM_INT);
+		$prepare->bindParam(11, $hone, PDO::PARAM_INT);
+		$prepare->bindParam(12, $lead, PDO::PARAM_INT);
+		$prepare->bindParam(13, $spec, PDO::PARAM_INT);
+		$prepare->bindParam(14, $form, PDO::PARAM_INT);
+		$prepare->bindParam(15, $stamina, PDO::PARAM_INT);
+		$prepare->bindParam(16, $exp, PDO::PARAM_INT);
+		$prepare->bindParam(17, $keep, PDO::PARAM_INT);
+		$prepare->bindParam(18, $def, PDO::PARAM_INT);
+		$prepare->bindParam(19, $pm, PDO::PARAM_INT);
+		$prepare->bindParam(20, $wing, PDO::PARAM_INT);
+		$prepare->bindParam(21, $pass, PDO::PARAM_INT);
+		$prepare->bindParam(22, $sco, PDO::PARAM_INT);
+		$prepare->bindParam(23, $sp, PDO::PARAM_INT);
+		$prepare->bindParam(24, $caps, PDO::PARAM_INT);
+		$prepare->bindParam(25, $U20caps, PDO::PARAM_INT);
+		$prepare->bindParam(26, $dateAdded, PDO::PARAM_STR);
+		$prepare->bindParam(27, $lastupdate, PDO::PARAM_STR);
+        $prepare->bindParam(28, $u20Int, PDO::PARAM_INT);
 		$prepare->execute();
 	}
 	
@@ -172,7 +177,7 @@ class PlayerDB extends DB {
 	}
 
 	public static function updatePlayer($player) {
-		$prepare		=	parent::getConn()->prepare("UPDATE player SET coach = ?, tsi = ?, salary = ?, injury = ?, form = ?, stamina = ?, experience = ?,".
+		$prepare		=	parent::getConn()->prepare("UPDATE player SET coach = ?, teamid = ?, tsi = ?, salary = ?, injury = ?, form = ?, stamina = ?, experience = ?,".
 			"keeper = ?, defender = ?, playmaker = ?, winger = ?, passing = ?, scorer = ?, setPieces = ?,".
 			"caps = ?, capsU20 = ?, dateOfBirth = FROM_UNIXTIME(?), lastupdate = FROM_UNIXTIME(?), ".
 			"indexGK = ?, indexCD = ?, indexDEF = ?, indexWB = ?, indexIM = ?, indexWG = ?, indexSC = ?, indexDFW = ?, indexSP = ?, ".
@@ -182,6 +187,7 @@ class PlayerDB extends DB {
 		
 		$id=$player->getId();
 		$coachID=$player->getCoachId();
+        $teamID=$player->getTeamID();
 		$name=$player->getName();
 		$gebdat=$player->getDateOfBirth();
 		$tsi=$player->getTsi();
@@ -244,44 +250,45 @@ class PlayerDB extends DB {
 		$sundayTraining=$player->getsundayTraining();
 		
 		$prepare->bindParam(1, $coachID, PDO::PARAM_INT);
-		$prepare->bindParam(2, $tsi, PDO::PARAM_INT);
-		$prepare->bindParam(3, $salary, PDO::PARAM_INT);
-		$prepare->bindParam(4, $injury, PDO::PARAM_INT);
-		$prepare->bindParam(5, $form, PDO::PARAM_INT);
-		$prepare->bindParam(6, $stamina, PDO::PARAM_INT);
-		$prepare->bindParam(7, $exp, PDO::PARAM_INT);
-		$prepare->bindParam(8, $keep, PDO::PARAM_INT);
-		$prepare->bindParam(9, $def, PDO::PARAM_INT);
-		$prepare->bindParam(10, $pm, PDO::PARAM_INT);
-		$prepare->bindParam(11, $wing, PDO::PARAM_INT);
-		$prepare->bindParam(12, $pass, PDO::PARAM_INT);
-		$prepare->bindParam(13, $sco, PDO::PARAM_INT);
-		$prepare->bindParam(14, $sp, PDO::PARAM_INT);
-		$prepare->bindParam(15, $caps, PDO::PARAM_INT);
-		$prepare->bindParam(16, $U20caps, PDO::PARAM_INT);
-		$prepare->bindParam(17, $gebdat, PDO::PARAM_STR);
-		$prepare->bindParam(18, $lastupdate, PDO::PARAM_STR);
-		$prepare->bindParam(19, $indexGK, PDO::PARAM_STR);
-		$prepare->bindParam(20, $indexCD, PDO::PARAM_STR);
-		$prepare->bindParam(21, $indexDEF, PDO::PARAM_STR);
-		$prepare->bindParam(22, $indexWB, PDO::PARAM_STR);
-		$prepare->bindParam(23, $indexIM, PDO::PARAM_STR);
-		$prepare->bindParam(24, $indexWG, PDO::PARAM_STR);
-		$prepare->bindParam(25, $indexSC, PDO::PARAM_STR);
-		$prepare->bindParam(26, $indexDFW, PDO::PARAM_STR);   
-		$prepare->bindParam(27, $indexSP, PDO::PARAM_STR);
-		$prepare->bindParam(28, $keepSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(29, $defSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(30, $pmSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(31, $wingSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(32, $passSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(33, $scoSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(34, $spSubSkill, PDO::PARAM_STR);
-		$prepare->bindParam(35, $lasttraining, PDO::PARAM_STR); 
-		$prepare->bindParam(36, $u20Int, PDO::PARAM_INT);
-		$prepare->bindParam(37, $sundayTraining, PDO::PARAM_INT); 
+        $prepare->bindParam(2, $teamID, PDO::PARAM_INT);
+		$prepare->bindParam(3, $tsi, PDO::PARAM_INT);
+		$prepare->bindParam(4, $salary, PDO::PARAM_INT);
+		$prepare->bindParam(5, $injury, PDO::PARAM_INT);
+		$prepare->bindParam(6, $form, PDO::PARAM_INT);
+		$prepare->bindParam(7, $stamina, PDO::PARAM_INT);
+		$prepare->bindParam(8, $exp, PDO::PARAM_INT);
+		$prepare->bindParam(9, $keep, PDO::PARAM_INT);
+		$prepare->bindParam(10, $def, PDO::PARAM_INT);
+		$prepare->bindParam(11, $pm, PDO::PARAM_INT);
+		$prepare->bindParam(12, $wing, PDO::PARAM_INT);
+		$prepare->bindParam(13, $pass, PDO::PARAM_INT);
+		$prepare->bindParam(14, $sco, PDO::PARAM_INT);
+		$prepare->bindParam(15, $sp, PDO::PARAM_INT);
+		$prepare->bindParam(16, $caps, PDO::PARAM_INT);
+		$prepare->bindParam(17, $U20caps, PDO::PARAM_INT);
+		$prepare->bindParam(18, $gebdat, PDO::PARAM_STR);
+		$prepare->bindParam(19, $lastupdate, PDO::PARAM_STR);
+		$prepare->bindParam(20, $indexGK, PDO::PARAM_STR);
+		$prepare->bindParam(21, $indexCD, PDO::PARAM_STR);
+		$prepare->bindParam(22, $indexDEF, PDO::PARAM_STR);
+		$prepare->bindParam(23, $indexWB, PDO::PARAM_STR);
+		$prepare->bindParam(24, $indexIM, PDO::PARAM_STR);
+		$prepare->bindParam(25, $indexWG, PDO::PARAM_STR);
+		$prepare->bindParam(26, $indexSC, PDO::PARAM_STR);
+		$prepare->bindParam(27, $indexDFW, PDO::PARAM_STR);   
+		$prepare->bindParam(28, $indexSP, PDO::PARAM_STR);
+		$prepare->bindParam(29, $keepSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(30, $defSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(31, $pmSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(32, $wingSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(33, $passSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(34, $scoSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(35, $spSubSkill, PDO::PARAM_STR);
+		$prepare->bindParam(36, $lasttraining, PDO::PARAM_STR); 
+		$prepare->bindParam(37, $u20Int, PDO::PARAM_INT);
+		$prepare->bindParam(38, $sundayTraining, PDO::PARAM_INT); 
 		
-		$prepare->bindParam(38, $id, PDO::PARAM_INT);
+		$prepare->bindParam(39, $id, PDO::PARAM_INT);
 		$prepare->execute();
 	}
 	
@@ -376,14 +383,15 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-			$list[]		=	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
+			$list[]		=	new Player($row['id'], $row['coach'],  $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 				$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'], 
 				$row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		return $list;
@@ -415,14 +423,15 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {	
-			$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
+			$list[] =	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 				$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 				$row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		return $list;
@@ -438,14 +447,15 @@ class PlayerDB extends DB {
 		$list = null;
 		
 		foreach($prepare->fetchAll() AS $row) {
-			$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
+			$list[] =	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 				$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 				$row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		//de topspelers die wel een coach hebben maar geen DS-login		
@@ -466,14 +476,15 @@ class PlayerDB extends DB {
 		$prepare->execute();
 		
 		foreach($prepare->fetchAll() AS $row) {
-			$list[] =	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
+			$list[] =	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 				$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 				$row['form'], $row['stamina'], $row['experience'], 
 				$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 				$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 				$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'],
 				$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+				$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 		}
 		
 		
@@ -585,14 +596,15 @@ class PlayerDB extends DB {
 				    ($row['scoutid'] == $requirement->getScoutID()) ||
 				    ($row['scoutid'] == 0) ||
 						($row['scoutid'] == '')) {
-					$player	=	new Player($row['id'], $row['coach'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
+					$player	=	new Player($row['id'], $row['coach'], $row['teamid'], $row['teamname'], $row['name'], strtotime($row['dateOfBirth']), $row['tsi'], $row['salary'], 
 						$row['injury'], $row['aggressiveness'], $row['agreeability'], $row['honesty'], $row['leadership'], $row['speciality'],
 						$row['form'], $row['stamina'], $row['experience'], 
 						$row['keeper'], $row['defender'], $row['playmaker'], $row['winger'], $row['passing'], $row['scorer'], $row['setPieces'], 
 						$row['caps'], $row['capsU20'], strtotime($row['added']), strtotime($row['lastupdate']),
 						$row['indexGK'], $row['indexCD'], $row['indexDEF'], $row['indexWB'], $row['indexIM'], $row['indexWG'], $row['indexSC'], $row['indexDFW'], $row['indexSP'], 
 						$row['keeperSubSkill'], $row['defenderSubSkill'], $row['playmakerSubSkill'], $row['wingerSubSkill'], $row['passingSubSkill'], $row['scorerSubSkill'], $row['setPiecesSubSkill'],
-						$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining']);
+						$row['lasttraining'], $row['u20'], $row['trainingtype'], $row['conditieperc'], $row['trainingintensity'], $row['trainerskill'], $row['assistants'], $row['scoutid'], $row['sundayTraining'],
+                        $row['leagueid'], $row['bot'], $row['formcoach'], $row['doctors']);
 					
 					$player->setScout($scout);
 					

@@ -178,8 +178,8 @@ if($scouting != NULL) {
               ($player->gettrainingtype() > 0)) {					
 						if (($player->getlasttraining() < 100) or
 								($player->gettrainingintensity() < 100) or
-								((($player->getU20()) && ($player->getassistants() < 9)) or
-                 ((! $player->getU20()) && ($player->getassistants() < 7))) or
+								((($player->getU20()) && ($player->getassistants() < 15)) or
+                 ((! $player->getU20()) && ($player->getassistants() < 12))) or
 								($player->getconditieperc() > 50) or
 								($player->gettrainerskill() < 7)) {
 							$playersFound = TRUE;
