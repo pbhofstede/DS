@@ -36,8 +36,7 @@ class Coach {
 
     public function getTeams($HT){
         $primTeam = $HT->getPrimaryTeam();
-        //$secTeam = $HT->getSecondaryTeam();
-        $secTeam = $HT->getPrimaryTeam();
+        $secTeam = $HT->getSecondaryTeam();
 
         $list[] = $primTeam;
         if ($secTeam !== NULL){

@@ -15,13 +15,11 @@
 	
 		if ($HT->getClub()->getUserId() > 0) {	
 			$coach = CoachDB::getCoach($HT->getClub()->getUserId());
-			
-			$team = $HT->getTeam(); 
-			
+            		
 			if ($coach == NULL) {
 				CoachDB::insertCoach(new Coach($HT->getClub()->getUserId(), $HT->getClub()->getTeamId(), $HT->getClub()->getTeamname(),
           "user", "",
-					"", "", $userToken, $userTokenSecret, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $team->getLeagueId()));
+					"", "", $userToken, $userTokenSecret, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 			
 				$coach = CoachDB::getCoach($HT->getClub()->getUserId());
 			}
@@ -30,10 +28,25 @@
 				$coach->setDSPassword("");
 				$coach->setHTuserToken($userToken);
 				$coach->setHTuserTokenSecret($userTokenSecret);
-			  $coach->setleagueID($team->getLeagueId());
 			}
 
 			CoachDB::updateCoach($coach);
+
+            $teams = $coach->getTeams($HT);
+            foreach($teams as $team) {
+			    $teamid = $team->getTeamID(); 
+	            
+                $coachteam = CoachDB::getCoachTeam($coach->getId(), $teamid); 
+                $coachteam->setleagueID($team->getLeagueId());
+                $coachteam->setassistants($HT->getClub($teamid)->getAssistantTrainerLevels());
+				$coachteam->setformcoach($HT->getClub($teamid)->getFormCoachLevels());
+				$coachteam->setdoctors($HT->getClub($teamid)->getMedicLevels());
+                $coachteam->setTeamName($team->getTeamName());
+
+                CoachDB::updateCoachTeam($coachteam);    
+            }
+            $HT->ClearPrimaryTeam();
+            $HT->clearSecondaryTeam()
 		}
   }
   catch(HTError $e)
