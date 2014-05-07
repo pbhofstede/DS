@@ -1,21 +1,20 @@
 <?php
 	// In callback url page:
-  include 'config.php';
+  include('config.php');
   
 	$HT = $_SESSION['HT'];
+	
   try
   {
 		$HT->retrieveAccessToken($_REQUEST['oauth_token'], $_REQUEST['oauth_verifier']);
-		/*
-		Now access is granted for your application
-		You can save user token and token secret and/or request xml files
-		*/
+		
 		$userToken = $HT->getOauthToken();
 		$userTokenSecret = $HT->getOauthTokenSecret();
 	
 		if ($HT->getClub()->getUserId() > 0) {	
+			
 			$coach = CoachDB::getCoach($HT->getClub()->getUserId());
-            		
+			            	
 			if ($coach == NULL) {
 				CoachDB::insertCoach(new Coach($HT->getClub()->getUserId(), $HT->getClub()->getTeamId(), $HT->getClub()->getTeamname(),
           "user", "",
@@ -29,29 +28,39 @@
 				$coach->setHTuserToken($userToken);
 				$coach->setHTuserTokenSecret($userTokenSecret);
 			}
-
+						
 			CoachDB::updateCoach($coach);
 
-            $teams = $coach->getTeams($HT);
-            foreach($teams as $team) {
-			    $teamid = $team->getTeamID(); 
-	            
-                $coachteam = CoachDB::getCoachTeam($coach->getId(), $teamid); 
-                $coachteam->setleagueID($team->getLeagueId());
-                $coachteam->setassistants($HT->getClub($teamid)->getAssistantTrainerLevels());
-				$coachteam->setformcoach($HT->getClub($teamid)->getFormCoachLevels());
-				$coachteam->setdoctors($HT->getClub($teamid)->getMedicLevels());
-                $coachteam->setTeamName($team->getTeamName());
+      $teams = $coach->getTeams($HT);
+      
+			if ($teams != null) {
+				foreach($teams as $team) {
+				  $teamid = $team->getTeamID(); 
+							
+          $coachteam = CoachDB::getCoachTeam($coach->getId(), $teamid); 
+					
+          $coachteam->setleagueID($team->getLeagueId());
+          $coachteam->setassistants($HT->getClub($teamid)->getAssistantTrainerLevels());
+				  $coachteam->setformcoach($HT->getClub($teamid)->getFormCoachLevels());
+				  $coachteam->setdoctors($HT->getClub($teamid)->getMedicLevels());
+          $coachteam->setTeamName($team->getTeamName());
 
-                CoachDB::updateCoachTeam($coachteam);    
-            }
-            $HT->ClearPrimaryTeam();
-            $HT->clearSecondaryTeam()
+          CoachDB::updateCoachTeam($coachteam);    
+					
+        } 
+				
+        $HT->ClearPrimaryTeam();
+        $HT->clearSecondaryTeam();
+			}
 		}
   }
   catch(HTError $e)
   {
-    echo $e->getMessage();
+    echo "Error: ".$e->getMessage();
+  }
+	catch(Error $e)
+  {
+    echo "Error: ".$e->getMessage();
   }
 ?>
 <html>

@@ -39,7 +39,7 @@ class Coach {
         $secTeam = $HT->getSecondaryTeam();
 
         $list[] = $primTeam;
-        if ($secTeam !== NULL){
+        if ($secTeam != NULL){
             $list[] = $secTeam;    
         }
         return $list;

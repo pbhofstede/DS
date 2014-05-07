@@ -67,7 +67,7 @@ class CoachDB extends DB {
 					$row['assistants'], $row['doctors'], $row['formcoach'], $row['bot'], $row['leagueID']);        
         }
         else {
-            $team = new CoachTeam($coachID, $teamID, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL);
+            $team = new CoachTeam($coachID, $teamID, '', NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             $team->setIsNew(TRUE);
             return $team;    
         }
@@ -285,7 +285,7 @@ class CoachDB extends DB {
  
 		$prepare	=	parent::getConn()->prepare(
 			"INSERT INTO coachteams (coachid, teamid, teamname, conditieperc, trainingtype, trainingintensity, trainerskill, ".
-			"  assistants, doctors, formcoach, bot, leagueID)".
+			"  assistants, doctors, formcoach, bot, leagueID) ".
             "VALUES ".
             "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $prepare->bindParam(1, $coachID, PDO::PARAM_INT);
@@ -305,10 +305,10 @@ class CoachDB extends DB {
 
     public static function updateCoachTeam($coachteam) {
 
-        if ($coachteam->getIsNew() == TRUE){
+        if ($coachteam->getIsNew()) {
             CoachDB::insertCoachTeam($coachteam);     
         }
-        else{
+        else {
             $coachID = $coachteam->getCoachID();
 		    $teamID = $coachteam->getTeamid();
             $teamName = $coachteam->getTeamName();
