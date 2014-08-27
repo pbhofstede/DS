@@ -22,7 +22,7 @@ try {
 		$HT->setOauthTokenSecret($coach->getHTuserTokenSecret());
 	  	$worlddetails = $HT->getWorldDetails(FALSE);
 	  	
-	  	$vCount = $worlddetails->getTotalLeague(); 
+	  	$vCount = $worlddetails->getLeagueNumber(); 
 		for($i=1; $i<=$vCount; $i++) 
 		{
 			$vCountry = $worlddetails->getLeague($i);
