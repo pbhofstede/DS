@@ -101,11 +101,8 @@ try {
 										if($nationalPlayer != Null)
 										{
 											NationalPlayersDB::deleteNationalPlayers($PlayerID);
-										} 
-										else 
-										{
-											$newPlayers = $newPlayers + 1;
-										}	
+										}
+
 										$wage = $player->getSalary(HTMoney::Nederland);
 										if ($player->IsAbroad()) 
 										{
@@ -170,9 +167,8 @@ try {
 										$nationalPlayer = NationalPlayersDB::getNationalPlayer($PlayerID);			
 										if($nationalPlayer != Null){
 											NationalPlayersDB::deleteNationalPlayers($PlayerID);
-										} else {
-											$newPlayers = $newPlayers + 1;
-										}	
+										}
+
 										$wage = $player->getSalary(HTMoney::Nederland);
 										if ($player->IsAbroad()) {
 											$wage = $wage / 1.2;	

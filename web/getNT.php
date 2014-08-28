@@ -8,8 +8,7 @@ try {
 		$coach = CoachDB::getCoach(2705367);	
 	}	
 	if ($coach != NULL)	
-	 { 	 
-	  	$newPlayers = 0;
+	 {
 	  	$HT = new CHPPConnection('GG6InhlME6WtIcHBPBpM87', 'jPfgjNAcVIZ5IGMuBDstDyf8K86jXvNpEgkPVyp9wak');
 		
 		$HT->setOauthToken($coach->getHTuserToken()); 
@@ -47,11 +46,8 @@ try {
 									if($nationalPlayer != Null)
 									{
 										NationalPlayersDB::deleteNationalPlayers($PlayerID);
-									} 
-									else 
-									{
-										$newPlayers = $newPlayers + 1;
-									}	
+									}
+
 									$wage = $player->getSalary(HTMoney::Nederland);
 									if ($player->IsAbroad()) 
 									{
